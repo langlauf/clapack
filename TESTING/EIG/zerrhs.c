@@ -1,3 +1,15 @@
+/* zerrhs.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -158,7 +170,7 @@ static integer c__4 = 4;
 
 /*        ZGEBAL */
 
-	s_copy(srnamc_1.srnamt, "ZGEBAL", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGEBAL", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgebal_("/", &c__0, a, &c__1, &ilo, &ihi, s, &info);
 	chkxer_("ZGEBAL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -175,7 +187,7 @@ static integer c__4 = 4;
 
 /*        ZGEBAK */
 
-	s_copy(srnamc_1.srnamt, "ZGEBAK", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGEBAK", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgebak_("/", "R", &c__0, &c__1, &c__0, s, &c__0, a, &c__1, &info);
 	chkxer_("ZGEBAK", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -216,7 +228,7 @@ static integer c__4 = 4;
 
 /*        ZGEHRD */
 
-	s_copy(srnamc_1.srnamt, "ZGEHRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGEHRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgehrd_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("ZGEHRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -249,7 +261,7 @@ static integer c__4 = 4;
 
 /*        ZUNGHR */
 
-	s_copy(srnamc_1.srnamt, "ZUNGHR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUNGHR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zunghr_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("ZUNGHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -282,7 +294,7 @@ static integer c__4 = 4;
 
 /*        ZUNMHR */
 
-	s_copy(srnamc_1.srnamt, "ZUNMHR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUNMHR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zunmhr_("/", "N", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
 		c__1, w, &c__1, &info);
@@ -367,7 +379,7 @@ static integer c__4 = 4;
 
 /*        ZHSEQR */
 
-	s_copy(srnamc_1.srnamt, "ZHSEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHSEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhseqr_("/", "N", &c__0, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
@@ -417,7 +429,7 @@ static integer c__4 = 4;
 
 /*        ZHSEIN */
 
-	s_copy(srnamc_1.srnamt, "ZHSEIN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHSEIN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhsein_("/", "N", "N", sel, &c__0, a, &c__1, x, vl, &c__1, vr, &c__1, 
 		&c__0, &m, w, rw, ifaill, ifailr, &info);
@@ -462,7 +474,7 @@ static integer c__4 = 4;
 
 /*        ZTREVC */
 
-	s_copy(srnamc_1.srnamt, "ZTREVC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZTREVC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrevc_("/", "A", sel, &c__0, a, &c__1, vl, &c__1, vr, &c__1, &c__0, &
 		m, w, rw, &info);

@@ -198,7 +198,49 @@ f2c_izamax(integer* N,
     return (integer) cblas_izamax(*N, X, *incX) + 1;
 }
 
+/*
+ * ===========================================================================
+ * Prototypes for level 0 BLAS routines
+ * ===========================================================================
+ */
+int
+f2c_srotg(real* a,
+          real* b,
+		  real* c,
+		  real* s)
+{
+    cblas_srotg(*a, *b, *c, *s);
+    return 0;
+}
 
+int
+f2c_crotg(complex* CA,
+          complex* CB,
+          complex* C,
+          real* S)
+{
+    cblas_crotg(*CA, *CB, *C, *S);
+    return 0;
+}
+
+int
+f2c_drotg(doublereal* a,
+          doublereal* b,
+          doublereal* c,
+          doublereal* s)
+{
+    cblas_drotg(*a, *b, *c, *s);
+    return 0;
+}
+int
+f2c_zrotg(doublecomplex* CA,
+          doublecomplex* CB,
+          doublecomplex* C,
+          doublereal* S)
+{
+    cblas_zrotg(*CA, *CB, *C, *S);
+    return 0;
+}
 /*
  * ===========================================================================
  * Prototypes for level 1 BLAS routines
@@ -326,12 +368,7 @@ f2c_zaxpy(integer* N,
  * Routines with S and D prefix only
  */
 
-int
-f2c_srotg(real* a, real* b, real* c, real* s)
-{
-    cblas_srotg(a, b, c, s);
-    return 0;
-}
+
 
 int
 f2c_srot(integer* N,
@@ -340,13 +377,6 @@ f2c_srot(integer* N,
          real* c, real* s)
 {
     cblas_srot(*N, X, *incX, Y, *incY, *c, *s);
-    return 0;
-}
-
-int
-f2c_drotg(doublereal* a, doublereal* b, doublereal* c, doublereal* s)
-{
-    cblas_drotg(a, b, c, s);
     return 0;
 }
 

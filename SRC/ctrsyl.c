@@ -1,3 +1,15 @@
+/* ctrsyl.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -46,8 +58,9 @@ static integer c__1 = 1;
     real smlnum;
 
 
-/*  -- LAPACK routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK routine (version 3.2) -- */
+/*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
+/*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..-- */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -182,6 +195,7 @@ static integer c__1 = 1;
 
 /*     Quick return if possible */
 
+    *scale = 1.f;
     if (*m == 0 || *n == 0) {
 	return 0;
     }
@@ -198,7 +212,6 @@ static integer c__1 = 1;
     r__1 = smlnum, r__2 = eps * clange_("M", m, m, &a[a_offset], lda, dum), r__1 = max(r__1,r__2), r__2 = eps * clange_("M", n, n, 
 	    &b[b_offset], ldb, dum);
     smin = dmax(r__1,r__2);
-    *scale = 1.f;
     sgn = (real) (*isgn);
 
     if (notrna && notrnb) {

@@ -1,3 +1,15 @@
+/* cerrtr.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -129,7 +141,7 @@ static integer c_n1 = -1;
 
 /*        CTRTRI */
 
-	s_copy(srnamc_1.srnamt, "CTRTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTRTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrtri_("/", "N", &c__0, a, &c__1, &info);
 	chkxer_("CTRTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -149,7 +161,7 @@ static integer c_n1 = -1;
 
 /*        CTRTI2 */
 
-	s_copy(srnamc_1.srnamt, "CTRTI2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTRTI2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrti2_("/", "N", &c__0, a, &c__1, &info);
 	chkxer_("CTRTI2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -170,7 +182,7 @@ static integer c_n1 = -1;
 
 /*        CTRTRS */
 
-	s_copy(srnamc_1.srnamt, "CTRTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTRTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrtrs_("/", "N", "N", &c__0, &c__0, a, &c__1, x, &c__1, &info);
 	chkxer_("CTRTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -195,7 +207,7 @@ static integer c_n1 = -1;
 
 /*        CTRRFS */
 
-	s_copy(srnamc_1.srnamt, "CTRRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTRRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, rw, &info);
@@ -239,7 +251,7 @@ static integer c_n1 = -1;
 
 /*        CTRCON */
 
-	s_copy(srnamc_1.srnamt, "CTRCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTRCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrcon_("/", "U", "N", &c__0, a, &c__1, &rcond, w, rw, &info);
 	chkxer_("CTRCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -263,7 +275,7 @@ static integer c_n1 = -1;
 
 /*        CLATRS */
 
-	s_copy(srnamc_1.srnamt, "CLATRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CLATRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	clatrs_("/", "N", "N", "N", &c__0, a, &c__1, x, &scale, rw, &info);
 	chkxer_("CLATRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -295,7 +307,7 @@ static integer c_n1 = -1;
 
 /*        CTPTRI */
 
-	s_copy(srnamc_1.srnamt, "CTPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctptri_("/", "N", &c__0, a, &info);
 	chkxer_("CTPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -311,7 +323,7 @@ static integer c_n1 = -1;
 
 /*        CTPTRS */
 
-	s_copy(srnamc_1.srnamt, "CTPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctptrs_("/", "N", "N", &c__0, &c__0, a, x, &c__1, &info);
 	chkxer_("CTPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -339,7 +351,7 @@ static integer c_n1 = -1;
 
 /*        CTPRFS */
 
-	s_copy(srnamc_1.srnamt, "CTPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 rw, &info);
@@ -378,7 +390,7 @@ static integer c_n1 = -1;
 
 /*        CTPCON */
 
-	s_copy(srnamc_1.srnamt, "CTPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctpcon_("/", "U", "N", &c__0, a, &rcond, w, rw, &info);
 	chkxer_("CTPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -398,7 +410,7 @@ static integer c_n1 = -1;
 
 /*        CLATPS */
 
-	s_copy(srnamc_1.srnamt, "CLATPS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CLATPS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	clatps_("/", "N", "N", "N", &c__0, a, x, &scale, rw, &info);
 	chkxer_("CLATPS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -426,7 +438,7 @@ static integer c_n1 = -1;
 
 /*        CTBTRS */
 
-	s_copy(srnamc_1.srnamt, "CTBTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTBTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctbtrs_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, x, &c__1, &info);
 	chkxer_("CTBTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -462,7 +474,7 @@ static integer c_n1 = -1;
 
 /*        CTBRFS */
 
-	s_copy(srnamc_1.srnamt, "CTBRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTBRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctbrfs_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, x, &
 		c__1, r1, r2, w, rw, &info);
@@ -511,7 +523,7 @@ static integer c_n1 = -1;
 
 /*        CTBCON */
 
-	s_copy(srnamc_1.srnamt, "CTBCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTBCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctbcon_("/", "U", "N", &c__0, &c__0, a, &c__1, &rcond, w, rw, &info);
 	chkxer_("CTBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -539,7 +551,7 @@ static integer c_n1 = -1;
 
 /*        CLATBS */
 
-	s_copy(srnamc_1.srnamt, "CLATBS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CLATBS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	clatbs_("/", "N", "N", "N", &c__0, &c__0, a, &c__1, x, &scale, rw, &
 		info);

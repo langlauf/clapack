@@ -1,3 +1,15 @@
+/* derrgt.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -127,7 +139,7 @@ static integer c__1 = 1;
 
 /*        DGTTRF */
 
-	s_copy(srnamc_1.srnamt, "DGTTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DGTTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgttrf_(&c_n1, c__, d__, e, f, ip, &info);
 	chkxer_("DGTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -135,7 +147,7 @@ static integer c__1 = 1;
 
 /*        DGTTRS */
 
-	s_copy(srnamc_1.srnamt, "DGTTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DGTTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgttrs_("/", &c__0, &c__0, c__, d__, e, f, ip, x, &c__1, &info);
 	chkxer_("DGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -155,7 +167,7 @@ static integer c__1 = 1;
 
 /*        DGTRFS */
 
-	s_copy(srnamc_1.srnamt, "DGTRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DGTRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgtrfs_("/", &c__0, &c__0, c__, d__, e, cf, df, ef, f, ip, b, &c__1, 
 		x, &c__1, r1, r2, w, iw, &info);
@@ -184,7 +196,7 @@ static integer c__1 = 1;
 
 /*        DGTCON */
 
-	s_copy(srnamc_1.srnamt, "DGTCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DGTCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgtcon_("/", &c__0, c__, d__, e, f, ip, &anorm, &rcond, w, iw, &info);
 	chkxer_("DGTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -206,7 +218,7 @@ static integer c__1 = 1;
 
 /*        DPTTRF */
 
-	s_copy(srnamc_1.srnamt, "DPTTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPTTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpttrf_(&c_n1, d__, e, &info);
 	chkxer_("DPTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -214,7 +226,7 @@ static integer c__1 = 1;
 
 /*        DPTTRS */
 
-	s_copy(srnamc_1.srnamt, "DPTTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPTTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpttrs_(&c_n1, &c__0, d__, e, x, &c__1, &info);
 	chkxer_("DPTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -230,7 +242,7 @@ static integer c__1 = 1;
 
 /*        DPTRFS */
 
-	s_copy(srnamc_1.srnamt, "DPTRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPTRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dptrfs_(&c_n1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, w, &
 		info);
@@ -254,7 +266,7 @@ static integer c__1 = 1;
 
 /*        DPTCON */
 
-	s_copy(srnamc_1.srnamt, "DPTCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPTCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dptcon_(&c_n1, d__, e, &anorm, &rcond, w, &info);
 	chkxer_("DPTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

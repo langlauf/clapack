@@ -1,3 +1,15 @@
+/* dlahqr.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -42,8 +54,8 @@ static integer c__1 = 1;
     doublereal safmin, safmax, rtdisc, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -156,11 +168,10 @@ static integer c__1 = 1;
 
 /*     12-04 Further modifications by */
 /*     Ralph Byers, University of Kansas, USA */
-
-/*       This is a modified version of DLAHQR from LAPACK version 3.0. */
-/*       It is (1) more robust against overflow and underflow and */
-/*       (2) adopts the more conservative Ahues & Tisseur stopping */
-/*       criterion (LAWN 122, 1997). */
+/*     This is a modified version of DLAHQR from LAPACK version 3.0. */
+/*     It is (1) more robust against overflow and underflow and */
+/*     (2) adopts the more conservative Ahues & Tisseur stopping */
+/*     criterion (LAWN 122, 1997). */
 
 /*     ========================================================= */
 
@@ -325,10 +336,22 @@ L40:
 	    i2 = i__;
 	}
 
-	if (its == 10 || its == 20) {
+	if (its == 10) {
 
 /*           Exceptional shift. */
 
+	    s = (d__1 = h__[l + 1 + l * h_dim1], abs(d__1)) + (d__2 = h__[l + 
+		    2 + (l + 1) * h_dim1], abs(d__2));
+	    h11 = s * .75 + h__[l + l * h_dim1];
+	    h12 = s * -.4375;
+	    h21 = s;
+	    h22 = h11;
+	} else if (its == 20) {
+
+/*           Exceptional shift. */
+
+	    s = (d__1 = h__[i__ + (i__ - 1) * h_dim1], abs(d__1)) + (d__2 = 
+		    h__[i__ - 1 + (i__ - 2) * h_dim1], abs(d__2));
 	    h11 = s * .75 + h__[i__ + i__ * h_dim1];
 	    h12 = s * -.4375;
 	    h21 = s;
@@ -449,7 +472,11 @@ L60:
 		    h__[k + 2 + (k - 1) * h_dim1] = 0.;
 		}
 	    } else if (m > l) {
-		h__[k + (k - 1) * h_dim1] = -h__[k + (k - 1) * h_dim1];
+/*               ==== Use the following instead of */
+/*               .    H( K, K-1 ) = -H( K, K-1 ) to */
+/*               .    avoid a bug when v(2) and v(3) */
+/*               .    underflow. ==== */
+		h__[k + (k - 1) * h_dim1] *= 1. - t1;
 	    }
 	    v2 = v[1];
 	    t2 = t1 * v2;

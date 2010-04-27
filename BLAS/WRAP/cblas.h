@@ -64,6 +64,18 @@ CBLAS_INDEX cblas_idamax(const int N, const double *X, const int incX);
 CBLAS_INDEX cblas_icamax(const int N, const void   *X, const int incX);
 CBLAS_INDEX cblas_izamax(const int N, const void   *X, const int incX);
 
+
+/*
+ * ===========================================================================
+ * Prototypes for level 0 BLAS routines
+ * ===========================================================================
+ */
+void cblas_srotg(float a, float b, float c, float s);
+void cblas_crotg(complex a, complex b, complex c, float s);
+void cblas_drotg(double a, double b, double c, double s);
+void cblas_zrotg(doublecomplex a, doublecomplex b, doublecomplex c, double s);
+
+
 /*
  * ===========================================================================
  * Prototypes for level 1 BLAS routines
@@ -105,14 +117,12 @@ void cblas_zaxpy(const int N, const void *alpha, const void *X,
 /*
  * Routines with S and D prefix only
  */
-void cblas_srotg(float *a, float *b, float *c, float *s);
 void cblas_srotmg(float *d1, float *d2, float *b1, const float b2, float *P);
 void cblas_srot(const int N, float *X, const int incX,
                 float *Y, const int incY, const float c, const float s);
 void cblas_srotm(const int N, float *X, const int incX,
                 float *Y, const int incY, const float *P);
 
-void cblas_drotg(double *a, double *b, double *c, double *s);
 void cblas_drotmg(double *d1, double *d2, double *b1, const double b2, double *P);
 void cblas_drot(const int N, double *X, const int incX,
                 double *Y, const int incY, const double c, const double s);

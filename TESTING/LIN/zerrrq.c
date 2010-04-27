@@ -1,3 +1,15 @@
+/* zerrrq.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -137,7 +149,7 @@ static integer c__2 = 2;
 
 /*     ZGERQF */
 
-    s_copy(srnamc_1.srnamt, "ZGERQF", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZGERQF", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zgerqf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("ZGERQF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -157,7 +169,7 @@ static integer c__2 = 2;
 
 /*     ZGERQ2 */
 
-    s_copy(srnamc_1.srnamt, "ZGERQ2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZGERQ2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zgerq2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("ZGERQ2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -173,7 +185,7 @@ static integer c__2 = 2;
 
 /*     ZGERQS */
 
-    s_copy(srnamc_1.srnamt, "ZGERQS", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZGERQS", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zgerqs_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("ZGERQS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +217,7 @@ static integer c__2 = 2;
 
 /*     ZUNGRQ */
 
-    s_copy(srnamc_1.srnamt, "ZUNGRQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZUNGRQ", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zungrq_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("ZUNGRQ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -237,7 +249,7 @@ static integer c__2 = 2;
 
 /*     ZUNGR2 */
 
-    s_copy(srnamc_1.srnamt, "ZUNGR2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZUNGR2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zungr2_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("ZUNGR2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -265,7 +277,7 @@ static integer c__2 = 2;
 
 /*     ZUNMRQ */
 
-    s_copy(srnamc_1.srnamt, "ZUNMRQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZUNMRQ", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zunmrq_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -329,7 +341,7 @@ static integer c__2 = 2;
 
 /*     ZUNMR2 */
 
-    s_copy(srnamc_1.srnamt, "ZUNMR2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "ZUNMR2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     zunmr2_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("ZUNMR2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

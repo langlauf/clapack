@@ -1,10 +1,22 @@
+/* sdrvst.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
 /* Common Block Declarations */
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -957,7 +969,7 @@ L110:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L130: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)32, (ftnlen)5);
 		sstev_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1], 
 			 &iinfo);
 		if (iinfo != 0) {
@@ -1002,7 +1014,7 @@ L110:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L160: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)32, (ftnlen)5);
 		sstev_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1], 
 			 &iinfo);
 		if (iinfo != 0) {
@@ -1057,7 +1069,7 @@ L180:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L200: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)32, (ftnlen)6);
 		sstevx_("V", "A", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
 			abstol, &m, &wa1[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -1110,7 +1122,7 @@ L180:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L230: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)32, (ftnlen)6);
 		sstevx_("N", "A", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -1167,7 +1179,7 @@ L250:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L270: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		sstevr_("V", "A", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
 			abstol, &m, &wa1[1], &z__[z_offset], ldu, &iwork[1], &
@@ -1220,7 +1232,7 @@ L250:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L300: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		sstevr_("N", "A", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &iwork[1], 
@@ -1279,7 +1291,7 @@ L320:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L340: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)32, (ftnlen)6);
 		sstevx_("V", "I", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -1327,7 +1339,7 @@ L320:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L370: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)32, (ftnlen)6);
 		sstevx_("N", "I", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
 			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -1405,7 +1417,7 @@ L380:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L400: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)32, (ftnlen)6);
 		sstevx_("V", "V", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -1459,7 +1471,7 @@ L380:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L430: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)32, (ftnlen)6);
 		sstevx_("N", "V", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
 			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -1505,7 +1517,7 @@ L440:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L460: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)32, (ftnlen)6);
 		sstevd_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1]
 , &lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -1550,7 +1562,7 @@ L440:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L490: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)32, (ftnlen)6);
 		sstevd_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1]
 , &lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -1606,7 +1618,7 @@ L510:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L530: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		sstevr_("V", "I", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &iwork[1], 
@@ -1655,7 +1667,7 @@ L510:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L560: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		sstevr_("N", "I", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
 			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &iwork[1], 
@@ -1734,7 +1746,7 @@ L570:
 		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L590: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		sstevr_("V", "V", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &iwork[1], 
@@ -1789,7 +1801,7 @@ L570:
 		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L620: */
 		}
-		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		sstevr_("N", "V", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
 			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &iwork[1], 
@@ -1852,7 +1864,7 @@ L630:
 		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSYEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSYEV", (ftnlen)32, (ftnlen)5);
 		ssyev_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], 
 			lwork, &iinfo);
 		if (iinfo != 0) {
@@ -1890,7 +1902,7 @@ L630:
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSYEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSYEV", (ftnlen)32, (ftnlen)5);
 		ssyev_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], 
 			lwork, &iinfo);
 		if (iinfo != 0) {
@@ -1977,7 +1989,7 @@ L660:
 		    vu = 1.f;
 		}
 
-		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)32, (ftnlen)6);
 		ssyevx_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &work[
 			1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2016,7 +2028,7 @@ L660:
 , &work[1], &result[ntest]);
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)32, (ftnlen)6);
 		ssyevx_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
 			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2068,7 +2080,7 @@ L680:
 
 		++ntest;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)32, (ftnlen)6);
 		ssyevx_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
 			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2108,7 +2120,7 @@ L680:
 
 		ntest += 2;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)32, (ftnlen)6);
 		ssyevx_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
 			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2149,7 +2161,7 @@ L690:
 
 		++ntest;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)32, (ftnlen)6);
 		ssyevx_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
 			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2189,7 +2201,7 @@ L690:
 
 		ntest += 2;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)32, (ftnlen)6);
 		ssyevx_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
 			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2275,7 +2287,7 @@ L700:
 		}
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSPEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSPEV", (ftnlen)32, (ftnlen)5);
 		sspev_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, &
 			v[v_offset], &iinfo);
 		if (iinfo != 0) {
@@ -2337,7 +2349,7 @@ L700:
 		}
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSPEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSPEV", (ftnlen)32, (ftnlen)5);
 		sspev_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, &
 			v[v_offset], &iinfo);
 		if (iinfo != 0) {
@@ -2451,7 +2463,7 @@ L800:
 		    vu = 1.f;
 		}
 
-		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)32, (ftnlen)6);
 		sspevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
 , &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2515,7 +2527,7 @@ L800:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)32, (ftnlen)6);
 		sspevx_("N", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
 			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2592,7 +2604,7 @@ L900:
 
 		++ntest;
 
-		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)32, (ftnlen)6);
 		sspevx_("V", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
 			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2656,7 +2668,7 @@ L900:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)32, (ftnlen)6);
 		sspevx_("N", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
 			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2735,7 +2747,7 @@ L990:
 
 		++ntest;
 
-		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)32, (ftnlen)6);
 		sspevx_("V", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
 			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2799,7 +2811,7 @@ L990:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)32, (ftnlen)6);
 		sspevx_("N", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
 			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
@@ -2894,7 +2906,7 @@ L1080:
 		}
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSBEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSBEV", (ftnlen)32, (ftnlen)5);
 		ssbev_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
 			z_offset], ldu, &work[1], &iinfo);
 		if (iinfo != 0) {
@@ -2957,7 +2969,7 @@ L1080:
 		}
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSBEV", (ftnlen)6, (ftnlen)5);
+		s_copy(srnamc_1.srnamt, "SSBEV", (ftnlen)32, (ftnlen)5);
 		ssbev_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
 			z_offset], ldu, &work[1], &iinfo);
 		if (iinfo != 0) {
@@ -3035,7 +3047,7 @@ L1180:
 		}
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)32, (ftnlen)6);
 		ssbevx_("V", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m, &wa2[
 			1], &z__[z_offset], ldu, &work[1], &iwork[1], &iwork[
@@ -3101,7 +3113,7 @@ L1180:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)32, (ftnlen)6);
 		ssbevx_("N", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
 			wa3[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
@@ -3179,7 +3191,7 @@ L1280:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)32, (ftnlen)6);
 		ssbevx_("V", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
 			wa2[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
@@ -3245,7 +3257,7 @@ L1280:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)32, (ftnlen)6);
 		ssbevx_("N", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
 			wa3[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
@@ -3320,7 +3332,7 @@ L1370:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)32, (ftnlen)6);
 		ssbevx_("V", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
 			wa2[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
@@ -3386,7 +3398,7 @@ L1370:
 		    }
 		}
 
-		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)32, (ftnlen)6);
 		ssbevx_("N", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
 			wa3[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
@@ -3444,7 +3456,7 @@ L1460:
 		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSYEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVD", (ftnlen)32, (ftnlen)6);
 		ssyevd_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], &
 			lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -3482,7 +3494,7 @@ L1460:
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSYEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVD", (ftnlen)32, (ftnlen)6);
 		ssyevd_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], &
 			lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -3564,7 +3576,7 @@ L1480:
 		}
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSPEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVD", (ftnlen)32, (ftnlen)6);
 		i__3 = lwedc - indx + 1;
 		sspevd_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, 
 			&work[indx], &i__3, &iwork[1], &liwedc, &iinfo);
@@ -3628,7 +3640,7 @@ L1480:
 		}
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSPEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSPEVD", (ftnlen)32, (ftnlen)6);
 		i__3 = lwedc - indx + 1;
 		sspevd_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, 
 			&work[indx], &i__3, &iwork[1], &liwedc, &iinfo);
@@ -3719,7 +3731,7 @@ L1580:
 		}
 
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)32, (ftnlen)6);
 		ssbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &iwork[1], &liwedc, 
 			&iinfo);
@@ -3783,7 +3795,7 @@ L1580:
 		}
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)32, (ftnlen)6);
 		ssbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &iwork[1], &liwedc, 
 			&iinfo);
@@ -3835,7 +3847,7 @@ L1680:
 
 		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 		++ntest;
-		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		ssyevr_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &
@@ -3876,7 +3888,7 @@ L1680:
 , &work[1], &result[ntest]);
 
 		ntest += 2;
-		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		ssyevr_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
@@ -3930,7 +3942,7 @@ L1700:
 
 		++ntest;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		ssyevr_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
@@ -3972,7 +3984,7 @@ L1700:
 
 		ntest += 2;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		ssyevr_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
@@ -4015,7 +4027,7 @@ L1710:
 
 		++ntest;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		ssyevr_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
@@ -4057,7 +4069,7 @@ L1710:
 
 		ntest += 2;
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
-		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)32, (ftnlen)6);
 		i__3 = *liwork - (n << 1);
 		ssyevr_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
 			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &

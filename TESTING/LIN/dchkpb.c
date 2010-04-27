@@ -1,3 +1,15 @@
+/* dchkpb.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -338,7 +350,7 @@ static integer c__7 = 7;
 			dlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, 
 				 &mode, &cndnum, dist);
 
-			s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)32, (ftnlen)
 				6);
 			dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, 
 				 &cndnum, &anorm, &kd, &kd, packit, &a[koff], 
@@ -454,7 +466,7 @@ static integer c__7 = 7;
 			i__5 = kd + 1;
 			dlacpy_("Full", &i__5, &n, &a[1], &ldab, &afac[1], &
 				ldab);
-			s_copy(srnamc_1.srnamt, "DPBTRF", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DPBTRF", (ftnlen)32, (ftnlen)
 				6);
 			dpbtrf_(uplo, &n, &kd, &afac[1], &ldab, &info);
 
@@ -520,7 +532,7 @@ static integer c__7 = 7;
 
 			dlaset_("Full", &n, &n, &c_b50, &c_b51, &ainv[1], &
 				lda);
-			s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)32, (ftnlen)
 				6);
 			dpbtrs_(uplo, &n, &kd, &n, &afac[1], &ldab, &ainv[1], 
 				&lda, &info);
@@ -544,7 +556,7 @@ static integer c__7 = 7;
 /* +    TEST 2 */
 /*                    Solve and compute residual for A * X = B. */
 
-			    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)32, (
 				    ftnlen)6);
 			    dlarhs_(path, xtype, uplo, " ", &n, &n, &kd, &kd, 
 				    &nrhs, &a[1], &ldab, &xact[1], &lda, &b[1]
@@ -552,7 +564,7 @@ static integer c__7 = 7;
 			    dlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
 				    lda);
 
-			    s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)32, (
 				    ftnlen)6);
 			    dpbtrs_(uplo, &n, &kd, &nrhs, &afac[1], &ldab, &x[
 				    1], &lda, &info);
@@ -580,7 +592,7 @@ static integer c__7 = 7;
 /* +    TESTS 4, 5, and 6 */
 /*                    Use iterative refinement to improve the solution. */
 
-			    s_copy(srnamc_1.srnamt, "DPBRFS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DPBRFS", (ftnlen)32, (
 				    ftnlen)6);
 			    dpbrfs_(uplo, &n, &kd, &nrhs, &a[1], &ldab, &afac[
 				    1], &ldab, &b[1], &lda, &x[1], &lda, &
@@ -636,7 +648,7 @@ static integer c__7 = 7;
 /* +    TEST 7 */
 /*                    Get an estimate of RCOND = 1/CNDNUM. */
 
-			s_copy(srnamc_1.srnamt, "DPBCON", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DPBCON", (ftnlen)32, (ftnlen)
 				6);
 			dpbcon_(uplo, &n, &kd, &afac[1], &ldab, &anorm, &
 				rcond, &work[1], &iwork[1], &info);

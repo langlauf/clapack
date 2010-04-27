@@ -1,3 +1,15 @@
+/* dhgeqz.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -79,9 +91,10 @@ static integer c__3 = 3;
     logical ilpivt, lquery;
 
 
-/*  -- LAPACK routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
-/*     November 2006 */
+/*  -- LAPACK routine (version 3.2.1)                                  -- */
+/*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
+/*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..-- */
+/*  -- April 2009                                                      -- */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -941,7 +954,7 @@ L200:
 	    if (ilast < ilastm) {
 		i__2 = ilastm - ilast;
 		drot_(&i__2, &t[ilast - 1 + (ilast + 1) * t_dim1], ldt, &t[
-			ilast + (ilast + 1) * t_dim1], ldh, &cl, &sl);
+			ilast + (ilast + 1) * t_dim1], ldt, &cl, &sl);
 	    }
 	    if (ifrstm < ilast - 1) {
 		i__2 = ifirst - ifrstm;

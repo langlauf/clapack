@@ -1,3 +1,15 @@
+/* claqr3.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -62,17 +74,18 @@ static integer c__12 = 12;
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
     real safmax;
-    extern /* Subroutine */ int cunghr_(integer *, integer *, integer *, 
-	    complex *, integer *, complex *, complex *, integer *, integer *),
-	     ctrexc_(char *, integer *, complex *, integer *, complex *, 
-	    integer *, integer *, integer *, integer *);
+    extern /* Subroutine */ int ctrexc_(char *, integer *, complex *, integer 
+	    *, complex *, integer *, integer *, integer *, integer *),
+	     cunmhr_(char *, char *, integer *, integer *, integer *, integer 
+	    *, complex *, integer *, complex *, complex *, integer *, complex 
+	    *, integer *, integer *);
     real smlnum;
     integer lwkopt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
-/*     November 2006 */
+/*  -- LAPACK auxiliary routine (version 3.2.1)                        -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
+/*  -- April 2009                                                      -- */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -140,7 +153,7 @@ static integer c__12 = 12;
 /*          Specify the rows of Z to which transformations must be */
 /*          applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N. */
 
-/*     Z       (input/output) COMPLEX array, dimension (LDZ,IHI) */
+/*     Z       (input/output) COMPLEX array, dimension (LDZ,N) */
 /*          IF WANTZ is .TRUE., then on output, the unitary */
 /*          similarity transformation mentioned above has been */
 /*          accumulated into Z(ILOZ:IHIZ,ILO:IHI) from the right. */
@@ -211,7 +224,7 @@ static integer c__12 = 12;
 /*        Karen Braman and Ralph Byers, Department of Mathematics, */
 /*        University of Kansas, USA */
 
-/*     ================================================================== */
+/*     ================================================================ */
 /*     .. Parameters .. */
 /*     .. */
 /*     .. Local Scalars .. */
@@ -264,11 +277,11 @@ static integer c__12 = 12;
 		c_n1, &info);
 	lwk1 = (integer) work[1].r;
 
-/*        ==== Workspace query call to CUNGHR ==== */
+/*        ==== Workspace query call to CUNMHR ==== */
 
 	i__1 = jw - 1;
-	cunghr_(&jw, &c__1, &i__1, &t[t_offset], ldt, &work[1], &work[1], &
-		c_n1, &info);
+	cunmhr_("R", "N", &jw, &jw, &c__1, &i__1, &t[t_offset], ldt, &work[1], 
+		 &v[v_offset], ldv, &work[1], &c_n1, &info);
 	lwk2 = (integer) work[1].r;
 
 /*        ==== Workspace query call to CLAQR4 ==== */
@@ -297,6 +310,7 @@ static integer c__12 = 12;
 /*     ... for an empty active block ... ==== */
     *ns = 0;
     *nd = 0;
+    work[1].r = 1.f, work[1].i = 0.f;
     if (*ktop > *kbot) {
 	return 0;
     }
@@ -348,6 +362,7 @@ static integer c__12 = 12;
 		h__[i__1].r = 0.f, h__[i__1].i = 0.f;
 	    }
 	}
+	work[1].r = 1.f, work[1].i = 0.f;
 	return 0;
     }
 
@@ -403,7 +418,7 @@ static integer c__12 = 12;
 	    --(*ns);
 	} else {
 
-/*           ==== One undflatable eigenvalue.  Move it up out of the */
+/*           ==== One undeflatable eigenvalue.  Move it up out of the */
 /*           .    way.   (CTREXC can not fail in this case.) ==== */
 
 	    ifst = *ns;
@@ -512,18 +527,12 @@ static integer c__12 = 12;
 		 &i__3);
 
 /*        ==== Accumulate orthogonal matrix in order update */
-/*        .    H and Z, if requested.  (A modified version */
-/*        .    of  CUNGHR that accumulates block Householder */
-/*        .    transformations into V directly might be */
-/*        .    marginally more efficient than the following.) ==== */
+/*        .    H and Z, if requested.  ==== */
 
 	if (*ns > 1 && (s.r != 0.f || s.i != 0.f)) {
 	    i__1 = *lwork - jw;
-	    cunghr_(&jw, &c__1, ns, &t[t_offset], ldt, &work[1], &work[jw + 1]
-, &i__1, &info);
-	    cgemm_("N", "N", &jw, ns, ns, &c_b2, &v[v_offset], ldv, &t[
-		    t_offset], ldt, &c_b1, &wv[wv_offset], ldwv);
-	    clacpy_("A", &jw, ns, &wv[wv_offset], ldwv, &v[v_offset], ldv);
+	    cunmhr_("R", "N", &jw, ns, &c__1, ns, &t[t_offset], ldt, &work[1], 
+		     &v[v_offset], ldv, &work[jw + 1], &i__1, &info);
 	}
 
 /*        ==== Update vertical slab in H ==== */

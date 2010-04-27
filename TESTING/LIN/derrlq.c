@@ -1,3 +1,15 @@
+/* derrlq.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -119,7 +131,7 @@ static integer c__2 = 2;
 
 /*     DGELQF */
 
-    s_copy(srnamc_1.srnamt, "DGELQF", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DGELQF", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dgelqf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("DGELQF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -139,7 +151,7 @@ static integer c__2 = 2;
 
 /*     DGELQ2 */
 
-    s_copy(srnamc_1.srnamt, "DGELQ2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DGELQ2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dgelq2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("DGELQ2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -155,7 +167,7 @@ static integer c__2 = 2;
 
 /*     DGELQS */
 
-    s_copy(srnamc_1.srnamt, "DGELQS", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DGELQS", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dgelqs_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("DGELQS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -187,7 +199,7 @@ static integer c__2 = 2;
 
 /*     DORGLQ */
 
-    s_copy(srnamc_1.srnamt, "DORGLQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DORGLQ", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dorglq_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("DORGLQ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -219,7 +231,7 @@ static integer c__2 = 2;
 
 /*     DORGL2 */
 
-    s_copy(srnamc_1.srnamt, "DORGL2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DORGL2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dorgl2_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("DORGL2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -247,7 +259,7 @@ static integer c__2 = 2;
 
 /*     DORMLQ */
 
-    s_copy(srnamc_1.srnamt, "DORMLQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DORMLQ", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dormlq_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -311,7 +323,7 @@ static integer c__2 = 2;
 
 /*     DORML2 */
 
-    s_copy(srnamc_1.srnamt, "DORML2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "DORML2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     dorml2_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("DORML2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

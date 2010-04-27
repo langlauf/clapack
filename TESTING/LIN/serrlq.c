@@ -1,3 +1,15 @@
+/* serrlq.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -117,7 +129,7 @@ static integer c__2 = 2;
 
 /*     SGELQF */
 
-    s_copy(srnamc_1.srnamt, "SGELQF", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SGELQF", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sgelqf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("SGELQF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -137,7 +149,7 @@ static integer c__2 = 2;
 
 /*     SGELQ2 */
 
-    s_copy(srnamc_1.srnamt, "SGELQ2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SGELQ2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sgelq2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("SGELQ2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -153,7 +165,7 @@ static integer c__2 = 2;
 
 /*     SGELQS */
 
-    s_copy(srnamc_1.srnamt, "SGELQS", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SGELQS", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sgelqs_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("SGELQS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -185,7 +197,7 @@ static integer c__2 = 2;
 
 /*     SORGLQ */
 
-    s_copy(srnamc_1.srnamt, "SORGLQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SORGLQ", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sorglq_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("SORGLQ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -217,7 +229,7 @@ static integer c__2 = 2;
 
 /*     SORGL2 */
 
-    s_copy(srnamc_1.srnamt, "SORGL2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SORGL2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sorgl2_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("SORGL2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -245,7 +257,7 @@ static integer c__2 = 2;
 
 /*     SORMLQ */
 
-    s_copy(srnamc_1.srnamt, "SORMLQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SORMLQ", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sormlq_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -309,7 +321,7 @@ static integer c__2 = 2;
 
 /*     SORML2 */
 
-    s_copy(srnamc_1.srnamt, "SORML2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SORML2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     sorml2_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("SORML2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

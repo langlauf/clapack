@@ -1,3 +1,15 @@
+/* cerrhe.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -157,7 +169,7 @@ static integer c__4 = 4;
 
 /*        CHETRF */
 
-	s_copy(srnamc_1.srnamt, "CHETRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHETRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chetrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("CHETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -173,7 +185,7 @@ static integer c__4 = 4;
 
 /*        CHETF2 */
 
-	s_copy(srnamc_1.srnamt, "CHETF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHETF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chetf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("CHETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -189,7 +201,7 @@ static integer c__4 = 4;
 
 /*        CHETRI */
 
-	s_copy(srnamc_1.srnamt, "CHETRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHETRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chetri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("CHETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +217,7 @@ static integer c__4 = 4;
 
 /*        CHETRS */
 
-	s_copy(srnamc_1.srnamt, "CHETRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHETRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CHETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -229,7 +241,7 @@ static integer c__4 = 4;
 
 /*        CHERFS */
 
-	s_copy(srnamc_1.srnamt, "CHERFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHERFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cherfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -268,7 +280,7 @@ static integer c__4 = 4;
 
 /*        CHECON */
 
-	s_copy(srnamc_1.srnamt, "CHECON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHECON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	checon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, &info);
 	chkxer_("CHECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -294,7 +306,7 @@ static integer c__4 = 4;
 
 /*        CHPTRF */
 
-	s_copy(srnamc_1.srnamt, "CHPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chptrf_("/", &c__0, a, ip, &info);
 	chkxer_("CHPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -306,7 +318,7 @@ static integer c__4 = 4;
 
 /*        CHPTRI */
 
-	s_copy(srnamc_1.srnamt, "CHPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("CHPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -318,7 +330,7 @@ static integer c__4 = 4;
 
 /*        CHPTRS */
 
-	s_copy(srnamc_1.srnamt, "CHPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("CHPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -338,7 +350,7 @@ static integer c__4 = 4;
 
 /*        CHPRFS */
 
-	s_copy(srnamc_1.srnamt, "CHPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		r__, &info);
@@ -367,7 +379,7 @@ static integer c__4 = 4;
 
 /*        CHPCON */
 
-	s_copy(srnamc_1.srnamt, "CHPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chpcon_("/", &c__0, a, ip, &anrm, &rcond, w, &info);
 	chkxer_("CHPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

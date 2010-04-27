@@ -1,10 +1,20 @@
+/* clarfx.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
 /* Table of constant values */
 
-static complex c_b1 = {0.f,0.f};
-static complex c_b2 = {1.f,0.f};
 static integer c__1 = 1;
 
 /* Subroutine */ int clarfx_(char *side, integer *m, integer *n, complex *v, 
@@ -23,15 +33,12 @@ static integer c__1 = 1;
     integer j;
     complex t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, v6, v7, 
 	    v8, v9, t10, v10, sum;
-    extern /* Subroutine */ int cgerc_(integer *, integer *, complex *, 
-	    complex *, integer *, complex *, integer *, complex *, integer *);
+    extern /* Subroutine */ int clarf_(char *, integer *, integer *, complex *
+, integer *, complex *, complex *, integer *, complex *);
     extern logical lsame_(char *, char *);
-    extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
-, complex *, integer *, complex *, integer *, complex *, complex *
-, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -131,16 +138,7 @@ static integer c__1 = 1;
 
 /*        Code for general M */
 
-/*        w := C'*v */
-
-	cgemv_("Conjugate transpose", m, n, &c_b2, &c__[c_offset], ldc, &v[1], 
-		 &c__1, &c_b1, &work[1], &c__1);
-
-/*        C := C - tau * v * w' */
-
-	q__1.r = -tau->r, q__1.i = -tau->i;
-	cgerc_(m, n, &q__1, &v[1], &c__1, &work[1], &c__1, &c__[c_offset], 
-		ldc);
+	clarf_(side, m, n, &v[1], &c__1, tau, &c__[c_offset], ldc, &work[1]);
 	goto L410;
 L10:
 
@@ -1127,16 +1125,7 @@ L190:
 
 /*        Code for general N */
 
-/*        w := C * v */
-
-	cgemv_("No transpose", m, n, &c_b2, &c__[c_offset], ldc, &v[1], &c__1, 
-		 &c_b1, &work[1], &c__1);
-
-/*        C := C - tau * w * v' */
-
-	q__1.r = -tau->r, q__1.i = -tau->i;
-	cgerc_(m, n, &q__1, &work[1], &c__1, &v[1], &c__1, &c__[c_offset], 
-		ldc);
+	clarf_(side, m, n, &v[1], &c__1, tau, &c__[c_offset], ldc, &work[1]);
 	goto L410;
 L210:
 

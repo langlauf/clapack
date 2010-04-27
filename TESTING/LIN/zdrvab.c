@@ -1,3 +1,15 @@
+/* zdrvab.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -94,12 +106,12 @@ static integer c__1 = 1;
     doublereal cndnum;
     extern /* Subroutine */ int zcgesv_(integer *, integer *, doublecomplex *, 
 	     integer *, integer *, doublecomplex *, integer *, doublecomplex *
-, integer *, doublecomplex *, complex *, integer *, integer *), 
-	    zlacpy_(char *, integer *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *), zlarhs_(char *, char *, char 
-	    *, char *, integer *, integer *, integer *, integer *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, integer *, integer *), zlaset_(char *, integer *, integer *, 
+, integer *, doublecomplex *, complex *, doublereal *, integer *, 
+	    integer *), zlacpy_(char *, integer *, integer *, doublecomplex *, 
+	     integer *, doublecomplex *, integer *), zlarhs_(char *, 
+	    char *, char *, char *, integer *, integer *, integer *, integer *
+, integer *, doublecomplex *, integer *, doublecomplex *, integer 
+	    *, doublecomplex *, integer *, integer *, integer *), zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *), zlatms_(integer *, integer *, char *, integer *, char *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, char *, doublecomplex *, integer *, doublecomplex *, 
@@ -272,7 +284,7 @@ static integer c__1 = 1;
 	    zlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, &
 		    cndnum, dist);
 
-	    s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+	    s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)32, (ftnlen)6);
 	    zlatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &cndnum, &
 		    anorm, &kl, &ku, "No packing", &a[1], &lda, &work[1], &
 		    info);
@@ -319,18 +331,18 @@ static integer c__1 = 1;
 		*(unsigned char *)xtype = 'N';
 		*(unsigned char *)trans = 'N';
 
-		s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)32, (ftnlen)6);
 		zlarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku, &nrhs, &a[
 			1], &lda, &x[1], &lda, &b[1], &lda, iseed, &info);
 
-		s_copy(srnamc_1.srnamt, "ZCGESV", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZCGESV", (ftnlen)32, (ftnlen)6);
 
 		++kase;
 
 		zlacpy_("Full", &m, &n, &a[1], &lda, &afac[1], &lda);
 
 		zcgesv_(&n, &nrhs, &a[1], &lda, &iwork[1], &b[1], &lda, &x[1], 
-			 &lda, &work[1], &swork[1], &iter, &info);
+			 &lda, &work[1], &swork[1], &rwork[1], &iter, &info);
 
 		if (iter < 0) {
 		    zlacpy_("Full", &m, &n, &afac[1], &lda, &a[1], &lda);

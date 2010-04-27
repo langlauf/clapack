@@ -15,4 +15,3 @@ doublereal second_()
   return (doublereal)(rusage.tms_utime) / CLK_TCK;
 
 } /* second_ */
-

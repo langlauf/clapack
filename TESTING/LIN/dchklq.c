@@ -1,3 +1,15 @@
+/* dchklq.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -76,10 +88,13 @@ static integer c__3 = 3;
 	    doublereal *, char *), alaerh_(char *, 
 	    char *, integer *, integer *, char *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *), dlacpy_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *), dlarhs_(char *, char *, char *, char *, integer *, 
-	    integer *, integer *, integer *, integer *, doublereal *, integer 
-	    *, doublereal *, integer *, doublereal *, integer *, integer *, 
+	    integer *);
+    extern logical dgennd_(integer *, integer *, doublereal *, integer *);
+    extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *), 
+	    dlarhs_(char *, char *, char *, char *, integer *, integer *, 
+	    integer *, integer *, integer *, doublereal *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *), dgelqs_(integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), 
@@ -89,7 +104,7 @@ static integer c__3 = 3;
 	    *, char *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, char *, doublereal *, integer *, doublereal 
 	    *, integer *), derrlq_(char *, integer *), xlaenv_(integer *, integer *);
-    doublereal result[7];
+    doublereal result[8];
 
     /* Fortran I/O blocks */
     static cilist io___33 = { 0, 0, 0, fmt_9999, 0 };
@@ -192,6 +207,8 @@ static integer c__3 = 3;
 /*     .. */
 /*     .. Local Arrays .. */
 /*     .. */
+/*     .. External Functions .. */
+/*     .. */
 /*     .. External Subroutines .. */
 /*     .. */
 /*     .. Intrinsic Functions .. */
@@ -273,7 +290,7 @@ static integer c__3 = 3;
 		dlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)32, (ftnlen)6);
 		dlatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
 			work[1], &info);
@@ -318,6 +335,9 @@ static integer c__3 = 3;
 			xlaenv_(&c__1, &nb);
 			nx = nxval[inb];
 			xlaenv_(&c__3, &nx);
+			for (i__ = 1; i__ <= 8; ++i__) {
+			    result[i__ - 1] = 0.;
+			}
 			nt = 2;
 			if (ik == 1) {
 
@@ -326,6 +346,10 @@ static integer c__3 = 3;
 			    dlqt01_(&m, &n, &a[1], &af[1], &aq[1], &al[1], &
 				    lda, &tau[1], &work[1], &lwork, &rwork[1], 
 				     result);
+			    if (! dgennd_(&m, &n, &af[1], &lda)) {
+				result[7] = *thresh * 2;
+			    }
+			    ++nt;
 			} else if (m <= n) {
 
 /*                       Test DORGLQ, using factorization */
@@ -357,8 +381,8 @@ static integer c__3 = 3;
 /*                          Generate a solution and set the right */
 /*                          hand side. */
 
-				s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)32, 
+					(ftnlen)6);
 				dlarhs_(path, "New", "Full", "No transpose", &
 					m, &n, &c__0, &c__0, nrhs, &a[1], &
 					lda, &xact[1], &lda, &b[1], &lda, 
@@ -366,8 +390,8 @@ static integer c__3 = 3;
 
 				dlacpy_("Full", &m, nrhs, &b[1], &lda, &x[1], 
 					&lda);
-				s_copy(srnamc_1.srnamt, "DGELQS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "DGELQS", (ftnlen)32, 
+					(ftnlen)6);
 				dgelqs_(&m, &n, nrhs, &af[1], &lda, &tau[1], &
 					x[1], &lda, &work[1], &lwork, &info);
 

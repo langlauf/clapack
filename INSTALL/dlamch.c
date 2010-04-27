@@ -1,5 +1,16 @@
+/* dlamch.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
-#include "stdio.h"
 #include "blaswrap.h"
 
 /* Table of constant values */
@@ -37,7 +48,7 @@ doublereal dlamch_(char *cmach)
 	    doublereal *, integer *, doublereal *, integer *, doublereal *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -175,7 +186,7 @@ doublereal dlamch_(char *cmach)
     static logical lieee1;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -383,7 +394,7 @@ L30:
 
     /* Builtin functions */
     double pow_di(doublereal *, integer *);
-    //integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
+    integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
     doublereal a, b, c__;
@@ -418,7 +429,7 @@ L30:
 
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -629,17 +640,9 @@ L10:
 /* Comment out this if block if EMIN is ok */
 	if (iwarn) {
 	    first = TRUE_;
-	    printf("\n\n WARNING. The value EMIN may be incorrect:- ");
-	    printf("EMIN = %8i\n",lemin);
-	    printf("If, after inspection, the value EMIN looks acceptable");
-            printf("please comment out \n the IF block as marked within the"); 
-            printf("code of routine DLAMC2, \n otherwise supply EMIN"); 
-            printf("explicitly.\n");
-         /*
 	    s_wsfe(&io___58);
 	    do_fio(&c__1, (char *)&lemin, (ftnlen)sizeof(integer));
 	    e_wsfe();
-         */
 	}
 /* ** */
 
@@ -692,7 +695,7 @@ doublereal dlamc3_(doublereal *a, doublereal *b)
     doublereal ret_val;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -741,7 +744,7 @@ doublereal dlamc3_(doublereal *a, doublereal *b)
     extern doublereal dlamc3_(doublereal *, doublereal *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -843,7 +846,7 @@ L10:
     integer exbits, expsum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 

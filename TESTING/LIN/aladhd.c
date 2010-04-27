@@ -1,3 +1,15 @@
+/* aladhd.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -229,6 +241,7 @@ static integer c__7 = 7;
 /*             _GB:  General band */
 /*             _GT:  General Tridiagonal */
 /*             _PO:  Symmetric or Hermitian positive definite */
+/*             _PS:  Symmetric or Hermitian positive semi-definite */
 /*             _PP:  Symmetric or Hermitian positive definite packed */
 /*             _PB:  Symmetric or Hermitian positive definite band */
 /*             _PT:  Symmetric or Hermitian positive definite tridiagonal */
@@ -414,9 +427,10 @@ static integer c__7 = 7;
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "PO") || lsamen_(&
-	    c__2, p2, "PP")) {
+	    c__2, p2, "PP") || lsamen_(&c__2, p2, "PS")) {
 
 /*        PO: Positive definite full */
+/*        PS: Positive definite full */
 /*        PP: Positive definite packed */
 
 	if (sord) {

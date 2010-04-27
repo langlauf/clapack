@@ -1,3 +1,15 @@
+/* zgeql2.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -20,11 +32,11 @@ static integer c__1 = 1;
     doublecomplex alpha;
     extern /* Subroutine */ int zlarf_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
-	    integer *, doublecomplex *), xerbla_(char *, integer *), zlarfg_(integer *, doublecomplex *, doublecomplex *, 
+	    integer *, doublecomplex *), xerbla_(char *, integer *), zlarfp_(integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *);
 
 
-/*  -- LAPACK routine (version 3.1) -- */
+/*  -- LAPACK routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -132,7 +144,7 @@ static integer c__1 = 1;
 	i__1 = *m - k + i__ + (*n - k + i__) * a_dim1;
 	alpha.r = a[i__1].r, alpha.i = a[i__1].i;
 	i__1 = *m - k + i__;
-	zlarfg_(&i__1, &alpha, &a[(*n - k + i__) * a_dim1 + 1], &c__1, &tau[
+	zlarfp_(&i__1, &alpha, &a[(*n - k + i__) * a_dim1 + 1], &c__1, &tau[
 		i__]);
 
 /*        Apply H(i)' to A(1:m-k+i,1:n-k+i-1) from the left */

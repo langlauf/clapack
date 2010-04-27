@@ -1,3 +1,15 @@
+/* zerrst.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -214,7 +226,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHETRD */
 
-	s_copy(srnamc_1.srnamt, "ZHETRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHETRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetrd_("/", &c__0, a, &c__1, d__, e, tau, w, &c__1, &info)
 		;
@@ -239,7 +251,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZUNGTR */
 
-	s_copy(srnamc_1.srnamt, "ZUNGTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUNGTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zungtr_("/", &c__0, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("ZUNGTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -260,7 +272,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZUNMTR */
 
-	s_copy(srnamc_1.srnamt, "ZUNMTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUNMTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zunmtr_("/", "U", "N", &c__0, &c__0, a, &c__1, tau, c__, &c__1, w, &
 		c__1, &info);
@@ -315,7 +327,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHPTRD */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptrd_("/", &c__0, a, d__, e, tau, &info);
 	chkxer_("ZHPTRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -328,7 +340,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZUPGTR */
 
-	s_copy(srnamc_1.srnamt, "ZUPGTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUPGTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zupgtr_("/", &c__0, a, tau, z__, &c__1, w, &info);
 	chkxer_("ZUPGTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -345,7 +357,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZUPMTR */
 
-	s_copy(srnamc_1.srnamt, "ZUPMTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUPMTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zupmtr_("/", "U", "N", &c__0, &c__0, a, tau, c__, &c__1, w, &info);
 	chkxer_("ZUPMTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -374,7 +386,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZPTEQR */
 
-	s_copy(srnamc_1.srnamt, "ZPTEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpteqr_("/", &c__0, d__, e, z__, &c__1, rw, &info);
 	chkxer_("ZPTEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -391,7 +403,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZSTEIN */
 
-	s_copy(srnamc_1.srnamt, "ZSTEIN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSTEIN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zstein_(&c_n1, d__, e, &c__0, x, i1, i2, z__, &c__1, rw, iw, i3, &
 		info);
@@ -416,7 +428,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZSTEQR */
 
-	s_copy(srnamc_1.srnamt, "ZSTEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSTEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsteqr_("/", &c__0, d__, e, z__, &c__1, rw, &info);
 	chkxer_("ZSTEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -433,7 +445,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZSTEDC */
 
-	s_copy(srnamc_1.srnamt, "ZSTEDC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSTEDC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zstedc_("/", &c__0, d__, e, z__, &c__1, w, &c__1, rw, &c__1, iw, &
 		c__1, &info);
@@ -493,7 +505,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHEEVD */
 
-	s_copy(srnamc_1.srnamt, "ZHEEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHEEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zheevd_("/", "U", &c__0, a, &c__1, x, w, &c__1, rw, &c__1, iw, &c__1, 
 		&info);
@@ -558,7 +570,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHEEV */
 
-	s_copy(srnamc_1.srnamt, "ZHEEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHEEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zheev_("/", "U", &c__0, a, &c__1, x, w, &c__1, rw, &info);
 	chkxer_("ZHEEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -583,7 +595,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHEEVX */
 
-	s_copy(srnamc_1.srnamt, "ZHEEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHEEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zheevx_("/", "A", "U", &c__0, a, &c__1, &c_b458, &c_b458, &c__0, &
 		c__0, &c_b458, &m, x, z__, &c__1, w, &c__1, rw, iw, i3, &info);
@@ -636,7 +648,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHEEVR */
 
-	s_copy(srnamc_1.srnamt, "ZHEEVR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHEEVR", (ftnlen)32, (ftnlen)6);
 	n = 1;
 	infoc_1.infot = 1;
 	i__1 = n << 1;
@@ -751,7 +763,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHPEVD */
 
-	s_copy(srnamc_1.srnamt, "ZHPEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpevd_("/", "U", &c__0, a, x, z__, &c__1, w, &c__1, rw, &c__1, iw, &
 		c__1, &info);
@@ -821,7 +833,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHPEV */
 
-	s_copy(srnamc_1.srnamt, "ZHPEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpev_("/", "U", &c__0, a, x, z__, &c__1, w, rw, &info);
 	chkxer_("ZHPEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -842,7 +854,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHPEVX */
 
-	s_copy(srnamc_1.srnamt, "ZHPEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpevx_("/", "A", "U", &c__0, a, &c_b458, &c_b458, &c__0, &c__0, &
 		c_b458, &m, x, z__, &c__1, w, rw, iw, i3, &info);
@@ -891,7 +903,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHBTRD */
 
-	s_copy(srnamc_1.srnamt, "ZHBTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHBTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhbtrd_("/", "U", &c__0, &c__0, a, &c__1, d__, e, z__, &c__1, w, &
 		info);
@@ -926,7 +938,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHBEVD */
 
-	s_copy(srnamc_1.srnamt, "ZHBEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHBEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
@@ -1006,7 +1018,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHBEV */
 
-	s_copy(srnamc_1.srnamt, "ZHBEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHBEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhbev_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, rw, &info);
 	chkxer_("ZHBEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -1035,7 +1047,7 @@ static doublereal c_b472 = 1.;
 
 /*        ZHBEVX */
 
-	s_copy(srnamc_1.srnamt, "ZHBEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHBEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhbevx_("/", "A", "U", &c__0, &c__0, a, &c__1, q, &c__1, &c_b458, &
 		c_b458, &c__0, &c__0, &c_b458, &m, x, z__, &c__1, w, rw, iw, 

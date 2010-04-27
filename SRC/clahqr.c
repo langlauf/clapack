@@ -1,3 +1,15 @@
+/* clahqr.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -55,8 +67,8 @@ static integer c__2 = 2;
     real safmin, safmax, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -161,11 +173,10 @@ static integer c__2 = 2;
 
 /*     12-04 Further modifications by */
 /*     Ralph Byers, University of Kansas, USA */
-
-/*       This is a modified version of CLAHQR from LAPACK version 3.0. */
-/*       It is (1) more robust against overflow and underflow and */
-/*       (2) adopts the more conservative Ahues & Tisseur stopping */
-/*       criterion (LAWN 122, 1997). */
+/*     This is a modified version of CLAHQR from LAPACK version 3.0. */
+/*     It is (1) more robust against overflow and underflow and */
+/*     (2) adopts the more conservative Ahues & Tisseur stopping */
+/*     criterion (LAWN 122, 1997). */
 
 /*     ========================================================= */
 
@@ -225,6 +236,13 @@ static integer c__2 = 2;
 	h__[i__1].r = 0.f, h__[i__1].i = 0.f;
     }
 /*     ==== ensure that subdiagonal entries are real ==== */
+    if (*wantt) {
+	jlo = 1;
+	jhi = *n;
+    } else {
+	jlo = *ilo;
+	jhi = *ihi;
+    }
     i__1 = *ihi;
     for (i__ = *ilo + 1; i__ <= i__1; ++i__) {
 	if (r_imag(&h__[i__ + (i__ - 1) * h_dim1]) != 0.f) {
@@ -244,13 +262,6 @@ static integer c__2 = 2;
 	    i__2 = i__ + (i__ - 1) * h_dim1;
 	    r__1 = c_abs(&h__[i__ + (i__ - 1) * h_dim1]);
 	    h__[i__2].r = r__1, h__[i__2].i = 0.f;
-	    if (*wantt) {
-		jlo = 1;
-		jhi = *n;
-	    } else {
-		jlo = *ilo;
-		jhi = *ihi;
-	    }
 	    i__2 = jhi - i__ + 1;
 	    cscal_(&i__2, &sc, &h__[i__ + i__ * h_dim1], ldh);
 /* Computing MIN */
@@ -409,7 +420,16 @@ L50:
 	    i2 = i__;
 	}
 
-	if (its == 10 || its == 20) {
+	if (its == 10) {
+
+/*           Exceptional shift. */
+
+	    i__1 = l + 1 + l * h_dim1;
+	    s = (r__1 = h__[i__1].r, dabs(r__1)) * .75f;
+	    i__1 = l + l * h_dim1;
+	    q__1.r = s + h__[i__1].r, q__1.i = h__[i__1].i;
+	    t.r = q__1.r, t.i = q__1.i;
+	} else if (its == 20) {
 
 /*           Exceptional shift. */
 

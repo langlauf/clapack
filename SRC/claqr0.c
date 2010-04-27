@@ -1,3 +1,15 @@
+/* claqr0.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -33,13 +45,11 @@ static integer c__3 = 3;
     complex aa, bb, cc, dd;
     integer ld, nh, it, ks, kt, ku, kv, ls, ns, nw;
     complex tr2, det;
-    integer inf, kdu, nho, nve, kwh, nsr, nwr, kwv, ndfl, kbot, nmin;
+    integer inf, kdu, nho, nve, kwh, nsr, nwr, kwv, ndec, ndfl, kbot, nmin;
     complex swap;
     integer ktop;
     complex zdum[1]	/* was [1][1] */;
-    integer kacc22;
-    logical nwinc;
-    integer itmax, nsmax, nwmax, kwtop;
+    integer kacc22, itmax, nsmax, nwmax, kwtop;
     extern /* Subroutine */ int claqr3_(logical *, logical *, integer *, 
 	    integer *, integer *, integer *, complex *, integer *, integer *, 
 	    integer *, complex *, integer *, integer *, integer *, complex *, 
@@ -59,14 +69,15 @@ static integer c__3 = 3;
 	    integer *, integer *, complex *, integer *, complex *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
-    char jbcmpz[2];
+    char jbcmpz[1];
     complex rtdisc;
+    integer nwupbd;
     logical sorted;
     integer lwkopt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -219,14 +230,15 @@ static integer c__3 = 3;
 /*     .    (This is a hard limit.) ==== */
 
 /*     ==== Exceptional deflation windows:  try to cure rare */
-/*     .    slow convergence by increasing the size of the */
-/*     .    deflation window after KEXNW iterations. ===== */
+/*     .    slow convergence by varying the size of the */
+/*     .    deflation window after KEXNW iterations. ==== */
 
 /*     ==== Exceptional shifts: try to cure rare slow convergence */
 /*     .    with ad-hoc exceptional shifts every KEXSH iterations. */
-/*     .    The constants WILK1 and WILK2 are used to form the */
-/*     .    exceptional shifts. ==== */
+/*     .    ==== */
 
+/*     ==== The constant WILK1 is used to form the exceptional */
+/*     .    shifts. ==== */
 /*     .. */
 /*     .. Local Scalars .. */
 /*     .. */
@@ -263,24 +275,9 @@ static integer c__3 = 3;
 	return 0;
     }
 
-/*     ==== Set up job flags for ILAENV. ==== */
-
-    if (*wantt) {
-	*(unsigned char *)jbcmpz = 'S';
-    } else {
-	*(unsigned char *)jbcmpz = 'E';
-    }
-    if (*wantz) {
-	*(unsigned char *)&jbcmpz[1] = 'V';
-    } else {
-	*(unsigned char *)&jbcmpz[1] = 'N';
-    }
-
-/*     ==== Tiny matrices must use CLAHQR. ==== */
-
     if (*n <= 11) {
 
-/*        ==== Estimate optimal workspace. ==== */
+/*        ==== Tiny matrices must use CLAHQR. ==== */
 
 	lwkopt = 1;
 	if (*lwork != -1) {
@@ -296,6 +293,19 @@ static integer c__3 = 3;
 
 	*info = 0;
 
+/*        ==== Set up job flags for ILAENV. ==== */
+
+	if (*wantt) {
+	    *(unsigned char *)jbcmpz = 'S';
+	} else {
+	    *(unsigned char *)jbcmpz = 'E';
+	}
+	if (*wantz) {
+	    *(unsigned char *)&jbcmpz[1] = 'V';
+	} else {
+	    *(unsigned char *)&jbcmpz[1] = 'N';
+	}
+
 /*        ==== NWR = recommended deflation window size.  At this */
 /*        .    point,  N .GT. NTINY = 11, so there is enough */
 /*        .    subdiagonal workspace for NWR.GE.2 as required. */
@@ -307,7 +317,6 @@ static integer c__3 = 3;
 /* Computing MIN */
 	i__1 = *ihi - *ilo + 1, i__2 = (*n - 1) / 3, i__1 = min(i__1,i__2);
 	nwr = min(i__1,nwr);
-	nw = nwr;
 
 /*        ==== NSR = recommended number of simultaneous shifts. */
 /*        .    At this point N .GT. NTINY = 11, so there is at */
@@ -371,6 +380,7 @@ static integer c__3 = 3;
 /* Computing MIN */
 	i__1 = (*n - 1) / 3, i__2 = *lwork / 2;
 	nwmax = min(i__1,i__2);
+	nw = nwmax;
 
 /*        ==== NSMAX = the Largest number of simultaneous shifts */
 /*        .    for which there is sufficient workspace. ==== */
@@ -419,61 +429,55 @@ static integer c__3 = 3;
 L20:
 	    ktop = k;
 
-/*           ==== Select deflation window size ==== */
+/*           ==== Select deflation window size: */
+/*           .    Typical Case: */
+/*           .      If possible and advisable, nibble the entire */
+/*           .      active block.  If not, use size MIN(NWR,NWMAX) */
+/*           .      or MIN(NWR+1,NWMAX) depending upon which has */
+/*           .      the smaller corresponding subdiagonal entry */
+/*           .      (a heuristic). */
+/*           . */
+/*           .    Exceptional Case: */
+/*           .      If there have been no deflations in KEXNW or */
+/*           .      more iterations, then vary the deflation window */
+/*           .      size.   At first, because, larger windows are, */
+/*           .      in general, more powerful than smaller ones, */
+/*           .      rapidly increase the window to the maximum possible. */
+/*           .      Then, gradually reduce the window size. ==== */
 
 	    nh = kbot - ktop + 1;
-	    if (ndfl < 5 || nh < nw) {
-
-/*              ==== Typical deflation window.  If possible and */
-/*              .    advisable, nibble the entire active block. */
-/*              .    If not, use size NWR or NWR+1 depending upon */
-/*              .    which has the smaller corresponding subdiagonal */
-/*              .    entry (a heuristic). ==== */
-
-		nwinc = TRUE_;
-		if (nh <= min(nmin,nwmax)) {
+	    nwupbd = min(nh,nwmax);
+	    if (ndfl < 5) {
+		nw = min(nwupbd,nwr);
+	    } else {
+/* Computing MIN */
+		i__2 = nwupbd, i__3 = nw << 1;
+		nw = min(i__2,i__3);
+	    }
+	    if (nw < nwmax) {
+		if (nw >= nh - 1) {
 		    nw = nh;
 		} else {
-/* Computing MIN */
-		    i__2 = min(nwr,nh);
-		    nw = min(i__2,nwmax);
-		    if (nw < nwmax) {
-			if (nw >= nh - 1) {
-			    nw = nh;
-			} else {
-			    kwtop = kbot - nw + 1;
-			    i__2 = kwtop + (kwtop - 1) * h_dim1;
-			    i__3 = kwtop - 1 + (kwtop - 2) * h_dim1;
-			    if ((r__1 = h__[i__2].r, dabs(r__1)) + (r__2 = 
-				    r_imag(&h__[kwtop + (kwtop - 1) * h_dim1])
-				    , dabs(r__2)) > (r__3 = h__[i__3].r, dabs(
-				    r__3)) + (r__4 = r_imag(&h__[kwtop - 1 + (
-				    kwtop - 2) * h_dim1]), dabs(r__4))) {
-				++nw;
-			    }
-			}
+		    kwtop = kbot - nw + 1;
+		    i__2 = kwtop + (kwtop - 1) * h_dim1;
+		    i__3 = kwtop - 1 + (kwtop - 2) * h_dim1;
+		    if ((r__1 = h__[i__2].r, dabs(r__1)) + (r__2 = r_imag(&
+			    h__[kwtop + (kwtop - 1) * h_dim1]), dabs(r__2)) > 
+			    (r__3 = h__[i__3].r, dabs(r__3)) + (r__4 = r_imag(
+			    &h__[kwtop - 1 + (kwtop - 2) * h_dim1]), dabs(
+			    r__4))) {
+			++nw;
 		    }
 		}
-	    } else {
-
-/*              ==== Exceptional deflation window.  If there have */
-/*              .    been no deflations in KEXNW or more iterations, */
-/*              .    then vary the deflation window size.   At first, */
-/*              .    because, larger windows are, in general, more */
-/*              .    powerful than smaller ones, rapidly increase the */
-/*              .    window up to the maximum reasonable and possible. */
-/*              .    Then maybe try a slightly smaller window.  ==== */
-
-		if (nwinc && nw < min(nwmax,nh)) {
-/* Computing MIN */
-		    i__2 = min(nwmax,nh), i__3 = nw << 1;
-		    nw = min(i__2,i__3);
-		} else {
-		    nwinc = FALSE_;
-		    if (nw == nh && nh > 2) {
-			nw = nh - 1;
-		    }
+	    }
+	    if (ndfl < 5) {
+		ndec = -1;
+	    } else if (ndec >= 0 || nw >= nwupbd) {
+		++ndec;
+		if (nw - ndec < 2) {
+		    ndec = 0;
 		}
+		nw -= ndec;
 	    }
 
 /*           ==== Aggressive early deflation: */

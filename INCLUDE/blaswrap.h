@@ -9,15 +9,15 @@
  
 /* BLAS1 routines */
 #define srotg_ f2c_srotg
+#define crotg_ f2c_crotg
 #define drotg_ f2c_drotg
+#define zrotg_ f2c_zrotg
 #define srotmg_ f2c_srotmg
 #define drotmg_ f2c_drotmg
 #define srot_ f2c_srot
 #define drot_ f2c_drot
 #define srotm_ f2c_srotm
 #define drotm_ f2c_drotm
-#define csrot_ f2c_csrot
-#define zdrot_ f2c_zdrot
 #define sswap_ f2c_sswap
 #define dswap_ f2c_dswap
 #define cswap_ f2c_cswap

@@ -1,3 +1,15 @@
+/* zerrsy.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -161,7 +173,7 @@ static integer c__4 = 4;
 
 /*        ZSYTRF */
 
-	s_copy(srnamc_1.srnamt, "ZSYTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsytrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("ZSYTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -177,7 +189,7 @@ static integer c__4 = 4;
 
 /*        ZSYTF2 */
 
-	s_copy(srnamc_1.srnamt, "ZSYTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsytf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("ZSYTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -193,7 +205,7 @@ static integer c__4 = 4;
 
 /*        ZSYTRI */
 
-	s_copy(srnamc_1.srnamt, "ZSYTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsytri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("ZSYTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -209,7 +221,7 @@ static integer c__4 = 4;
 
 /*        ZSYTRS */
 
-	s_copy(srnamc_1.srnamt, "ZSYTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsytrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("ZSYTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -233,7 +245,7 @@ static integer c__4 = 4;
 
 /*        ZSYRFS */
 
-	s_copy(srnamc_1.srnamt, "ZSYRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsyrfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -272,7 +284,7 @@ static integer c__4 = 4;
 
 /*        ZSYCON */
 
-	s_copy(srnamc_1.srnamt, "ZSYCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsycon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, &info);
 	chkxer_("ZSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -298,7 +310,7 @@ static integer c__4 = 4;
 
 /*        ZSPTRF */
 
-	s_copy(srnamc_1.srnamt, "ZSPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsptrf_("/", &c__0, a, ip, &info);
 	chkxer_("ZSPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -310,7 +322,7 @@ static integer c__4 = 4;
 
 /*        ZSPTRI */
 
-	s_copy(srnamc_1.srnamt, "ZSPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("ZSPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -322,7 +334,7 @@ static integer c__4 = 4;
 
 /*        ZSPTRS */
 
-	s_copy(srnamc_1.srnamt, "ZSPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("ZSPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -342,7 +354,7 @@ static integer c__4 = 4;
 
 /*        ZSPRFS */
 
-	s_copy(srnamc_1.srnamt, "ZSPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		r__, &info);
@@ -371,7 +383,7 @@ static integer c__4 = 4;
 
 /*        ZSPCON */
 
-	s_copy(srnamc_1.srnamt, "ZSPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zspcon_("/", &c__0, a, ip, &anrm, &rcond, w, &info);
 	chkxer_("ZSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

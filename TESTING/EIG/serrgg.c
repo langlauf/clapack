@@ -1,3 +1,15 @@
+/* serrgg.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -208,7 +220,7 @@ static integer c__20 = 20;
 
 /*        SGGHRD */
 
-	s_copy(srnamc_1.srnamt, "SGGHRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGHRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgghrd_("/", "N", &c__0, &c__1, &c__0, a, &c__1, b, &c__1, q, &c__1, 
 		z__, &c__1, &info);
@@ -258,7 +270,7 @@ static integer c__20 = 20;
 
 /*        SHGEQZ */
 
-	s_copy(srnamc_1.srnamt, "SHGEQZ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SHGEQZ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	shgeqz_("/", "N", "N", &c__0, &c__1, &c__0, a, &c__1, b, &c__1, r1, 
 		r2, r3, q, &c__1, z__, &c__1, w, &c__18, &info);
@@ -313,7 +325,7 @@ static integer c__20 = 20;
 
 /*        STGEVC */
 
-	s_copy(srnamc_1.srnamt, "STGEVC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "STGEVC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	stgevc_("/", "A", sel, &c__0, a, &c__1, b, &c__1, q, &c__1, z__, &
 		c__1, &c__0, &m, w, &info);
@@ -362,7 +374,7 @@ static integer c__20 = 20;
 
 /*        SGGSVD */
 
-	s_copy(srnamc_1.srnamt, "SGGSVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGSVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggsvd_("/", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
 		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
@@ -433,7 +445,7 @@ static integer c__20 = 20;
 
 /*        SGGSVP */
 
-	s_copy(srnamc_1.srnamt, "SGGSVP", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGSVP", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggsvp_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
@@ -504,7 +516,7 @@ static integer c__20 = 20;
 
 /*        STGSJA */
 
-	s_copy(srnamc_1.srnamt, "STGSJA", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "STGSJA", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	stgsja_("/", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
 		c__1, b, &c__1, &tola, &tolb, r1, r2, u, &c__1, v, &c__1, q, &
@@ -579,7 +591,7 @@ static integer c__20 = 20;
 
 /*        SGGGLM */
 
-	s_copy(srnamc_1.srnamt, "SGGGLM", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGGLM", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggglm_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, r1, r2, r3, w, &
 		c__18, &info);
@@ -628,7 +640,7 @@ static integer c__20 = 20;
 
 /*        SGGLSE */
 
-	s_copy(srnamc_1.srnamt, "SGGLSE", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGLSE", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgglse_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, r1, r2, r3, w, &
 		c__18, &info);
@@ -677,7 +689,7 @@ static integer c__20 = 20;
 
 /*        SGGQRF */
 
-	s_copy(srnamc_1.srnamt, "SGGQRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGQRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggqrf_(&c_n1, &c__0, &c__0, a, &c__1, r1, b, &c__1, r2, w, &c__18, &
 		info);
@@ -712,7 +724,7 @@ static integer c__20 = 20;
 
 /*        SGGRQF */
 
-	s_copy(srnamc_1.srnamt, "SGGRQF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGRQF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggrqf_(&c_n1, &c__0, &c__0, a, &c__1, r1, b, &c__1, r2, w, &c__18, &
 		info);
@@ -753,7 +765,7 @@ static integer c__20 = 20;
 
 /*        SGGES */
 
-	s_copy(srnamc_1.srnamt, "SGGES ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGES ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgges_("/", "N", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
@@ -813,7 +825,7 @@ static integer c__20 = 20;
 
 /*        SGGESX */
 
-	s_copy(srnamc_1.srnamt, "SGGESX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGESX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggesx_("/", "N", "S", (L_fp)slctsx_, "N", &c__1, a, &c__1, b, &c__1, 
 		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
@@ -908,7 +920,7 @@ static integer c__20 = 20;
 
 /*        SGGEV */
 
-	s_copy(srnamc_1.srnamt, "SGGEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggev_("/", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, &c__1, u, &
 		c__1, w, &c__1, &info);
@@ -963,7 +975,7 @@ static integer c__20 = 20;
 
 /*        SGGEVX */
 
-	s_copy(srnamc_1.srnamt, "SGGEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGGEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggevx_("/", "N", "N", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
 		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
@@ -1040,7 +1052,7 @@ static integer c__20 = 20;
 
 /*        STGEXC */
 
-	s_copy(srnamc_1.srnamt, "STGEXC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "STGEXC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 3;
 	stgexc_(&c_true, &c_true, &c_n1, a, &c__1, b, &c__1, q, &c__1, z__, &
 		c__1, &ifst, &ilst, w, &c__1, &info);
@@ -1085,7 +1097,7 @@ static integer c__20 = 20;
 
 /*        STGSEN */
 
-	s_copy(srnamc_1.srnamt, "STGSEN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "STGSEN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	stgsen_(&c_n1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
 		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
@@ -1162,7 +1174,7 @@ static integer c__20 = 20;
 
 /*        STGSNA */
 
-	s_copy(srnamc_1.srnamt, "STGSNA", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "STGSNA", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	stgsna_("/", "A", sel, &c__1, a, &c__1, b, &c__1, q, &c__1, u, &c__1, 
 		r1, r2, &c__1, &m, w, &c__1, iw, &info);
@@ -1212,7 +1224,7 @@ static integer c__20 = 20;
 
 /*        STGSYL */
 
-	s_copy(srnamc_1.srnamt, "STGSYL", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "STGSYL", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	stgsyl_("/", &c__0, &c__1, &c__1, a, &c__1, b, &c__1, q, &c__1, u, &
 		c__1, v, &c__1, z__, &c__1, &scale, &dif, w, &c__1, iw, &info);

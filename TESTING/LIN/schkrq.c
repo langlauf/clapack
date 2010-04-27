@@ -1,3 +1,15 @@
+/* schkrq.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -41,7 +53,7 @@ static integer c__3 = 3;
 	    "t(\002,i2,\002)=\002,g12.5)";
 
     /* System generated locals */
-    integer i__1, i__2, i__3, i__4, i__5;
+    integer i__1, i__2, i__3, i__4;
 
     /* Builtin functions */
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
@@ -73,8 +85,10 @@ static integer c__3 = 3;
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
 ), alaerh_(char *, char *, integer *, 
 	    integer *, char *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *), alasum_(char *, integer *, integer *, integer *, 
-	    integer *);
+	    integer *, integer *, integer *, integer *, integer *);
+    extern logical sgennd_(integer *, integer *, real *, integer *);
+    extern /* Subroutine */ int alasum_(char *, integer *, integer *, integer 
+	    *, integer *);
     real cndnum;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), slarhs_(char *, char *, 
@@ -86,7 +100,7 @@ static integer c__3 = 3;
 	    integer *, char *, real *, integer *, real *, integer *), sgerqs_(integer *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *, integer *, integer *
 );
-    real result[7];
+    real result[8];
     extern /* Subroutine */ int serrrq_(char *, integer *);
 
     /* Fortran I/O blocks */
@@ -190,6 +204,8 @@ static integer c__3 = 3;
 /*     .. */
 /*     .. Local Arrays .. */
 /*     .. */
+/*     .. External Functions .. */
+/*     .. */
 /*     .. External Subroutines .. */
 /*     .. */
 /*     .. Intrinsic Functions .. */
@@ -271,7 +287,7 @@ static integer c__3 = 3;
 		slatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)32, (ftnlen)6);
 		slatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
 			work[1], &info);
@@ -316,6 +332,9 @@ static integer c__3 = 3;
 			xlaenv_(&c__1, &nb);
 			nx = nxval[inb];
 			xlaenv_(&c__3, &nx);
+			for (i__ = 1; i__ <= 8; ++i__) {
+			    result[i__ - 1] = 0.f;
+			}
 			nt = 2;
 			if (ik == 1) {
 
@@ -324,6 +343,20 @@ static integer c__3 = 3;
 			    srqt01_(&m, &n, &a[1], &af[1], &aq[1], &ar[1], &
 				    lda, &tau[1], &work[1], &lwork, &rwork[1], 
 				     result);
+			    if (m <= n) {
+/*                          Check the upper-right m-by-m corner */
+				if (! sgennd_(&m, &m, &af[lda * (n - m) + 1], 
+					&lda)) {
+				    result[7] = *thresh * 2;
+				}
+			    } else {
+/*                          Check the (m-n)th subdiagonal */
+				i__ = m - n;
+				if (! sgennd_(&n, &n, &af[i__ + 1], &lda)) {
+				    result[7] = *thresh * 2;
+				}
+			    }
+			    ++nt;
 			} else if (m <= n) {
 
 /*                       Test SORGRQ, using factorization */
@@ -332,9 +365,6 @@ static integer c__3 = 3;
 			    srqt02_(&m, &n, &k, &a[1], &af[1], &aq[1], &ar[1], 
 				     &lda, &tau[1], &work[1], &lwork, &rwork[
 				    1], result);
-			} else {
-			    result[0] = 0.f;
-			    result[1] = 0.f;
 			}
 			if (m >= k) {
 
@@ -355,8 +385,8 @@ static integer c__3 = 3;
 /*                          Generate a solution and set the right */
 /*                          hand side. */
 
-				s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)32, 
+					(ftnlen)6);
 				slarhs_(path, "New", "Full", "No transpose", &
 					m, &n, &c__0, &c__0, nrhs, &a[1], &
 					lda, &xact[1], &lda, &b[1], &lda, 
@@ -364,8 +394,8 @@ static integer c__3 = 3;
 
 				slacpy_("Full", &m, nrhs, &b[1], &lda, &x[n - 
 					m + 1], &lda);
-				s_copy(srnamc_1.srnamt, "SGERQS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "SGERQS", (ftnlen)32, 
+					(ftnlen)6);
 				sgerqs_(&m, &n, nrhs, &af[1], &lda, &tau[1], &
 					x[1], &lda, &work[1], &lwork, &info);
 
@@ -381,21 +411,13 @@ static integer c__3 = 3;
 					lda, &x[1], &lda, &b[1], &lda, &rwork[
 					1], &result[6]);
 				++nt;
-			    } else {
-				result[6] = 0.f;
 			    }
-			} else {
-			    result[2] = 0.f;
-			    result[3] = 0.f;
-			    result[4] = 0.f;
-			    result[5] = 0.f;
 			}
 
 /*                    Print information about the tests that did not */
 /*                    pass the threshold. */
 
-			i__5 = nt;
-			for (i__ = 1; i__ <= i__5; ++i__) {
+			for (i__ = 1; i__ <= 8; ++i__) {
 			    if (result[i__ - 1] >= *thresh) {
 				if (nfail == 0 && nerrs == 0) {
 				    alahd_(nout, path);

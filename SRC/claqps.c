@@ -1,3 +1,15 @@
+/* claqps.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -35,7 +47,7 @@ static integer c__1 = 1;
 	    integer *, complex *, integer *, complex *, integer *);
     integer itemp;
     extern doublereal scnrm2_(integer *, complex *, integer *);
-    extern /* Subroutine */ int clarfg_(integer *, complex *, complex *, 
+    extern /* Subroutine */ int clarfp_(integer *, complex *, complex *, 
 	    integer *, complex *);
     extern doublereal slamch_(char *);
     integer lsticc;
@@ -43,8 +55,9 @@ static integer c__1 = 1;
     integer lastrk;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
+/*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
+/*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..-- */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -216,10 +229,10 @@ L10:
 
 	if (rk < *m) {
 	    i__1 = *m - rk + 1;
-	    clarfg_(&i__1, &a[rk + k * a_dim1], &a[rk + 1 + k * a_dim1], &
+	    clarfp_(&i__1, &a[rk + k * a_dim1], &a[rk + 1 + k * a_dim1], &
 		    c__1, &tau[k]);
 	} else {
-	    clarfg_(&c__1, &a[rk + k * a_dim1], &a[rk + k * a_dim1], &c__1, &
+	    clarfp_(&c__1, &a[rk + k * a_dim1], &a[rk + k * a_dim1], &c__1, &
 		    tau[k]);
 	}
 

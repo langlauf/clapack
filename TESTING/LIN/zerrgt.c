@@ -1,3 +1,15 @@
+/* zerrgt.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -142,7 +154,7 @@ static integer c__1 = 1;
 
 /*        ZGTTRF */
 
-	s_copy(srnamc_1.srnamt, "ZGTTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGTTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgttrf_(&c_n1, dl, e, du, du2, ip, &info);
 	chkxer_("ZGTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -150,7 +162,7 @@ static integer c__1 = 1;
 
 /*        ZGTTRS */
 
-	s_copy(srnamc_1.srnamt, "ZGTTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGTTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgttrs_("/", &c__0, &c__0, dl, e, du, du2, ip, x, &c__1, &info);
 	chkxer_("ZGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -170,7 +182,7 @@ static integer c__1 = 1;
 
 /*        ZGTRFS */
 
-	s_copy(srnamc_1.srnamt, "ZGTRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGTRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgtrfs_("/", &c__0, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
@@ -199,7 +211,7 @@ static integer c__1 = 1;
 
 /*        ZGTCON */
 
-	s_copy(srnamc_1.srnamt, "ZGTCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGTCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgtcon_("/", &c__0, dl, e, du, du2, ip, &anorm, &rcond, w, &info);
 	chkxer_("ZGTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -221,7 +233,7 @@ static integer c__1 = 1;
 
 /*        ZPTTRF */
 
-	s_copy(srnamc_1.srnamt, "ZPTTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpttrf_(&c_n1, d__, e, &info);
 	chkxer_("ZPTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -229,7 +241,7 @@ static integer c__1 = 1;
 
 /*        ZPTTRS */
 
-	s_copy(srnamc_1.srnamt, "ZPTTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpttrs_("/", &c__1, &c__0, d__, e, x, &c__1, &info);
 	chkxer_("ZPTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -249,7 +261,7 @@ static integer c__1 = 1;
 
 /*        ZPTRFS */
 
-	s_copy(srnamc_1.srnamt, "ZPTRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zptrfs_("/", &c__1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
@@ -278,7 +290,7 @@ static integer c__1 = 1;
 
 /*        ZPTCON */
 
-	s_copy(srnamc_1.srnamt, "ZPTCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zptcon_(&c_n1, d__, e, &anorm, &rcond, rw, &info);
 	chkxer_("ZPTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

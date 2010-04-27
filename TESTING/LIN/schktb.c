@@ -1,3 +1,15 @@
+/* schktb.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -45,10 +57,10 @@ static integer c__8 = 8;
 	    "',                        DIAG='\002,a1,\002', N=\002,i5,\002, K"
 	    "D=\002,i5,\002, NRHS=\002,i5,\002, type \002,i2,\002, test(\002,"
 	    "i2,\002)=\002,g12.5)";
-    static char fmt_9998[] = "(1x,a6,\002( '\002,a1,\002', '\002,a1,\002', "
+    static char fmt_9998[] = "(1x,a,\002( '\002,a1,\002', '\002,a1,\002', "
 	    "'\002,a1,\002',\002,i5,\002,\002,i5,\002,  ... ), type \002,i2"
 	    ",\002, test(\002,i2,\002)=\002,g12.5)";
-    static char fmt_9997[] = "(1x,a6,\002( '\002,a1,\002', '\002,a1,\002', "
+    static char fmt_9997[] = "(1x,a,\002( '\002,a1,\002', '\002,a1,\002', "
 	    "'\002,a1,\002', '\002,a1,\002',\002,i5,\002,\002,i5,\002, ...  )"
 	    ",  type \002,i2,\002, test(\002,i1,\002)=\002,g12.5)";
 
@@ -316,7 +328,7 @@ static integer c__8 = 8;
 
 /*                 Call SLATTB to generate a triangular test matrix. */
 
-		    s_copy(srnamc_1.srnamt, "SLATTB", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "SLATTB", (ftnlen)32, (ftnlen)6);
 		    slattb_(&imat, uplo, "No transpose", diag, iseed, &n, &kd, 
 			     &ab[1], &ldab, &x[1], &work[1], &info);
 
@@ -396,7 +408,7 @@ static integer c__8 = 8;
 /* +    TEST 1 */
 /*                    Solve and compute residual for op(A)*x = b. */
 
-			    s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)32, (
 				    ftnlen)6);
 			    slarhs_(path, xtype, uplo, trans, &n, &n, &kd, &
 				    idiag, &nrhs, &ab[1], &ldab, &xact[1], &
@@ -405,7 +417,7 @@ static integer c__8 = 8;
 			    slacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
 				    lda);
 
-			    s_copy(srnamc_1.srnamt, "STBTRS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "STBTRS", (ftnlen)32, (
 				    ftnlen)6);
 			    stbtrs_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1], 
 				     &ldab, &x[1], &lda, &info);
@@ -438,7 +450,7 @@ static integer c__8 = 8;
 /*                    Use iterative refinement to improve the solution */
 /*                    and compute error bounds. */
 
-			    s_copy(srnamc_1.srnamt, "STBRFS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "STBRFS", (ftnlen)32, (
 				    ftnlen)6);
 			    stbrfs_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1], 
 				     &ldab, &b[1], &lda, &x[1], &lda, &rwork[
@@ -512,7 +524,7 @@ static integer c__8 = 8;
 			    *(unsigned char *)norm = 'I';
 			    rcondc = rcondi;
 			}
-			s_copy(srnamc_1.srnamt, "STBCON", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "STBCON", (ftnlen)32, (ftnlen)
 				6);
 			stbcon_(norm, uplo, diag, &n, &kd, &ab[1], &ldab, &
 				rcond, &work[1], &iwork[1], &info);
@@ -594,7 +606,7 @@ L90:
 
 /*                    Call SLATTB to generate a triangular test matrix. */
 
-			s_copy(srnamc_1.srnamt, "SLATTB", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "SLATTB", (ftnlen)32, (ftnlen)
 				6);
 			slattb_(&imat, uplo, trans, diag, iseed, &n, &kd, &ab[
 				1], &ldab, &x[1], &work[1], &info);
@@ -602,7 +614,7 @@ L90:
 /* +    TEST 7 */
 /*                    Solve the system op(A)*x = b */
 
-			s_copy(srnamc_1.srnamt, "SLATBS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "SLATBS", (ftnlen)32, (ftnlen)
 				6);
 			scopy_(&n, &x[1], &c__1, &b[1], &c__1);
 			slatbs_(uplo, trans, diag, "N", &n, &kd, &ab[1], &

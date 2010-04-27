@@ -1,3 +1,15 @@
+/* cerrge.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -165,7 +177,7 @@ static integer c__4 = 4;
 
 /*        CGETRF */
 
-	s_copy(srnamc_1.srnamt, "CGETRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGETRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetrf_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -181,7 +193,7 @@ static integer c__4 = 4;
 
 /*        CGETF2 */
 
-	s_copy(srnamc_1.srnamt, "CGETF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGETF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetf2_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -197,7 +209,7 @@ static integer c__4 = 4;
 
 /*        CGETRI */
 
-	s_copy(srnamc_1.srnamt, "CGETRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGETRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetri_(&c_n1, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("CGETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -213,7 +225,7 @@ static integer c__4 = 4;
 
 /*        CGETRS */
 
-	s_copy(srnamc_1.srnamt, "CGETRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGETRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CGETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -237,7 +249,7 @@ static integer c__4 = 4;
 
 /*        CGERFS */
 
-	s_copy(srnamc_1.srnamt, "CGERFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGERFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgerfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -276,7 +288,7 @@ static integer c__4 = 4;
 
 /*        CGECON */
 
-	s_copy(srnamc_1.srnamt, "CGECON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGECON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgecon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r__, &info)
 		;
@@ -295,7 +307,7 @@ static integer c__4 = 4;
 
 /*        CGEEQU */
 
-	s_copy(srnamc_1.srnamt, "CGEEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgeequ_(&c_n1, &c__0, a, &c__1, r1, r2, &rcond, &ccond, &anrm, &info);
 	chkxer_("CGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -316,7 +328,7 @@ static integer c__4 = 4;
 
 /*        CGBTRF */
 
-	s_copy(srnamc_1.srnamt, "CGBTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbtrf_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -340,7 +352,7 @@ static integer c__4 = 4;
 
 /*        CGBTF2 */
 
-	s_copy(srnamc_1.srnamt, "CGBTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbtf2_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -364,7 +376,7 @@ static integer c__4 = 4;
 
 /*        CGBTRS */
 
-	s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbtrs_("/", &c__0, &c__0, &c__0, &c__1, a, &c__1, ip, b, &c__1, &
 		info);
@@ -403,7 +415,7 @@ static integer c__4 = 4;
 
 /*        CGBRFS */
 
-	s_copy(srnamc_1.srnamt, "CGBRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbrfs_("/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &
 		c__1, x, &c__1, r1, r2, w, r__, &info);
@@ -452,7 +464,7 @@ static integer c__4 = 4;
 
 /*        CGBCON */
 
-	s_copy(srnamc_1.srnamt, "CGBCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
@@ -481,7 +493,7 @@ static integer c__4 = 4;
 
 /*        CGBEQU */
 
-	s_copy(srnamc_1.srnamt, "CGBEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbequ_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, r1, r2, &rcond, &ccond, 
 		&anrm, &info);

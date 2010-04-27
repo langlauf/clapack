@@ -1,3 +1,15 @@
+/* ilaenv.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,10 +23,10 @@ struct {
 
 /* Table of constant values */
 
-static integer c__0 = 0;
+static integer c__1 = 1;
 static real c_b3 = 0.f;
 static real c_b4 = 1.f;
-static integer c__1 = 1;
+static integer c__0 = 0;
 
 integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1, 
 	integer *n2, integer *n3, integer *n4)
@@ -155,7 +167,7 @@ integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
 /*        ILAENV = 0 */
 	ret_val = 1;
 	if (ret_val == 1) {
-	    ret_val = ieeeck_(&c__0, &c_b3, &c_b4);
+	    ret_val = ieeeck_(&c__1, &c_b3, &c_b4);
 	}
 
     } else if (*ispec == 11) {
@@ -165,7 +177,7 @@ integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
 /*        ILAENV = 0 */
 	ret_val = 1;
 	if (ret_val == 1) {
-	    ret_val = ieeeck_(&c__1, &c_b3, &c_b4);
+	    ret_val = ieeeck_(&c__0, &c_b3, &c_b4);
 	}
 
     } else {

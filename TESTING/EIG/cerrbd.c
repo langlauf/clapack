@@ -1,3 +1,15 @@
+/* cerrbd.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -137,7 +149,7 @@ static integer c__1 = 1;
 
 /*        CGEBRD */
 
-	s_copy(srnamc_1.srnamt, "CGEBRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEBRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgebrd_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("CGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -158,7 +170,7 @@ static integer c__1 = 1;
 
 /*        CUNGBR */
 
-	s_copy(srnamc_1.srnamt, "CUNGBR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUNGBR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cungbr_("/", &c__0, &c__0, &c__0, a, &c__1, tq, w, &c__1, &info);
 	chkxer_("CUNGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -203,7 +215,7 @@ static integer c__1 = 1;
 
 /*        CUNMBR */
 
-	s_copy(srnamc_1.srnamt, "CUNMBR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUNMBR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cunmbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
@@ -273,7 +285,7 @@ static integer c__1 = 1;
 
 /*        CBDSQR */
 
-	s_copy(srnamc_1.srnamt, "CBDSQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CBDSQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
 		a, &c__1, rw, &info);

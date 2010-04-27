@@ -1,3 +1,15 @@
+/* ddrvab.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -274,7 +286,7 @@ static integer c__1 = 1;
 	    dlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, &
 		    cndnum, dist);
 
-	    s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+	    s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)32, (ftnlen)6);
 	    dlatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &cndnum, &
 		    anorm, &kl, &ku, "No packing", &a[1], &lda, &work[1], &
 		    info);
@@ -320,11 +332,11 @@ static integer c__1 = 1;
 		*(unsigned char *)xtype = 'N';
 		*(unsigned char *)trans = 'N';
 
-		s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)32, (ftnlen)6);
 		dlarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku, &nrhs, &a[
 			1], &lda, &x[1], &lda, &b[1], &lda, iseed, &info);
 
-		s_copy(srnamc_1.srnamt, "DSGESV", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DSGESV", (ftnlen)32, (ftnlen)6);
 
 		++kase;
 

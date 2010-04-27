@@ -1,3 +1,15 @@
+/* ctzrqf.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -25,13 +37,14 @@ static integer c__1 = 1;
 , complex *, integer *, complex *, integer *, complex *, complex *
 , integer *), ccopy_(integer *, complex *, integer *, 
 	    complex *, integer *), caxpy_(integer *, complex *, complex *, 
-	    integer *, complex *, integer *), clarfg_(integer *, complex *, 
-	    complex *, integer *, complex *), clacgv_(integer *, complex *, 
-	    integer *), xerbla_(char *, integer *);
+	    integer *, complex *, integer *), clacgv_(integer *, complex *, 
+	    integer *), clarfp_(integer *, complex *, complex *, integer *, 
+	    complex *), xerbla_(char *, integer *);
 
 
-/*  -- LAPACK routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK routine (version 3.2) -- */
+/*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
+/*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..-- */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -174,7 +187,7 @@ static integer c__1 = 1;
 	    i__1 = k + k * a_dim1;
 	    alpha.r = a[i__1].r, alpha.i = a[i__1].i;
 	    i__1 = *n - *m + 1;
-	    clarfg_(&i__1, &alpha, &a[k + m1 * a_dim1], lda, &tau[k]);
+	    clarfp_(&i__1, &alpha, &a[k + m1 * a_dim1], lda, &tau[k]);
 	    i__1 = k + k * a_dim1;
 	    a[i__1].r = alpha.r, a[i__1].i = alpha.i;
 	    i__1 = k;

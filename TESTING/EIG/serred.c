@@ -1,3 +1,15 @@
+/* serred.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -169,7 +181,7 @@ static integer c__5 = 5;
 
 /*        Test SGEEV */
 
-	s_copy(srnamc_1.srnamt, "SGEEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGEEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeev_("X", "N", &c__0, a, &c__1, wr, wi, vl, &c__1, vr, &c__1, w, &
 		c__1, &info);
@@ -211,7 +223,7 @@ static integer c__5 = 5;
 
 /*        Test SGEES */
 
-	s_copy(srnamc_1.srnamt, "SGEES ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGEES ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgees_("X", "N", (L_fp)sslect_, &c__0, a, &c__1, &sdim, wr, wi, vl, &
 		c__1, w, &c__1, b, &info);
@@ -248,7 +260,7 @@ static integer c__5 = 5;
 
 /*        Test SGEEVX */
 
-	s_copy(srnamc_1.srnamt, "SGEEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGEEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeevx_("X", "N", "N", "N", &c__0, a, &c__1, wr, wi, vl, &c__1, vr, &
 		c__1, &ilo, &ihi, s, &abnrm, r1, r2, w, &c__1, iw, &info);
@@ -310,7 +322,7 @@ static integer c__5 = 5;
 
 /*        Test SGEESX */
 
-	s_copy(srnamc_1.srnamt, "SGEESX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGEESX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeesx_("X", "N", (L_fp)sslect_, "N", &c__0, a, &c__1, &sdim, wr, wi, 
 		vl, &c__1, r1, r2, w, &c__1, iw, &c__1, b, &info);
@@ -352,7 +364,7 @@ static integer c__5 = 5;
 
 /*        Test SGESVD */
 
-	s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgesvd_("X", "N", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &
 		c__1, &info);
@@ -397,7 +409,7 @@ static integer c__5 = 5;
 
 /*        Test SGESDD */
 
-	s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 iw, &info);

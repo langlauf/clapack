@@ -1,3 +1,15 @@
+/* zdrvge.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -23,6 +35,7 @@ static integer c__2 = 2;
 static integer c__0 = 0;
 static integer c_n1 = -1;
 static doublecomplex c_b20 = {0.,0.};
+static logical c_true = TRUE_;
 static integer c__6 = 6;
 static integer c__7 = 7;
 
@@ -41,13 +54,13 @@ static integer c__7 = 7;
     static char equeds[1*4] = "N" "R" "C" "B";
 
     /* Format strings */
-    static char fmt_9999[] = "(1x,a6,\002, N =\002,i5,\002, type \002,i2,"
-	    "\002, test(\002,i2,\002) =\002,g12.5)";
-    static char fmt_9997[] = "(1x,a6,\002, FACT='\002,a1,\002', TRANS='\002,"
-	    "a1,\002', N=\002,i5,\002, EQUED='\002,a1,\002', type \002,i2,"
-	    "\002, test(\002,i1,\002)=\002,g12.5)";
-    static char fmt_9998[] = "(1x,a6,\002, FACT='\002,a1,\002', TRANS='\002,"
-	    "a1,\002', N=\002,i5,\002, type \002,i2,\002, test(\002,i1,\002)"
+    static char fmt_9999[] = "(1x,a,\002, N =\002,i5,\002, type \002,i2,\002"
+	    ", test(\002,i2,\002) =\002,g12.5)";
+    static char fmt_9997[] = "(1x,a,\002, FACT='\002,a1,\002', TRANS='\002,a"
+	    "1,\002', N=\002,i5,\002, EQUED='\002,a1,\002', type \002,i2,\002"
+	    ", test(\002,i1,\002)=\002,g12.5)";
+    static char fmt_9998[] = "(1x,a,\002, FACT='\002,a1,\002', TRANS='\002,a"
+	    "1,\002', N=\002,i5,\002, type \002,i2,\002, test(\002,i1,\002)"
 	    "=\002,g12.5)";
 
     /* System generated locals */
@@ -94,7 +107,7 @@ static integer c__7 = 7;
     extern /* Subroutine */ int zget07_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, doublereal *, doublereal *);
+	    doublereal *, logical *, doublereal *, doublereal *);
     char trans[1];
     integer izero, nerrs, lwork;
     extern /* Subroutine */ int zgesv_(integer *, integer *, doublecomplex *, 
@@ -333,7 +346,7 @@ static integer c__7 = 7;
 		    cndnum, dist);
 	    rcondc = 1. / cndnum;
 
-	    s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+	    s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)32, (ftnlen)6);
 	    zlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cndnum, &
 		    anorm, &kl, &ku, "No packing", &a[1], &lda, &work[1], &
 		    info);
@@ -501,7 +514,7 @@ static integer c__7 = 7;
 
 /*                    Form an exact solution and set the right hand side. */
 
-			s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)32, (ftnlen)
 				6);
 			zlarhs_(path, xtype, "Full", trans, &n, &n, &kl, &ku, 
 				nrhs, &a[1], &lda, &xact[1], &lda, &b[1], &
@@ -521,7 +534,7 @@ static integer c__7 = 7;
 			    zlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
 				    lda);
 
-			    s_copy(srnamc_1.srnamt, "ZGESV ", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZGESV ", (ftnlen)32, (
 				    ftnlen)6);
 			    zgesv_(&n, nrhs, &afac[1], &lda, &iwork[1], &x[1], 
 				     &lda, &info);
@@ -604,7 +617,7 @@ static integer c__7 = 7;
 /*                    Solve the system and compute the condition number */
 /*                    and error bounds using ZGESVX. */
 
-			s_copy(srnamc_1.srnamt, "ZGESVX", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "ZGESVX", (ftnlen)32, (ftnlen)
 				6);
 			zgesvx_(fact, trans, &n, nrhs, &a[1], &lda, &afac[1], 
 				&lda, &iwork[1], equed, &s[1], &s[n + 1], &b[
@@ -695,7 +708,8 @@ static integer c__7 = 7;
 
 			    zget07_(trans, &n, nrhs, &asav[1], &lda, &b[1], &
 				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
-				    1], &rwork[*nrhs + 1], &result[3]);
+				    1], &c_true, &rwork[*nrhs + 1], &result[3]
+);
 			} else {
 			    trfcon = TRUE_;
 			}

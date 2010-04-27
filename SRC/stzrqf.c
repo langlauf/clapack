@@ -1,3 +1,15 @@
+/* stzrqf.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -21,10 +33,10 @@ static real c_b8 = 1.f;
 , real *, real *, integer *), scopy_(integer *, real *, 
 	    integer *, real *, integer *), saxpy_(integer *, real *, real *, 
 	    integer *, real *, integer *), xerbla_(char *, integer *),
-	     slarfg_(integer *, real *, real *, integer *, real *);
+	     slarfp_(integer *, real *, real *, integer *, real *);
 
 
-/*  -- LAPACK routine (version 3.1) -- */
+/*  -- LAPACK routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -160,7 +172,7 @@ static real c_b8 = 1.f;
 /*           First set up the reflection. */
 
 	    i__1 = *n - *m + 1;
-	    slarfg_(&i__1, &a[k + k * a_dim1], &a[k + m1 * a_dim1], lda, &tau[
+	    slarfp_(&i__1, &a[k + k * a_dim1], &a[k + m1 * a_dim1], lda, &tau[
 		    k]);
 
 	    if (tau[k] != 0.f && k > 1) {

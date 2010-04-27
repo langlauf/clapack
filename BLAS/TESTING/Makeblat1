@@ -1,5 +1,6 @@
-include ../../make.inc
- 
+TOPDIR=../..
+include $(TOPDIR)/make.inc 
+
 #######################################################################
 #  This makefile creates the test programs for the BLAS 1 routines.
 #  The test files are grouped as follows:
@@ -44,19 +45,19 @@ complex: ../xblat1c
 complex16: ../xblat1z
 
 ../xblat1s: $(SBLAT1)
-	${CC} $(LOADOPTS)   $(SBLAT1) \
+	$(CC) $(LOADOPTS)   $(SBLAT1) \
         $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1s
 
 ../xblat1c: $(CBLAT1) 
-	${CC} $(LOADOPTS)   $(CBLAT1) \
+	$(CC) $(LOADOPTS)   $(CBLAT1) \
         $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1c
  
 ../xblat1d: $(DBLAT1) 
-	${CC} $(LOADOPTS)   $(DBLAT1) \
+	$(CC) $(LOADOPTS)   $(DBLAT1) \
         $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1d
  
 ../xblat1z: $(ZBLAT1) 
-	${CC} $(LOADOPTS)   $(ZBLAT1) \
+	$(CC) $(LOADOPTS)   $(ZBLAT1) \
         $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1z
  
 $(SBLAT1): $(FRC)
@@ -71,4 +72,4 @@ clean:
 	rm -f *.o
  
 .c.o: 
-	${CC} $(CFLAGS) -c  $<
+	$(CC) $(CFLAGS) -c $< -o $@

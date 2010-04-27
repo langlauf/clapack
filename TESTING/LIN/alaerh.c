@@ -1,5 +1,18 @@
+/* alaerh.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
+#include "string.h"
 
 /* Table of constant values */
 
@@ -14,168 +27,167 @@ static integer c__5 = 5;
 	nout)
 {
     /* Format strings */
-    static char fmt_9988[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> M =\002,i5,\002, N "
-	    "=\002,i5,\002, NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9975[] = "(\002 *** Error code from \002,a6,\002=\002,"
-	    "i5,\002 for M=\002,i5,\002, N=\002,i5,\002, NB=\002,i4,\002, typ"
-	    "e \002,i2)";
+    static char fmt_9988[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> M =\002,i5,\002, N =\002,i"
+	    "5,\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9975[] = "(\002 *** Error code from \002,a,\002=\002,i5"
+	    ",\002 for M=\002,i5,\002, N=\002,i5,\002, NB=\002,i4,\002, type"
+	    " \002,i2)";
     static char fmt_9949[] = "(\002 ==> Doing only the condition estimate fo"
 	    "r this case\002)";
-    static char fmt_9984[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> N =\002,i5,\002, NRHS ="
+    static char fmt_9984[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> N =\002,i5,\002, NRHS ="
 	    "\002,i4,\002, type \002,i2)";
-    static char fmt_9970[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,\002 for N =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9992[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', T"
-	    "RANS='\002,a1,\002', N =\002,i5,\002, NRHS =\002,i4,\002, type"
-	    " \002,i2)";
-    static char fmt_9997[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> FACT='\002,a1,\002', TRANS='\002,a1,\002', N =\002,i"
-	    "5,\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9971[] = "(\002 *** Error code from \002,a6,\002=\002,"
-	    "i5,\002 for N=\002,i5,\002, NB=\002,i4,\002, type \002,i2)";
-    static char fmt_9978[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,\002 for M =\002,i5,\002, N =\002,i5,\002, type \002,i2)";
-    static char fmt_9969[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,\002 for NORM = '\002,a1,\002', N =\002,i5,\002, type \002,i2)";
-    static char fmt_9965[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> TRANS = '\002,a1,\002', M =\002,i5,\002, N =\002,i5"
-	    ",\002, NRHS =\002,i4,\002, NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9974[] = "(\002 *** Error code from \002,a6,\002=\002,i5"
-	    ",/\002 ==> M =\002,i5,\002, N =\002,i5,\002, NRHS =\002,i4,\002,"
-	    " NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9963[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> TRANS = '\002,a1,\002', N =\002,i5,\002, NRHS =\002,"
-	    "i4,\002, type \002,i2)";
-    static char fmt_9989[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> M = \002,i5,\002, N "
-	    "=\002,i5,\002, KL =\002,i5,\002, KU =\002,i5,\002, NB =\002,i4"
-	    ",\002, type \002,i2)";
-    static char fmt_9976[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> M = \002,i5,\002, N =\002,i5,\002, KL =\002,i5,\002,"
-	    " KU =\002,i5,\002, NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9986[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> N =\002,i5,\002, KL "
-	    "=\002,i5,\002, KU =\002,i5,\002, NRHS =\002,i4,\002, type \002,i"
-	    "2)";
-    static char fmt_9972[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> N =\002,i5,\002, KL =\002,i5,\002, KU =\002,i5,\002,"
-	    " NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9993[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', T"
-	    "RANS='\002,a1,\002', N=\002,i5,\002, KL=\002,i5,\002, KU=\002,i5,"
-	    "\002, NRHS=\002,i4,\002, type \002,i1)";
-    static char fmt_9998[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> FACT='\002,a1,\002', TRANS='\002,a1,\002', N=\002,i5,"
-	    "\002, KL=\002,i5,\002, KU=\002,i5,\002, NRHS=\002,i4,\002, type"
-	    " \002,i1)";
-    static char fmt_9977[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> M = \002,i5,\002, N =\002,i5,\002, KL =\002,i5,\002,"
-	    " KU =\002,i5,\002, type \002,i2)";
-    static char fmt_9968[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> NORM ='\002,a1,\002', N =\002,i5,\002, KL =\002,i5"
-	    ",\002, KU =\002,i5,\002, type \002,i2)";
-    static char fmt_9964[] = "(\002 *** Error code from \002,a6,\002=\002,i5"
-	    ",/\002 ==> TRANS='\002,a1,\002', N =\002,i5,\002, KL =\002,i5"
-	    ",\002, KU =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9987[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,\002 for N=\002,i5,\002, type"
-	    " \002,i2)";
-    static char fmt_9973[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,\002 for N =\002,i5,\002, type \002,i2)";
-    static char fmt_9980[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002',"
-	    " N =\002,i5,\002, NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9956[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, NB =\002,i4"
-	    ",\002, type \002,i2)";
-    static char fmt_9979[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002',"
-	    " N =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9955[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, NRHS =\002,i"
-	    "4,\002, type \002,i2)";
-    static char fmt_9990[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', U"
-	    "PLO='\002,a1,\002', N =\002,i5,\002, NRHS =\002,i4,\002, type"
-	    " \002,i2)";
-    static char fmt_9995[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> FACT='\002,a1,\002', UPLO='\002,a1,\002', N =\002,i5,"
+    static char fmt_9970[] = "(\002 *** Error code from \002,a,\002 =\002,"
+	    "i5,\002 for N =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9992[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', TRANS"
+	    "='\002,a1,\002', N =\002,i5,\002, NRHS =\002,i4,\002, type \002,"
+	    "i2)";
+    static char fmt_9997[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> FACT='\002,a1,\002', TRANS='\002,a1,\002', N =\002,i5,"
 	    "\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9960[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,\002 for UPLO = '\002,a1,\002', N =\002,i5,\002, type \002,i2)";
-    static char fmt_9983[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002',"
-	    " N =\002,i5,\002, type \002,i2)";
-    static char fmt_9982[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002',"
-	    " N =\002,i5,\002, KD =\002,i5,\002, NB =\002,i4,\002, type \002,"
-	    "i2)";
-    static char fmt_9958[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, KD =\002,i5"
-	    ",\002, NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9981[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> UPLO='\002,a1,\002', N"
-	    " =\002,i5,\002, KD =\002,i5,\002, NRHS =\002,i4,\002, type \002,"
-	    "i2)";
-    static char fmt_9957[] = "(\002 *** Error code from \002,a6,\002=\002,i5"
-	    ",/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, KD =\002,i5"
-	    ",\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9991[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', U"
-	    "PLO='\002,a1,\002', N=\002,i5,\002, KD=\002,i5,\002, NRHS=\002,i"
+    static char fmt_9971[] = "(\002 *** Error code from \002,a,\002=\002,i5"
+	    ",\002 for N=\002,i5,\002, NB=\002,i4,\002, type \002,i2)";
+    static char fmt_9978[] = "(\002 *** Error code from \002,a,\002 =\002,"
+	    "i5,\002 for M =\002,i5,\002, N =\002,i5,\002, type \002,i2)";
+    static char fmt_9969[] = "(\002 *** Error code from \002,a,\002 =\002,"
+	    "i5,\002 for NORM = '\002,a1,\002', N =\002,i5,\002, type \002,i2)"
+	    ;
+    static char fmt_9965[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> TRANS = '\002,a1,\002', M =\002,i5,\002, N =\002,i5"
+	    ",\002, NRHS =\002,i4,\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9974[] = "(\002 *** Error code from \002,a,\002=\002,i"
+	    "5,/\002 ==> M =\002,i5,\002, N =\002,i5,\002, NRHS =\002,i4,\002"
+	    ", NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9963[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> TRANS = '\002,a1,\002', N =\002,i5,\002, NRHS =\002,i"
 	    "4,\002, type \002,i2)";
-    static char fmt_9996[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> FACT='\002,a1,\002', UPLO='\002,a1,\002', N=\002,i5"
-	    ",\002, KD=\002,i5,\002, NRHS=\002,i4,\002, type \002,i2)";
-    static char fmt_9959[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, KD =\002,i5"
+    static char fmt_9989[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> M = \002,i5,\002, N =\002,"
+	    "i5,\002, KL =\002,i5,\002, KU =\002,i5,\002, NB =\002,i4,\002, t"
+	    "ype \002,i2)";
+    static char fmt_9976[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> M = \002,i5,\002, N =\002,i5,\002, KL =\002,i5,\002, "
+	    "KU =\002,i5,\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9986[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> N =\002,i5,\002, KL =\002,"
+	    "i5,\002, KU =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9972[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> N =\002,i5,\002, KL =\002,i5,\002, KU =\002,i5,\002, "
+	    "NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9993[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', TRANS"
+	    "='\002,a1,\002', N=\002,i5,\002, KL=\002,i5,\002, KU=\002,i5,"
+	    "\002, NRHS=\002,i4,\002, type \002,i1)";
+    static char fmt_9998[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> FACT='\002,a1,\002', TRANS='\002,a1,\002', N=\002,i5"
+	    ",\002, KL=\002,i5,\002, KU=\002,i5,\002, NRHS=\002,i4,\002, type "
+	    "\002,i1)";
+    static char fmt_9977[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> M = \002,i5,\002, N =\002,i5,\002, KL =\002,i5,\002, "
+	    "KU =\002,i5,\002, type \002,i2)";
+    static char fmt_9968[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> NORM ='\002,a1,\002', N =\002,i5,\002, KL =\002,i5"
+	    ",\002, KU =\002,i5,\002, type \002,i2)";
+    static char fmt_9964[] = "(\002 *** Error code from \002,a,\002=\002,i"
+	    "5,/\002 ==> TRANS='\002,a1,\002', N =\002,i5,\002, KL =\002,i5"
+	    ",\002, KU =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9987[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,\002 for N=\002,i5,\002, type \002,i"
+	    "2)";
+    static char fmt_9973[] = "(\002 *** Error code from \002,a,\002 =\002,"
+	    "i5,\002 for N =\002,i5,\002, type \002,i2)";
+    static char fmt_9980[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002', N "
+	    "=\002,i5,\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9956[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, NB =\002,i4"
 	    ",\002, type \002,i2)";
-    static char fmt_9994[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', N"
-	    " =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
-    static char fmt_9999[] = "(\002 *** Error code from \002,a6,\002=\002,"
-	    "i5,\002, FACT='\002,a1,\002', N=\002,i5,\002, NRHS=\002,i4,\002,"
-	    " type \002,i2)";
-    static char fmt_9961[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO='\002,a1,\002', DIAG ='\002,a1,\002', N =\002,i"
-	    "5,\002, NB =\002,i4,\002, type \002,i2)";
-    static char fmt_9967[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> NORM='\002,a1,\002', UPLO ='\002,a1,\002', DIAG='"
-	    "\002,a1,\002', N =\002,i5,\002, type \002,i2)";
-    static char fmt_9952[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='"
-	    "\002,a1,\002', NORMIN='\002,a1,\002', N =\002,i5,\002, type \002"
-	    ",i2)";
-    static char fmt_9953[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='"
+    static char fmt_9979[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002', N "
+	    "=\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9955[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, NRHS =\002,i4,"
+	    "\002, type \002,i2)";
+    static char fmt_9990[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', UPLO='"
 	    "\002,a1,\002', N =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)"
 	    ;
-    static char fmt_9962[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO='\002,a1,\002', DIAG ='\002,a1,\002', N =\002,i"
-	    "5,\002, type \002,i2)";
-    static char fmt_9966[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> NORM='\002,a1,\002', UPLO ='\002,a1,\002', DIAG='"
-	    "\002,a1,\002', N=\002,i5,\002, KD=\002,i5,\002, type \002,i2)";
-    static char fmt_9951[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='"
-	    "\002,a1,\002', NORMIN='\002,a1,\002', N=\002,i5,\002, KD=\002,i5,"
-	    "\002, type \002,i2)";
-    static char fmt_9954[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5,/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='"
+    static char fmt_9995[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> FACT='\002,a1,\002', UPLO='\002,a1,\002', N =\002,i5"
+	    ",\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9960[] = "(\002 *** Error code from \002,a,\002 =\002,"
+	    "i5,\002 for UPLO = '\002,a1,\002', N =\002,i5,\002, type \002,i2)"
+	    ;
+    static char fmt_9983[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002', N "
+	    "=\002,i5,\002, type \002,i2)";
+    static char fmt_9982[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> UPLO = '\002,a1,\002', N "
+	    "=\002,i5,\002, KD =\002,i5,\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9958[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, KD =\002,i5"
+	    ",\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9981[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> UPLO='\002,a1,\002', N "
+	    "=\002,i5,\002, KD =\002,i5,\002, NRHS =\002,i4,\002, type \002,i"
+	    "2)";
+    static char fmt_9957[] = "(\002 *** Error code from \002,a,\002=\002,i"
+	    "5,/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, KD =\002,i5"
+	    ",\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9991[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', UPLO='"
 	    "\002,a1,\002', N=\002,i5,\002, KD=\002,i5,\002, NRHS=\002,i4,"
 	    "\002, type \002,i2)";
-    static char fmt_9985[] = "(\002 *** \002,a6,\002 returned with INFO ="
-	    "\002,i5,\002 instead of \002,i2,/\002 ==> N =\002,i5,\002, NB "
-	    "=\002,i4,\002, type \002,i2)";
-    static char fmt_9950[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
-	    "5)";
+    static char fmt_9996[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> FACT='\002,a1,\002', UPLO='\002,a1,\002', N=\002,i5"
+	    ",\002, KD=\002,i5,\002, NRHS=\002,i4,\002, type \002,i2)";
+    static char fmt_9959[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO = '\002,a1,\002', N =\002,i5,\002, KD =\002,i5"
+	    ",\002, type \002,i2)";
+    static char fmt_9994[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> FACT='\002,a1,\002', N "
+	    "=\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9999[] = "(\002 *** Error code from \002,a,\002=\002,i5"
+	    ",\002, FACT='\002,a1,\002', N=\002,i5,\002, NRHS=\002,i4,\002, t"
+	    "ype \002,i2)";
+    static char fmt_9961[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO='\002,a1,\002', DIAG ='\002,a1,\002', N =\002,i5,"
+	    "\002, NB =\002,i4,\002, type \002,i2)";
+    static char fmt_9967[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> NORM='\002,a1,\002', UPLO ='\002,a1,\002', DIAG='\002"
+	    ",a1,\002', N =\002,i5,\002, type \002,i2)";
+    static char fmt_9952[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='\002"
+	    ",a1,\002', NORMIN='\002,a1,\002', N =\002,i5,\002, type \002,i2)";
+    static char fmt_9953[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='\002"
+	    ",a1,\002', N =\002,i5,\002, NRHS =\002,i4,\002, type \002,i2)";
+    static char fmt_9962[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO='\002,a1,\002', DIAG ='\002,a1,\002', N =\002,i5,"
+	    "\002, type \002,i2)";
+    static char fmt_9966[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> NORM='\002,a1,\002', UPLO ='\002,a1,\002', DIAG='\002"
+	    ",a1,\002', N=\002,i5,\002, KD=\002,i5,\002, type \002,i2)";
+    static char fmt_9951[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='\002"
+	    ",a1,\002', NORMIN='\002,a1,\002', N=\002,i5,\002, KD=\002,i5,"
+	    "\002, type \002,i2)";
+    static char fmt_9954[] = "(\002 *** Error code from \002,a,\002 =\002,i5"
+	    ",/\002 ==> UPLO='\002,a1,\002', TRANS='\002,a1,\002', DIAG='\002"
+	    ",a1,\002', N=\002,i5,\002, KD=\002,i5,\002, NRHS=\002,i4,\002, t"
+	    "ype \002,i2)";
+    static char fmt_9985[] = "(\002 *** \002,a,\002 returned with INFO =\002"
+	    ",i5,\002 instead of \002,i2,/\002 ==> N =\002,i5,\002, NB =\002,"
+	    "i4,\002, type \002,i2)";
+    static char fmt_9950[] = "(\002 *** Error code from \002,a,\002 =\002,i5)"
+	    ;
 
     /* Builtin functions */
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
-    integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
+    integer s_wsfe(cilist *), i_len_trim(char *, ftnlen), do_fio(integer *, 
+	    char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
     char c3[3], p2[2], uplo[1];
@@ -234,61 +246,74 @@ static integer c__5 = 5;
     static cilist io___50 = { 0, 0, 0, fmt_9955, 0 };
     static cilist io___51 = { 0, 0, 0, fmt_9990, 0 };
     static cilist io___52 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___53 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___54 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___55 = { 0, 0, 0, fmt_9983, 0 };
-    static cilist io___56 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___57 = { 0, 0, 0, fmt_9949, 0 };
-    static cilist io___58 = { 0, 0, 0, fmt_9979, 0 };
-    static cilist io___59 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9990, 0 };
-    static cilist io___61 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___62 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___63 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___64 = { 0, 0, 0, fmt_9982, 0 };
-    static cilist io___65 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___66 = { 0, 0, 0, fmt_9949, 0 };
-    static cilist io___67 = { 0, 0, 0, fmt_9981, 0 };
-    static cilist io___68 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___69 = { 0, 0, 0, fmt_9991, 0 };
-    static cilist io___70 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___71 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___72 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___73 = { 0, 0, 0, fmt_9987, 0 };
-    static cilist io___74 = { 0, 0, 0, fmt_9973, 0 };
-    static cilist io___75 = { 0, 0, 0, fmt_9949, 0 };
-    static cilist io___76 = { 0, 0, 0, fmt_9984, 0 };
-    static cilist io___77 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___78 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___79 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___80 = { 0, 0, 0, fmt_9973, 0 };
-    static cilist io___81 = { 0, 0, 0, fmt_9969, 0 };
-    static cilist io___82 = { 0, 0, 0, fmt_9963, 0 };
-    static cilist io___83 = { 0, 0, 0, fmt_9961, 0 };
-    static cilist io___84 = { 0, 0, 0, fmt_9967, 0 };
-    static cilist io___85 = { 0, 0, 0, fmt_9952, 0 };
-    static cilist io___86 = { 0, 0, 0, fmt_9953, 0 };
-    static cilist io___87 = { 0, 0, 0, fmt_9962, 0 };
-    static cilist io___88 = { 0, 0, 0, fmt_9967, 0 };
-    static cilist io___89 = { 0, 0, 0, fmt_9952, 0 };
-    static cilist io___90 = { 0, 0, 0, fmt_9953, 0 };
-    static cilist io___91 = { 0, 0, 0, fmt_9966, 0 };
-    static cilist io___92 = { 0, 0, 0, fmt_9951, 0 };
-    static cilist io___93 = { 0, 0, 0, fmt_9954, 0 };
-    static cilist io___94 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___95 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___96 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___97 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___98 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___99 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___100 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___101 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___102 = { 0, 0, 0, fmt_9988, 0 };
-    static cilist io___103 = { 0, 0, 0, fmt_9975, 0 };
-    static cilist io___104 = { 0, 0, 0, fmt_9985, 0 };
-    static cilist io___105 = { 0, 0, 0, fmt_9971, 0 };
-    static cilist io___106 = { 0, 0, 0, fmt_9950, 0 };
+    static cilist io___53 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___54 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___55 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___56 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___57 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9949, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___60 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___61 = { 0, 0, 0, fmt_9990, 0 };
+    static cilist io___62 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___63 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___64 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___65 = { 0, 0, 0, fmt_9983, 0 };
+    static cilist io___66 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___67 = { 0, 0, 0, fmt_9949, 0 };
+    static cilist io___68 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___69 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___70 = { 0, 0, 0, fmt_9990, 0 };
+    static cilist io___71 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___72 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___73 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___74 = { 0, 0, 0, fmt_9982, 0 };
+    static cilist io___75 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___76 = { 0, 0, 0, fmt_9949, 0 };
+    static cilist io___77 = { 0, 0, 0, fmt_9981, 0 };
+    static cilist io___78 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___79 = { 0, 0, 0, fmt_9991, 0 };
+    static cilist io___80 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___81 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___82 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___83 = { 0, 0, 0, fmt_9987, 0 };
+    static cilist io___84 = { 0, 0, 0, fmt_9973, 0 };
+    static cilist io___85 = { 0, 0, 0, fmt_9949, 0 };
+    static cilist io___86 = { 0, 0, 0, fmt_9984, 0 };
+    static cilist io___87 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___88 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___89 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___90 = { 0, 0, 0, fmt_9973, 0 };
+    static cilist io___91 = { 0, 0, 0, fmt_9969, 0 };
+    static cilist io___92 = { 0, 0, 0, fmt_9963, 0 };
+    static cilist io___93 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___94 = { 0, 0, 0, fmt_9967, 0 };
+    static cilist io___95 = { 0, 0, 0, fmt_9952, 0 };
+    static cilist io___96 = { 0, 0, 0, fmt_9953, 0 };
+    static cilist io___97 = { 0, 0, 0, fmt_9962, 0 };
+    static cilist io___98 = { 0, 0, 0, fmt_9967, 0 };
+    static cilist io___99 = { 0, 0, 0, fmt_9952, 0 };
+    static cilist io___100 = { 0, 0, 0, fmt_9953, 0 };
+    static cilist io___101 = { 0, 0, 0, fmt_9966, 0 };
+    static cilist io___102 = { 0, 0, 0, fmt_9951, 0 };
+    static cilist io___103 = { 0, 0, 0, fmt_9954, 0 };
+    static cilist io___104 = { 0, 0, 0, fmt_9974, 0 };
+    static cilist io___105 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___106 = { 0, 0, 0, fmt_9974, 0 };
+    static cilist io___107 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___108 = { 0, 0, 0, fmt_9974, 0 };
+    static cilist io___109 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___110 = { 0, 0, 0, fmt_9974, 0 };
+    static cilist io___111 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___112 = { 0, 0, 0, fmt_9988, 0 };
+    static cilist io___113 = { 0, 0, 0, fmt_9975, 0 };
+    static cilist io___114 = { 0, 0, 0, fmt_9985, 0 };
+    static cilist io___115 = { 0, 0, 0, fmt_9971, 0 };
+    static cilist io___116 = { 0, 0, 0, fmt_9950, 0 };
 
+	int subnam_len;
+
+	subnam_len = strlen(subnam);
 
 
 /*  -- LAPACK auxiliary test routine (version 3.1) -- */
@@ -313,7 +338,7 @@ static integer c__5 = 5;
 /*  PATH    (input) CHARACTER*3 */
 /*          The LAPACK path name of subroutine SUBNAM. */
 
-/*  SUBNAM  (input) CHARACTER*6 */
+/*  SUBNAM  (input) CHARACTER*(*) */
 /*          The name of the subroutine that returned an error code. */
 
 /*  INFO    (input) INTEGER */
@@ -370,6 +395,8 @@ static integer c__5 = 5;
 /*     .. */
 /*     .. External Functions .. */
 /*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
 /*     .. External Subroutines .. */
 /*     .. */
 /*     .. Executable Statements .. */
@@ -403,7 +430,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___3.ciunit = *nout;
 		s_wsfe(&io___3);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -414,7 +441,7 @@ static integer c__5 = 5;
 	    } else {
 		io___4.ciunit = *nout;
 		s_wsfe(&io___4);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -433,7 +460,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___6.ciunit = *nout;
 		s_wsfe(&io___6);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -443,7 +470,7 @@ static integer c__5 = 5;
 	    } else {
 		io___7.ciunit = *nout;
 		s_wsfe(&io___7);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
@@ -456,7 +483,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___8.ciunit = *nout;
 		s_wsfe(&io___8);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -468,7 +495,7 @@ static integer c__5 = 5;
 	    } else {
 		io___9.ciunit = *nout;
 		s_wsfe(&io___9);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -482,7 +509,7 @@ static integer c__5 = 5;
 
 	    io___10.ciunit = *nout;
 	    s_wsfe(&io___10);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
@@ -494,7 +521,7 @@ static integer c__5 = 5;
 
 	    io___11.ciunit = *nout;
 	    s_wsfe(&io___11);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -505,7 +532,7 @@ static integer c__5 = 5;
 
 	    io___12.ciunit = *nout;
 	    s_wsfe(&io___12);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -516,7 +543,7 @@ static integer c__5 = 5;
 
 	    io___13.ciunit = *nout;
 	    s_wsfe(&io___13);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -531,7 +558,7 @@ static integer c__5 = 5;
 
 	    io___14.ciunit = *nout;
 	    s_wsfe(&io___14);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -544,7 +571,7 @@ static integer c__5 = 5;
 
 	    io___15.ciunit = *nout;
 	    s_wsfe(&io___15);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -561,7 +588,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___16.ciunit = *nout;
 		s_wsfe(&io___16);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -574,7 +601,7 @@ static integer c__5 = 5;
 	    } else {
 		io___17.ciunit = *nout;
 		s_wsfe(&io___17);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -595,7 +622,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___19.ciunit = *nout;
 		s_wsfe(&io___19);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -607,7 +634,7 @@ static integer c__5 = 5;
 	    } else {
 		io___20.ciunit = *nout;
 		s_wsfe(&io___20);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*kl), (ftnlen)sizeof(integer));
@@ -622,7 +649,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___21.ciunit = *nout;
 		s_wsfe(&io___21);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -636,7 +663,7 @@ static integer c__5 = 5;
 	    } else {
 		io___22.ciunit = *nout;
 		s_wsfe(&io___22);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -653,7 +680,7 @@ static integer c__5 = 5;
 
 	    io___23.ciunit = *nout;
 	    s_wsfe(&io___23);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -666,7 +693,7 @@ static integer c__5 = 5;
 
 	    io___24.ciunit = *nout;
 	    s_wsfe(&io___24);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -679,7 +706,7 @@ static integer c__5 = 5;
 
 	    io___25.ciunit = *nout;
 	    s_wsfe(&io___25);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -698,7 +725,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___26.ciunit = *nout;
 		s_wsfe(&io___26);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -707,7 +734,7 @@ static integer c__5 = 5;
 	    } else {
 		io___27.ciunit = *nout;
 		s_wsfe(&io___27);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
@@ -724,7 +751,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___29.ciunit = *nout;
 		s_wsfe(&io___29);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -734,7 +761,7 @@ static integer c__5 = 5;
 	    } else {
 		io___30.ciunit = *nout;
 		s_wsfe(&io___30);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
@@ -747,7 +774,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___31.ciunit = *nout;
 		s_wsfe(&io___31);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -759,7 +786,7 @@ static integer c__5 = 5;
 	    } else {
 		io___32.ciunit = *nout;
 		s_wsfe(&io___32);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -773,7 +800,7 @@ static integer c__5 = 5;
 
 	    io___33.ciunit = *nout;
 	    s_wsfe(&io___33);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -784,7 +811,7 @@ static integer c__5 = 5;
 
 	    io___34.ciunit = *nout;
 	    s_wsfe(&io___34);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -802,7 +829,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___36.ciunit = *nout;
 		s_wsfe(&io___36);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -813,7 +840,7 @@ static integer c__5 = 5;
 	    } else {
 		io___37.ciunit = *nout;
 		s_wsfe(&io___37);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -832,7 +859,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___39.ciunit = *nout;
 		s_wsfe(&io___39);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -843,7 +870,7 @@ static integer c__5 = 5;
 	    } else {
 		io___40.ciunit = *nout;
 		s_wsfe(&io___40);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -857,7 +884,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___41.ciunit = *nout;
 		s_wsfe(&io___41);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -869,7 +896,7 @@ static integer c__5 = 5;
 	    } else {
 		io___42.ciunit = *nout;
 		s_wsfe(&io___42);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -883,7 +910,7 @@ static integer c__5 = 5;
 
 	    io___43.ciunit = *nout;
 	    s_wsfe(&io___43);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -896,7 +923,7 @@ static integer c__5 = 5;
 
 	    io___44.ciunit = *nout;
 	    s_wsfe(&io___44);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -907,7 +934,7 @@ static integer c__5 = 5;
 
 	    io___45.ciunit = *nout;
 	    s_wsfe(&io___45);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -916,17 +943,16 @@ static integer c__5 = 5;
 	    e_wsfe();
 	}
 
-    } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&
-	    c__2, p2, "HE")) {
+    } else if (lsamen_(&c__2, p2, "PS")) {
 
-/*        xHE, or xSY:  Symmetric or Hermitian indefinite matrices */
+/*        xPS:  Symmetric or Hermitian positive semi-definite matrices */
 
 	*(unsigned char *)uplo = *(unsigned char *)opts;
 	if (lsamen_(&c__3, c3, "TRF")) {
 	    if (*info != *infoe && *infoe != 0) {
 		io___46.ciunit = *nout;
 		s_wsfe(&io___46);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, subnam_len);
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -937,7 +963,7 @@ static integer c__5 = 5;
 	    } else {
 		io___47.ciunit = *nout;
 		s_wsfe(&io___47);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, subnam_len);
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -956,7 +982,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___49.ciunit = *nout;
 		s_wsfe(&io___49);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, subnam_len);
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -967,7 +993,7 @@ static integer c__5 = 5;
 	    } else {
 		io___50.ciunit = *nout;
 		s_wsfe(&io___50);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, subnam_len);
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -981,7 +1007,7 @@ static integer c__5 = 5;
 	    if (*info != *infoe && *infoe != 0) {
 		io___51.ciunit = *nout;
 		s_wsfe(&io___51);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, subnam_len);
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -993,7 +1019,131 @@ static integer c__5 = 5;
 	    } else {
 		io___52.ciunit = *nout;
 		s_wsfe(&io___52);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		do_fio(&c__1, subnam, subnam_len);
+		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+		do_fio(&c__1, opts, (ftnlen)1);
+		do_fio(&c__1, opts + 1, (ftnlen)1);
+		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+
+	} else if (lsamen_(&c__3, c3, "TRI")) {
+
+	    io___53.ciunit = *nout;
+	    s_wsfe(&io___53);
+	    do_fio(&c__1, subnam, subnam_len);
+	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, uplo, (ftnlen)1);
+	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+	    e_wsfe();
+
+	} else if (lsamen_(&c__5, subnam + 1, "LATMT") 
+		|| lsamen_(&c__3, c3, "CON")) {
+
+	    io___54.ciunit = *nout;
+	    s_wsfe(&io___54);
+	    do_fio(&c__1, subnam, subnam_len);
+	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, uplo, (ftnlen)1);
+	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+	    e_wsfe();
+
+	} else {
+
+	    io___55.ciunit = *nout;
+	    s_wsfe(&io___55);
+	    do_fio(&c__1, subnam, subnam_len);
+	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, uplo, (ftnlen)1);
+	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+	    e_wsfe();
+	}
+
+    } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&
+	    c__2, p2, "HE")) {
+
+/*        xHE, or xSY:  Symmetric or Hermitian indefinite matrices */
+
+	*(unsigned char *)uplo = *(unsigned char *)opts;
+	if (lsamen_(&c__3, c3, "TRF")) {
+	    if (*info != *infoe && *infoe != 0) {
+		io___56.ciunit = *nout;
+		s_wsfe(&io___56);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
+		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
+		do_fio(&c__1, uplo, (ftnlen)1);
+		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+		e_wsfe();
+	    } else {
+		io___57.ciunit = *nout;
+		s_wsfe(&io___57);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
+		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+		do_fio(&c__1, uplo, (ftnlen)1);
+		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+	    if (*info != 0) {
+		io___58.ciunit = *nout;
+		s_wsfe(&io___58);
+		e_wsfe();
+	    }
+
+	} else if (lsamen_(&c__3, c3, "SV ")) {
+
+	    if (*info != *infoe && *infoe != 0) {
+		io___59.ciunit = *nout;
+		s_wsfe(&io___59);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
+		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
+		do_fio(&c__1, uplo, (ftnlen)1);
+		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+		e_wsfe();
+	    } else {
+		io___60.ciunit = *nout;
+		s_wsfe(&io___60);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
+		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+		do_fio(&c__1, uplo, (ftnlen)1);
+		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+
+	} else if (lsamen_(&c__3, c3, "SVX")) {
+
+	    if (*info != *infoe && *infoe != 0) {
+		io___61.ciunit = *nout;
+		s_wsfe(&io___61);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
+		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
+		do_fio(&c__1, opts, (ftnlen)1);
+		do_fio(&c__1, opts + 1, (ftnlen)1);
+		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
+		e_wsfe();
+	    } else {
+		io___62.ciunit = *nout;
+		s_wsfe(&io___62);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1007,9 +1157,9 @@ static integer c__5 = 5;
 		|| lsamen_(&c__3, c3, "TRI") || lsamen_(
 		&c__3, c3, "CON")) {
 
-	    io___53.ciunit = *nout;
-	    s_wsfe(&io___53);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___63.ciunit = *nout;
+	    s_wsfe(&io___63);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1018,9 +1168,9 @@ static integer c__5 = 5;
 
 	} else {
 
-	    io___54.ciunit = *nout;
-	    s_wsfe(&io___54);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___64.ciunit = *nout;
+	    s_wsfe(&io___64);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1037,9 +1187,9 @@ static integer c__5 = 5;
 	*(unsigned char *)uplo = *(unsigned char *)opts;
 	if (lsamen_(&c__3, c3, "TRF")) {
 	    if (*info != *infoe && *infoe != 0) {
-		io___55.ciunit = *nout;
-		s_wsfe(&io___55);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___65.ciunit = *nout;
+		s_wsfe(&io___65);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -1047,9 +1197,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___56.ciunit = *nout;
-		s_wsfe(&io___56);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___66.ciunit = *nout;
+		s_wsfe(&io___66);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1057,17 +1207,17 @@ static integer c__5 = 5;
 		e_wsfe();
 	    }
 	    if (*info != 0) {
-		io___57.ciunit = *nout;
-		s_wsfe(&io___57);
+		io___67.ciunit = *nout;
+		s_wsfe(&io___67);
 		e_wsfe();
 	    }
 
 	} else if (lsamen_(&c__3, c3, "SV ")) {
 
 	    if (*info != *infoe && *infoe != 0) {
-		io___58.ciunit = *nout;
-		s_wsfe(&io___58);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___68.ciunit = *nout;
+		s_wsfe(&io___68);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -1076,9 +1226,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___59.ciunit = *nout;
-		s_wsfe(&io___59);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___69.ciunit = *nout;
+		s_wsfe(&io___69);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1090,9 +1240,9 @@ static integer c__5 = 5;
 	} else if (lsamen_(&c__3, c3, "SVX")) {
 
 	    if (*info != *infoe && *infoe != 0) {
-		io___60.ciunit = *nout;
-		s_wsfe(&io___60);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___70.ciunit = *nout;
+		s_wsfe(&io___70);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -1102,9 +1252,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___61.ciunit = *nout;
-		s_wsfe(&io___61);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___71.ciunit = *nout;
+		s_wsfe(&io___71);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1118,9 +1268,9 @@ static integer c__5 = 5;
 		|| lsamen_(&c__3, c3, "TRI") || lsamen_(
 		&c__3, c3, "CON")) {
 
-	    io___62.ciunit = *nout;
-	    s_wsfe(&io___62);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___72.ciunit = *nout;
+	    s_wsfe(&io___72);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1129,9 +1279,9 @@ static integer c__5 = 5;
 
 	} else {
 
-	    io___63.ciunit = *nout;
-	    s_wsfe(&io___63);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___73.ciunit = *nout;
+	    s_wsfe(&io___73);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1147,9 +1297,9 @@ static integer c__5 = 5;
 	*(unsigned char *)uplo = *(unsigned char *)opts;
 	if (lsamen_(&c__3, c3, "TRF")) {
 	    if (*info != *infoe && *infoe != 0) {
-		io___64.ciunit = *nout;
-		s_wsfe(&io___64);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___74.ciunit = *nout;
+		s_wsfe(&io___74);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -1159,9 +1309,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___65.ciunit = *nout;
-		s_wsfe(&io___65);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___75.ciunit = *nout;
+		s_wsfe(&io___75);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1171,17 +1321,17 @@ static integer c__5 = 5;
 		e_wsfe();
 	    }
 	    if (*info != 0) {
-		io___66.ciunit = *nout;
-		s_wsfe(&io___66);
+		io___76.ciunit = *nout;
+		s_wsfe(&io___76);
 		e_wsfe();
 	    }
 
 	} else if (lsamen_(&c__3, c3, "SV ")) {
 
 	    if (*info != *infoe && *infoe != 0) {
-		io___67.ciunit = *nout;
-		s_wsfe(&io___67);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___77.ciunit = *nout;
+		s_wsfe(&io___77);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
@@ -1191,9 +1341,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___68.ciunit = *nout;
-		s_wsfe(&io___68);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___78.ciunit = *nout;
+		s_wsfe(&io___78);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, uplo, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1206,9 +1356,9 @@ static integer c__5 = 5;
 	} else if (lsamen_(&c__3, c3, "SVX")) {
 
 	    if (*info != *infoe && *infoe != 0) {
-		io___69.ciunit = *nout;
-		s_wsfe(&io___69);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___79.ciunit = *nout;
+		s_wsfe(&io___79);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -1219,9 +1369,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___70.ciunit = *nout;
-		s_wsfe(&io___70);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___80.ciunit = *nout;
+		s_wsfe(&io___80);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1235,9 +1385,9 @@ static integer c__5 = 5;
 	} else if (lsamen_(&c__5, subnam + 1, "LATMS") 
 		|| lsamen_(&c__3, c3, "CON")) {
 
-	    io___71.ciunit = *nout;
-	    s_wsfe(&io___71);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___81.ciunit = *nout;
+	    s_wsfe(&io___81);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1247,9 +1397,9 @@ static integer c__5 = 5;
 
 	} else {
 
-	    io___72.ciunit = *nout;
-	    s_wsfe(&io___72);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___82.ciunit = *nout;
+	    s_wsfe(&io___82);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, uplo, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1265,35 +1415,35 @@ static integer c__5 = 5;
 
 	if (lsamen_(&c__3, c3, "TRF")) {
 	    if (*info != *infoe && *infoe != 0) {
-		io___73.ciunit = *nout;
-		s_wsfe(&io___73);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___83.ciunit = *nout;
+		s_wsfe(&io___83);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___74.ciunit = *nout;
-		s_wsfe(&io___74);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___84.ciunit = *nout;
+		s_wsfe(&io___84);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
 	    if (*info != 0) {
-		io___75.ciunit = *nout;
-		s_wsfe(&io___75);
+		io___85.ciunit = *nout;
+		s_wsfe(&io___85);
 		e_wsfe();
 	    }
 
 	} else if (lsamen_(&c__3, c3, "SV ")) {
 
 	    if (*info != *infoe && *infoe != 0) {
-		io___76.ciunit = *nout;
-		s_wsfe(&io___76);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___86.ciunit = *nout;
+		s_wsfe(&io___86);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1301,9 +1451,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___77.ciunit = *nout;
-		s_wsfe(&io___77);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___87.ciunit = *nout;
+		s_wsfe(&io___87);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
@@ -1314,9 +1464,9 @@ static integer c__5 = 5;
 	} else if (lsamen_(&c__3, c3, "SVX")) {
 
 	    if (*info != *infoe && *infoe != 0) {
-		io___78.ciunit = *nout;
-		s_wsfe(&io___78);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___88.ciunit = *nout;
+		s_wsfe(&io___88);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
@@ -1325,9 +1475,9 @@ static integer c__5 = 5;
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___79.ciunit = *nout;
-		s_wsfe(&io___79);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___89.ciunit = *nout;
+		s_wsfe(&io___89);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1340,17 +1490,17 @@ static integer c__5 = 5;
 
 	    if (lsame_(subnam, "S") || lsame_(subnam, 
 		    "D")) {
-		io___80.ciunit = *nout;
-		s_wsfe(&io___80);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___90.ciunit = *nout;
+		s_wsfe(&io___90);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
-		io___81.ciunit = *nout;
-		s_wsfe(&io___81);
-		do_fio(&c__1, subnam, (ftnlen)6);
+		io___91.ciunit = *nout;
+		s_wsfe(&io___91);
+		do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 		do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 		do_fio(&c__1, opts, (ftnlen)1);
 		do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1360,9 +1510,9 @@ static integer c__5 = 5;
 
 	} else {
 
-	    io___82.ciunit = *nout;
-	    s_wsfe(&io___82);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___92.ciunit = *nout;
+	    s_wsfe(&io___92);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1376,9 +1526,9 @@ static integer c__5 = 5;
 /*        xTR:  Triangular matrix */
 
 	if (lsamen_(&c__3, c3, "TRI")) {
-	    io___83.ciunit = *nout;
-	    s_wsfe(&io___83);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___93.ciunit = *nout;
+	    s_wsfe(&io___93);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1387,9 +1537,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (lsamen_(&c__3, c3, "CON")) {
-	    io___84.ciunit = *nout;
-	    s_wsfe(&io___84);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___94.ciunit = *nout;
+	    s_wsfe(&io___94);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1399,9 +1549,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATRS")) 
 		{
-	    io___85.ciunit = *nout;
-	    s_wsfe(&io___85);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___95.ciunit = *nout;
+	    s_wsfe(&io___95);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1411,9 +1561,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___86.ciunit = *nout;
-	    s_wsfe(&io___86);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___96.ciunit = *nout;
+	    s_wsfe(&io___96);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1429,9 +1579,9 @@ static integer c__5 = 5;
 /*        xTP:  Triangular packed matrix */
 
 	if (lsamen_(&c__3, c3, "TRI")) {
-	    io___87.ciunit = *nout;
-	    s_wsfe(&io___87);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___97.ciunit = *nout;
+	    s_wsfe(&io___97);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1439,9 +1589,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (lsamen_(&c__3, c3, "CON")) {
-	    io___88.ciunit = *nout;
-	    s_wsfe(&io___88);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___98.ciunit = *nout;
+	    s_wsfe(&io___98);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1451,9 +1601,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATPS")) 
 		{
-	    io___89.ciunit = *nout;
-	    s_wsfe(&io___89);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___99.ciunit = *nout;
+	    s_wsfe(&io___99);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1463,9 +1613,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___90.ciunit = *nout;
-	    s_wsfe(&io___90);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___100.ciunit = *nout;
+	    s_wsfe(&io___100);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1481,9 +1631,9 @@ static integer c__5 = 5;
 /*        xTB:  Triangular band matrix */
 
 	if (lsamen_(&c__3, c3, "CON")) {
-	    io___91.ciunit = *nout;
-	    s_wsfe(&io___91);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___101.ciunit = *nout;
+	    s_wsfe(&io___101);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1494,9 +1644,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATBS")) 
 		{
-	    io___92.ciunit = *nout;
-	    s_wsfe(&io___92);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___102.ciunit = *nout;
+	    s_wsfe(&io___102);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1507,9 +1657,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___93.ciunit = *nout;
-	    s_wsfe(&io___93);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___103.ciunit = *nout;
+	    s_wsfe(&io___103);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, opts, (ftnlen)1);
 	    do_fio(&c__1, opts + 1, (ftnlen)1);
@@ -1526,9 +1676,9 @@ static integer c__5 = 5;
 /*        xQR:  QR factorization */
 
 	if (lsamen_(&c__3, c3, "QRS")) {
-	    io___94.ciunit = *nout;
-	    s_wsfe(&io___94);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___104.ciunit = *nout;
+	    s_wsfe(&io___104);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1538,9 +1688,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATMS")) 
 		{
-	    io___95.ciunit = *nout;
-	    s_wsfe(&io___95);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___105.ciunit = *nout;
+	    s_wsfe(&io___105);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1553,9 +1703,9 @@ static integer c__5 = 5;
 /*        xLQ:  LQ factorization */
 
 	if (lsamen_(&c__3, c3, "LQS")) {
-	    io___96.ciunit = *nout;
-	    s_wsfe(&io___96);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___106.ciunit = *nout;
+	    s_wsfe(&io___106);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1565,9 +1715,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATMS")) 
 		{
-	    io___97.ciunit = *nout;
-	    s_wsfe(&io___97);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___107.ciunit = *nout;
+	    s_wsfe(&io___107);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1580,9 +1730,9 @@ static integer c__5 = 5;
 /*        xQL:  QL factorization */
 
 	if (lsamen_(&c__3, c3, "QLS")) {
-	    io___98.ciunit = *nout;
-	    s_wsfe(&io___98);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___108.ciunit = *nout;
+	    s_wsfe(&io___108);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1592,9 +1742,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATMS")) 
 		{
-	    io___99.ciunit = *nout;
-	    s_wsfe(&io___99);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___109.ciunit = *nout;
+	    s_wsfe(&io___109);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1607,9 +1757,9 @@ static integer c__5 = 5;
 /*        xRQ:  RQ factorization */
 
 	if (lsamen_(&c__3, c3, "RQS")) {
-	    io___100.ciunit = *nout;
-	    s_wsfe(&io___100);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___110.ciunit = *nout;
+	    s_wsfe(&io___110);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1619,9 +1769,9 @@ static integer c__5 = 5;
 	    e_wsfe();
 	} else if (lsamen_(&c__5, subnam + 1, "LATMS")) 
 		{
-	    io___101.ciunit = *nout;
-	    s_wsfe(&io___101);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___111.ciunit = *nout;
+	    s_wsfe(&io___111);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1632,9 +1782,9 @@ static integer c__5 = 5;
     } else if (lsamen_(&c__2, p2, "LU")) {
 
 	if (*info != *infoe && *infoe != 0) {
-	    io___102.ciunit = *nout;
-	    s_wsfe(&io___102);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___112.ciunit = *nout;
+	    s_wsfe(&io___112);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1643,9 +1793,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___103.ciunit = *nout;
-	    s_wsfe(&io___103);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___113.ciunit = *nout;
+	    s_wsfe(&io___113);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
@@ -1657,9 +1807,9 @@ static integer c__5 = 5;
     } else if (lsamen_(&c__2, p2, "CH")) {
 
 	if (*info != *infoe && *infoe != 0) {
-	    io___104.ciunit = *nout;
-	    s_wsfe(&io___104);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___114.ciunit = *nout;
+	    s_wsfe(&io___114);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*infoe), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
@@ -1667,9 +1817,9 @@ static integer c__5 = 5;
 	    do_fio(&c__1, (char *)&(*imat), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___105.ciunit = *nout;
-	    s_wsfe(&io___105);
-	    do_fio(&c__1, subnam, (ftnlen)6);
+	    io___115.ciunit = *nout;
+	    s_wsfe(&io___115);
+	    do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*m), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n5), (ftnlen)sizeof(integer));
@@ -1681,9 +1831,9 @@ static integer c__5 = 5;
 
 /*        Print a generic message if the path is unknown. */
 
-	io___106.ciunit = *nout;
-	s_wsfe(&io___106);
-	do_fio(&c__1, subnam, (ftnlen)6);
+	io___116.ciunit = *nout;
+	s_wsfe(&io___116);
+	do_fio(&c__1, subnam, i_len_trim(subnam, subnam_len));
 	do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	e_wsfe();
     }

@@ -1,3 +1,15 @@
+/* cerred.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -36,10 +48,10 @@ static integer c__5 = 5;
 /* Subroutine */ int cerred_(char *path, integer *nunit)
 {
     /* Format strings */
-    static char fmt_9999[] = "(1x,a6,\002 passed the tests of the error exit"
-	    "s (\002,i3,\002 tests done)\002)";
-    static char fmt_9998[] = "(\002 *** \002,a6,\002 failed the tests of the"
-	    " error exits ***\002)";
+    static char fmt_9999[] = "(1x,a,\002 passed the tests of the error exits"
+	    " (\002,i3,\002 tests done)\002)";
+    static char fmt_9998[] = "(\002 *** \002,a,\002 failed the tests of the "
+	    "error exits ***\002)";
 
     /* System generated locals */
     integer i__1;
@@ -47,7 +59,8 @@ static integer c__5 = 5;
     /* Builtin functions */
     integer s_wsle(cilist *), e_wsle(void);
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
-    integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
+    integer s_wsfe(cilist *), i_len_trim(char *, ftnlen), do_fio(integer *, 
+	    char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
     complex a[16]	/* was [4][4] */;
@@ -141,6 +154,8 @@ static integer c__5 = 5;
 /*     .. */
 /*     .. External Functions .. */
 /*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
 /*     .. Arrays in Common .. */
 /*     .. */
 /*     .. Scalars in Common .. */
@@ -177,7 +192,7 @@ static integer c__5 = 5;
 
 /*        Test CGEEV */
 
-	s_copy(srnamc_1.srnamt, "CGEEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgeev_("X", "N", &c__0, a, &c__1, x, vl, &c__1, vr, &c__1, w, &c__1, 
 		rw, &info);
@@ -219,7 +234,7 @@ static integer c__5 = 5;
 
 /*        Test CGEES */
 
-	s_copy(srnamc_1.srnamt, "CGEES ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEES ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgees_("X", "N", (L_fp)cslect_, &c__0, a, &c__1, &sdim, x, vl, &c__1, 
 		w, &c__1, rw, b, &info);
@@ -256,7 +271,7 @@ static integer c__5 = 5;
 
 /*        Test CGEEVX */
 
-	s_copy(srnamc_1.srnamt, "CGEEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgeevx_("X", "N", "N", "N", &c__0, a, &c__1, x, vl, &c__1, vr, &c__1, 
 		&ilo, &ihi, s, &abnrm, r1, r2, w, &c__1, rw, &info);
@@ -313,7 +328,7 @@ static integer c__5 = 5;
 
 /*        Test CGEESX */
 
-	s_copy(srnamc_1.srnamt, "CGEESX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEESX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgeesx_("X", "N", (L_fp)cslect_, "N", &c__0, a, &c__1, &sdim, x, vl, &
 		c__1, r1, r2, w, &c__1, rw, b, &info);
@@ -355,7 +370,7 @@ static integer c__5 = 5;
 
 /*        Test CGESVD */
 
-	s_copy(srnamc_1.srnamt, "CGESVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGESVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgesvd_("X", "N", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &
 		c__1, rw, &info);
@@ -400,7 +415,8 @@ static integer c__5 = 5;
 	if (infoc_1.ok) {
 	    io___23.ciunit = infoc_1.nout;
 	    s_wsfe(&io___23);
-	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
+	    do_fio(&c__1, srnamc_1.srnamt, i_len_trim(srnamc_1.srnamt, (
+		    ftnlen)32));
 	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
@@ -411,7 +427,7 @@ static integer c__5 = 5;
 
 /*        Test CGESDD */
 
-	s_copy(srnamc_1.srnamt, "CGESDD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGESDD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
@@ -446,7 +462,8 @@ static integer c__5 = 5;
 	if (infoc_1.ok) {
 	    io___26.ciunit = infoc_1.nout;
 	    s_wsfe(&io___26);
-	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
+	    do_fio(&c__1, srnamc_1.srnamt, i_len_trim(srnamc_1.srnamt, (
+		    ftnlen)32));
 	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
@@ -462,7 +479,8 @@ static integer c__5 = 5;
 	if (infoc_1.ok) {
 	    io___28.ciunit = infoc_1.nout;
 	    s_wsfe(&io___28);
-	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
+	    do_fio(&c__1, srnamc_1.srnamt, i_len_trim(srnamc_1.srnamt, (
+		    ftnlen)32));
 	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {

@@ -1,3 +1,15 @@
+/* cerrsy.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -157,7 +169,7 @@ static integer c__4 = 4;
 
 /*        CSYTRF */
 
-	s_copy(srnamc_1.srnamt, "CSYTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("CSYTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -173,7 +185,7 @@ static integer c__4 = 4;
 
 /*        CSYTF2 */
 
-	s_copy(srnamc_1.srnamt, "CSYTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("CSYTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -189,7 +201,7 @@ static integer c__4 = 4;
 
 /*        CSYTRI */
 
-	s_copy(srnamc_1.srnamt, "CSYTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("CSYTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +217,7 @@ static integer c__4 = 4;
 
 /*        CSYTRS */
 
-	s_copy(srnamc_1.srnamt, "CSYTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CSYTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -229,7 +241,7 @@ static integer c__4 = 4;
 
 /*        CSYRFS */
 
-	s_copy(srnamc_1.srnamt, "CSYRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csyrfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -268,7 +280,7 @@ static integer c__4 = 4;
 
 /*        CSYCON */
 
-	s_copy(srnamc_1.srnamt, "CSYCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csycon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, &info);
 	chkxer_("CSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -294,7 +306,7 @@ static integer c__4 = 4;
 
 /*        CSPTRF */
 
-	s_copy(srnamc_1.srnamt, "CSPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csptrf_("/", &c__0, a, ip, &info);
 	chkxer_("CSPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -306,7 +318,7 @@ static integer c__4 = 4;
 
 /*        CSPTRI */
 
-	s_copy(srnamc_1.srnamt, "CSPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("CSPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -318,7 +330,7 @@ static integer c__4 = 4;
 
 /*        CSPTRS */
 
-	s_copy(srnamc_1.srnamt, "CSPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("CSPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -338,7 +350,7 @@ static integer c__4 = 4;
 
 /*        CSPRFS */
 
-	s_copy(srnamc_1.srnamt, "CSPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		r__, &info);
@@ -367,7 +379,7 @@ static integer c__4 = 4;
 
 /*        CSPCON */
 
-	s_copy(srnamc_1.srnamt, "CSPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cspcon_("/", &c__0, a, ip, &anrm, &rcond, w, &info);
 	chkxer_("CSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

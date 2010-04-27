@@ -1,3 +1,15 @@
+/* cdrvgt.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -38,11 +50,11 @@ static complex c_b65 = {0.f,0.f};
     static char transs[1*3] = "N" "T" "C";
 
     /* Format strings */
-    static char fmt_9999[] = "(1x,a6,\002, N =\002,i5,\002, type \002,i2,"
-	    "\002, test \002,i2,\002, ratio = \002,g12.5)";
-    static char fmt_9998[] = "(1x,a6,\002, FACT='\002,a1,\002', TRANS='\002,"
-	    "a1,\002', N =\002,i5,\002, type \002,i2,\002, test \002,i2,\002,"
-	    " ratio = \002,g12.5)";
+    static char fmt_9999[] = "(1x,a,\002, N =\002,i5,\002, type \002,i2,\002"
+	    ", test \002,i2,\002, ratio = \002,g12.5)";
+    static char fmt_9998[] = "(1x,a,\002, FACT='\002,a1,\002', TRANS='\002,a"
+	    "1,\002', N =\002,i5,\002, type \002,i2,\002, test \002,i2,\002, "
+	    "ratio = \002,g12.5)";
 
     /* System generated locals */
     address a__1[2];
@@ -276,7 +288,7 @@ static complex c_b65 = {0.f,0.f};
 /* Computing MAX */
 		i__3 = 2 - ku, i__4 = 3 - max(1,n);
 		koff = max(i__3,i__4);
-		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)32, (ftnlen)6);
 		clatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
 			&anorm, &kl, &ku, "Z", &af[koff], &c__3, &work[1], &
 			info);
@@ -510,7 +522,7 @@ static complex c_b65 = {0.f,0.f};
 			ccopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
 			clacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
 
-			s_copy(srnamc_1.srnamt, "CGTSV ", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "CGTSV ", (ftnlen)32, (ftnlen)
 				6);
 			cgtsv_(&n, nrhs, &af[1], &af[m + 1], &af[n + m + 1], &
 				x[1], &lda, &info);
@@ -586,7 +598,7 @@ static complex c_b65 = {0.f,0.f};
 /*                 Solve the system and compute the condition number and */
 /*                 error bounds using CGTSVX. */
 
-		    s_copy(srnamc_1.srnamt, "CGTSVX", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "CGTSVX", (ftnlen)32, (ftnlen)6);
 		    cgtsvx_(fact, trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m 
 			    + 1], &af[1], &af[m + 1], &af[n + m + 1], &af[n + 
 			    (m << 1) + 1], &iwork[1], &b[1], &lda, &x[1], &

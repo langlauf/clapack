@@ -1,3 +1,15 @@
+/* ddrvpp.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -39,13 +51,13 @@ static integer c__2 = 2;
     static char equeds[1*2] = "N" "Y";
 
     /* Format strings */
-    static char fmt_9999[] = "(1x,a6,\002, UPLO='\002,a1,\002', N =\002,i5"
+    static char fmt_9999[] = "(1x,a,\002, UPLO='\002,a1,\002', N =\002,i5"
 	    ",\002, type \002,i1,\002, test(\002,i1,\002)=\002,g12.5)";
-    static char fmt_9997[] = "(1x,a6,\002, FACT='\002,a1,\002', UPLO='\002,a"
-	    "1,\002', N=\002,i5,\002, EQUED='\002,a1,\002', type \002,i1,\002"
-	    ", test(\002,i1,\002)=\002,g12.5)";
-    static char fmt_9998[] = "(1x,a6,\002, FACT='\002,a1,\002', UPLO='\002,a"
-	    "1,\002', N=\002,i5,\002, type \002,i1,\002, test(\002,i1,\002)"
+    static char fmt_9997[] = "(1x,a,\002, FACT='\002,a1,\002', UPLO='\002,"
+	    "a1,\002', N=\002,i5,\002, EQUED='\002,a1,\002', type \002,i1,"
+	    "\002, test(\002,i1,\002)=\002,g12.5)";
+    static char fmt_9998[] = "(1x,a,\002, FACT='\002,a1,\002', UPLO='\002,"
+	    "a1,\002', N=\002,i5,\002, type \002,i1,\002, test(\002,i1,\002)"
 	    "=\002,g12.5)";
 
     /* System generated locals */
@@ -312,7 +324,7 @@ static integer c__2 = 2;
 			&cndnum, dist);
 		rcondc = 1. / cndnum;
 
-		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)32, (ftnlen)6);
 		dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, packit, &a[1], &lda, &work[
 			1], &info);
@@ -464,7 +476,7 @@ static integer c__2 = 2;
 
 /*                    Form an exact solution and set the right hand side. */
 
-			s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)32, (ftnlen)
 				6);
 			dlarhs_(path, xtype, uplo, " ", &n, &n, &kl, &ku, 
 				nrhs, &a[1], &lda, &xact[1], &lda, &b[1], &
@@ -483,7 +495,7 @@ static integer c__2 = 2;
 			    dlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
 				    lda);
 
-			    s_copy(srnamc_1.srnamt, "DPPSV ", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DPPSV ", (ftnlen)32, (
 				    ftnlen)6);
 			    dppsv_(uplo, &n, nrhs, &afac[1], &x[1], &lda, &
 				    info);
@@ -568,7 +580,7 @@ L70:
 /*                    Solve the system and compute the condition number */
 /*                    and error bounds using DPPSVX. */
 
-			s_copy(srnamc_1.srnamt, "DPPSVX", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DPPSVX", (ftnlen)32, (ftnlen)
 				6);
 			dppsvx_(fact, uplo, &n, nrhs, &a[1], &afac[1], equed, 
 				&s[1], &b[1], &lda, &x[1], &lda, &rcond, &

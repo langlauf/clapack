@@ -1,3 +1,15 @@
+/* zlarfg.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -32,7 +44,7 @@ static doublecomplex c_b5 = {1.,0.};
 	     doublecomplex *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -127,11 +139,11 @@ static doublecomplex c_b5 = {1.,0.};
 	safmin = dlamch_("S") / dlamch_("E");
 	rsafmn = 1. / safmin;
 
+	knt = 0;
 	if (abs(beta) < safmin) {
 
 /*           XNORM, BETA may be inaccurate; scale X and recompute them */
 
-	    knt = 0;
 L10:
 	    ++knt;
 	    i__1 = *n - 1;
@@ -151,37 +163,25 @@ L10:
 	    alpha->r = z__1.r, alpha->i = z__1.i;
 	    d__1 = dlapy3_(&alphr, &alphi, &xnorm);
 	    beta = -d_sign(&d__1, &alphr);
-	    d__1 = (beta - alphr) / beta;
-	    d__2 = -alphi / beta;
-	    z__1.r = d__1, z__1.i = d__2;
-	    tau->r = z__1.r, tau->i = z__1.i;
-	    z__2.r = alpha->r - beta, z__2.i = alpha->i;
-	    zladiv_(&z__1, &c_b5, &z__2);
-	    alpha->r = z__1.r, alpha->i = z__1.i;
-	    i__1 = *n - 1;
-	    zscal_(&i__1, alpha, &x[1], incx);
-
-/*           If ALPHA is subnormal, it may lose relative accuracy */
-
-	    alpha->r = beta, alpha->i = 0.;
-	    i__1 = knt;
-	    for (j = 1; j <= i__1; ++j) {
-		z__1.r = safmin * alpha->r, z__1.i = safmin * alpha->i;
-		alpha->r = z__1.r, alpha->i = z__1.i;
-/* L20: */
-	    }
-	} else {
-	    d__1 = (beta - alphr) / beta;
-	    d__2 = -alphi / beta;
-	    z__1.r = d__1, z__1.i = d__2;
-	    tau->r = z__1.r, tau->i = z__1.i;
-	    z__2.r = alpha->r - beta, z__2.i = alpha->i;
-	    zladiv_(&z__1, &c_b5, &z__2);
-	    alpha->r = z__1.r, alpha->i = z__1.i;
-	    i__1 = *n - 1;
-	    zscal_(&i__1, alpha, &x[1], incx);
-	    alpha->r = beta, alpha->i = 0.;
 	}
+	d__1 = (beta - alphr) / beta;
+	d__2 = -alphi / beta;
+	z__1.r = d__1, z__1.i = d__2;
+	tau->r = z__1.r, tau->i = z__1.i;
+	z__2.r = alpha->r - beta, z__2.i = alpha->i;
+	zladiv_(&z__1, &c_b5, &z__2);
+	alpha->r = z__1.r, alpha->i = z__1.i;
+	i__1 = *n - 1;
+	zscal_(&i__1, alpha, &x[1], incx);
+
+/*        If ALPHA is subnormal, it may lose relative accuracy */
+
+	i__1 = knt;
+	for (j = 1; j <= i__1; ++j) {
+	    beta *= safmin;
+/* L20: */
+	}
+	alpha->r = beta, alpha->i = 0.;
     }
 
     return 0;

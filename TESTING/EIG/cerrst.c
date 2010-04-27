@@ -1,3 +1,15 @@
+/* cerrst.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -200,7 +212,7 @@ static real c_b472 = 1.f;
 
 /*        CHETRD */
 
-	s_copy(srnamc_1.srnamt, "CHETRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHETRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chetrd_("/", &c__0, a, &c__1, d__, e, tau, w, &c__1, &info)
 		;
@@ -225,7 +237,7 @@ static real c_b472 = 1.f;
 
 /*        CUNGTR */
 
-	s_copy(srnamc_1.srnamt, "CUNGTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUNGTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cungtr_("/", &c__0, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("CUNGTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -246,7 +258,7 @@ static real c_b472 = 1.f;
 
 /*        CUNMTR */
 
-	s_copy(srnamc_1.srnamt, "CUNMTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUNMTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cunmtr_("/", "U", "N", &c__0, &c__0, a, &c__1, tau, c__, &c__1, w, &
 		c__1, &info);
@@ -301,7 +313,7 @@ static real c_b472 = 1.f;
 
 /*        CHPTRD */
 
-	s_copy(srnamc_1.srnamt, "CHPTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chptrd_("/", &c__0, a, d__, e, tau, &info);
 	chkxer_("CHPTRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -314,7 +326,7 @@ static real c_b472 = 1.f;
 
 /*        CUPGTR */
 
-	s_copy(srnamc_1.srnamt, "CUPGTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUPGTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cupgtr_("/", &c__0, a, tau, z__, &c__1, w, &info);
 	chkxer_("CUPGTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -331,7 +343,7 @@ static real c_b472 = 1.f;
 
 /*        CUPMTR */
 
-	s_copy(srnamc_1.srnamt, "CUPMTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUPMTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cupmtr_("/", "U", "N", &c__0, &c__0, a, tau, c__, &c__1, w, &info);
 	chkxer_("CUPMTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -360,7 +372,7 @@ static real c_b472 = 1.f;
 
 /*        CPTEQR */
 
-	s_copy(srnamc_1.srnamt, "CPTEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpteqr_("/", &c__0, d__, e, z__, &c__1, rw, &info);
 	chkxer_("CPTEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -377,7 +389,7 @@ static real c_b472 = 1.f;
 
 /*        CSTEIN */
 
-	s_copy(srnamc_1.srnamt, "CSTEIN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSTEIN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cstein_(&c_n1, d__, e, &c__0, x, i1, i2, z__, &c__1, rw, iw, i3, &
 		info);
@@ -402,7 +414,7 @@ static real c_b472 = 1.f;
 
 /*        CSTEQR */
 
-	s_copy(srnamc_1.srnamt, "CSTEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSTEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csteqr_("/", &c__0, d__, e, z__, &c__1, rw, &info);
 	chkxer_("CSTEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -419,7 +431,7 @@ static real c_b472 = 1.f;
 
 /*        CSTEDC */
 
-	s_copy(srnamc_1.srnamt, "CSTEDC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSTEDC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cstedc_("/", &c__0, d__, e, z__, &c__1, w, &c__1, rw, &c__1, iw, &
 		c__1, &info);
@@ -479,7 +491,7 @@ static real c_b472 = 1.f;
 
 /*        CHEEVD */
 
-	s_copy(srnamc_1.srnamt, "CHEEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHEEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cheevd_("/", "U", &c__0, a, &c__1, x, w, &c__1, rw, &c__1, iw, &c__1, 
 		&info);
@@ -544,7 +556,7 @@ static real c_b472 = 1.f;
 
 /*        CHEEV */
 
-	s_copy(srnamc_1.srnamt, "CHEEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHEEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cheev_("/", "U", &c__0, a, &c__1, x, w, &c__1, rw, &info);
 	chkxer_("CHEEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -569,7 +581,7 @@ static real c_b472 = 1.f;
 
 /*        CHEEVX */
 
-	s_copy(srnamc_1.srnamt, "CHEEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHEEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cheevx_("/", "A", "U", &c__0, a, &c__1, &c_b458, &c_b458, &c__0, &
 		c__0, &c_b458, &m, x, z__, &c__1, w, &c__1, rw, iw, i3, &info);
@@ -622,7 +634,7 @@ static real c_b472 = 1.f;
 
 /*        CHEEVR */
 
-	s_copy(srnamc_1.srnamt, "CHEEVR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHEEVR", (ftnlen)32, (ftnlen)6);
 	n = 1;
 	infoc_1.infot = 1;
 	i__1 = n << 1;
@@ -737,7 +749,7 @@ static real c_b472 = 1.f;
 
 /*        CHPEVD */
 
-	s_copy(srnamc_1.srnamt, "CHPEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chpevd_("/", "U", &c__0, a, x, z__, &c__1, w, &c__1, rw, &c__1, iw, &
 		c__1, &info);
@@ -807,7 +819,7 @@ static real c_b472 = 1.f;
 
 /*        CHPEV */
 
-	s_copy(srnamc_1.srnamt, "CHPEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chpev_("/", "U", &c__0, a, x, z__, &c__1, w, rw, &info);
 	chkxer_("CHPEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -828,7 +840,7 @@ static real c_b472 = 1.f;
 
 /*        CHPEVX */
 
-	s_copy(srnamc_1.srnamt, "CHPEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chpevx_("/", "A", "U", &c__0, a, &c_b458, &c_b458, &c__0, &c__0, &
 		c_b458, &m, x, z__, &c__1, w, rw, iw, i3, &info);
@@ -877,7 +889,7 @@ static real c_b472 = 1.f;
 
 /*        CHBTRD */
 
-	s_copy(srnamc_1.srnamt, "CHBTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHBTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chbtrd_("/", "U", &c__0, &c__0, a, &c__1, d__, e, z__, &c__1, w, &
 		info);
@@ -912,7 +924,7 @@ static real c_b472 = 1.f;
 
 /*        CHBEVD */
 
-	s_copy(srnamc_1.srnamt, "CHBEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHBEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
@@ -992,7 +1004,7 @@ static real c_b472 = 1.f;
 
 /*        CHBEV */
 
-	s_copy(srnamc_1.srnamt, "CHBEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHBEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chbev_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, rw, &info);
 	chkxer_("CHBEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -1021,7 +1033,7 @@ static real c_b472 = 1.f;
 
 /*        CHBEVX */
 
-	s_copy(srnamc_1.srnamt, "CHBEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHBEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chbevx_("/", "A", "U", &c__0, &c__0, a, &c__1, q, &c__1, &c_b458, &
 		c_b458, &c__0, &c__0, &c_b458, &m, x, z__, &c__1, w, rw, iw, 

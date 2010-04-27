@@ -1,3 +1,15 @@
+/* zerrge.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -169,7 +181,7 @@ static integer c__4 = 4;
 
 /*        ZGETRF */
 
-	s_copy(srnamc_1.srnamt, "ZGETRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGETRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgetrf_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("ZGETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -185,7 +197,7 @@ static integer c__4 = 4;
 
 /*        ZGETF2 */
 
-	s_copy(srnamc_1.srnamt, "ZGETF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGETF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgetf2_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("ZGETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -201,7 +213,7 @@ static integer c__4 = 4;
 
 /*        ZGETRI */
 
-	s_copy(srnamc_1.srnamt, "ZGETRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGETRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgetri_(&c_n1, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("ZGETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -217,7 +229,7 @@ static integer c__4 = 4;
 
 /*        ZGETRS */
 
-	s_copy(srnamc_1.srnamt, "ZGETRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGETRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("ZGETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -241,7 +253,7 @@ static integer c__4 = 4;
 
 /*        ZGERFS */
 
-	s_copy(srnamc_1.srnamt, "ZGERFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGERFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgerfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -280,7 +292,7 @@ static integer c__4 = 4;
 
 /*        ZGECON */
 
-	s_copy(srnamc_1.srnamt, "ZGECON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGECON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgecon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r__, &info)
 		;
@@ -299,7 +311,7 @@ static integer c__4 = 4;
 
 /*        ZGEEQU */
 
-	s_copy(srnamc_1.srnamt, "ZGEEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGEEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgeequ_(&c_n1, &c__0, a, &c__1, r1, r2, &rcond, &ccond, &anrm, &info);
 	chkxer_("ZGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -320,7 +332,7 @@ static integer c__4 = 4;
 
 /*        ZGBTRF */
 
-	s_copy(srnamc_1.srnamt, "ZGBTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbtrf_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("ZGBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -344,7 +356,7 @@ static integer c__4 = 4;
 
 /*        ZGBTF2 */
 
-	s_copy(srnamc_1.srnamt, "ZGBTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbtf2_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("ZGBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -368,7 +380,7 @@ static integer c__4 = 4;
 
 /*        ZGBTRS */
 
-	s_copy(srnamc_1.srnamt, "ZGBTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbtrs_("/", &c__0, &c__0, &c__0, &c__1, a, &c__1, ip, b, &c__1, &
 		info);
@@ -407,7 +419,7 @@ static integer c__4 = 4;
 
 /*        ZGBRFS */
 
-	s_copy(srnamc_1.srnamt, "ZGBRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbrfs_("/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &
 		c__1, x, &c__1, r1, r2, w, r__, &info);
@@ -456,7 +468,7 @@ static integer c__4 = 4;
 
 /*        ZGBCON */
 
-	s_copy(srnamc_1.srnamt, "ZGBCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
@@ -485,7 +497,7 @@ static integer c__4 = 4;
 
 /*        ZGBEQU */
 
-	s_copy(srnamc_1.srnamt, "ZGBEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbequ_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, r1, r2, &rcond, &ccond, 
 		&anrm, &info);

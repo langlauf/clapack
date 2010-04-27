@@ -1,3 +1,15 @@
+/* derrpo.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -153,7 +165,7 @@ static integer c_n1 = -1;
 
 /*        DPOTRF */
 
-	s_copy(srnamc_1.srnamt, "DPOTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPOTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotrf_("/", &c__0, a, &c__1, &info);
 	chkxer_("DPOTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -169,7 +181,7 @@ static integer c_n1 = -1;
 
 /*        DPOTF2 */
 
-	s_copy(srnamc_1.srnamt, "DPOTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPOTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotf2_("/", &c__0, a, &c__1, &info);
 	chkxer_("DPOTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -185,7 +197,7 @@ static integer c_n1 = -1;
 
 /*        DPOTRI */
 
-	s_copy(srnamc_1.srnamt, "DPOTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPOTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotri_("/", &c__0, a, &c__1, &info);
 	chkxer_("DPOTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -201,7 +213,7 @@ static integer c_n1 = -1;
 
 /*        DPOTRS */
 
-	s_copy(srnamc_1.srnamt, "DPOTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPOTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotrs_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("DPOTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -225,7 +237,7 @@ static integer c_n1 = -1;
 
 /*        DPORFS */
 
-	s_copy(srnamc_1.srnamt, "DPORFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPORFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dporfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &c__1, 
 		r1, r2, w, iw, &info);
@@ -264,7 +276,7 @@ static integer c_n1 = -1;
 
 /*        DPOCON */
 
-	s_copy(srnamc_1.srnamt, "DPOCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPOCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpocon_("/", &c__0, a, &c__1, &anrm, &rcond, w, iw, &info);
 	chkxer_("DPOCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -280,7 +292,7 @@ static integer c_n1 = -1;
 
 /*        DPOEQU */
 
-	s_copy(srnamc_1.srnamt, "DPOEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPOEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpoequ_(&c_n1, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("DPOEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -297,7 +309,7 @@ static integer c_n1 = -1;
 
 /*        DPPTRF */
 
-	s_copy(srnamc_1.srnamt, "DPPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpptrf_("/", &c__0, a, &info);
 	chkxer_("DPPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -309,7 +321,7 @@ static integer c_n1 = -1;
 
 /*        DPPTRI */
 
-	s_copy(srnamc_1.srnamt, "DPPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpptri_("/", &c__0, a, &info);
 	chkxer_("DPPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -321,7 +333,7 @@ static integer c_n1 = -1;
 
 /*        DPPTRS */
 
-	s_copy(srnamc_1.srnamt, "DPPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpptrs_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("DPPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -341,7 +353,7 @@ static integer c_n1 = -1;
 
 /*        DPPRFS */
 
-	s_copy(srnamc_1.srnamt, "DPPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpprfs_("/", &c__0, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, iw, &
 		info);
@@ -370,7 +382,7 @@ static integer c_n1 = -1;
 
 /*        DPPCON */
 
-	s_copy(srnamc_1.srnamt, "DPPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dppcon_("/", &c__0, a, &anrm, &rcond, w, iw, &info);
 	chkxer_("DPPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -382,7 +394,7 @@ static integer c_n1 = -1;
 
 /*        DPPEQU */
 
-	s_copy(srnamc_1.srnamt, "DPPEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPPEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dppequ_("/", &c__0, a, r1, &rcond, &anrm, &info);
 	chkxer_("DPPEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -399,7 +411,7 @@ static integer c_n1 = -1;
 
 /*        DPBTRF */
 
-	s_copy(srnamc_1.srnamt, "DPBTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPBTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbtrf_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("DPBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -419,7 +431,7 @@ static integer c_n1 = -1;
 
 /*        DPBTF2 */
 
-	s_copy(srnamc_1.srnamt, "DPBTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPBTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbtf2_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("DPBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -439,7 +451,7 @@ static integer c_n1 = -1;
 
 /*        DPBTRS */
 
-	s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbtrs_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("DPBTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -467,7 +479,7 @@ static integer c_n1 = -1;
 
 /*        DPBRFS */
 
-	s_copy(srnamc_1.srnamt, "DPBRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPBRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbrfs_("/", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &
 		c__1, r1, r2, w, iw, &info);
@@ -511,7 +523,7 @@ static integer c_n1 = -1;
 
 /*        DPBCON */
 
-	s_copy(srnamc_1.srnamt, "DPBCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPBCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbcon_("/", &c__0, &c__0, a, &c__1, &anrm, &rcond, w, iw, &info);
 	chkxer_("DPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -531,7 +543,7 @@ static integer c_n1 = -1;
 
 /*        DPBEQU */
 
-	s_copy(srnamc_1.srnamt, "DPBEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPBEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbequ_("/", &c__0, &c__0, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("DPBEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

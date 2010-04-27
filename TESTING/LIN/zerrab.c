@@ -1,3 +1,15 @@
+/* zerrab.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -47,17 +59,18 @@ static integer c__2 = 2;
 	    */;
     integer ip[4], info, iter;
     doublecomplex work[1];
+    doublereal rwork[1];
     complex swork[1];
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), zcgesv_(integer *, integer *, 
 	    doublecomplex *, integer *, integer *, doublecomplex *, integer *, 
-	     doublecomplex *, integer *, doublecomplex *, complex *, integer *
-, integer *);
+	     doublecomplex *, integer *, doublecomplex *, complex *, 
+	    doublereal *, integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
-    static cilist io___18 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___19 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___19 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___20 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
@@ -137,41 +150,41 @@ static integer c__2 = 2;
 
     s_copy(srnamc_1.srnamt, "ZCGESV", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
-    zcgesv_(&c_n1, &c__0, a, &c__1, ip, b, &c__1, x, &c__1, work, swork, &
-	    iter, &info);
+    zcgesv_(&c_n1, &c__0, a, &c__1, ip, b, &c__1, x, &c__1, work, swork, 
+	    rwork, &iter, &info);
     chkxer_("ZCGESV", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 2;
-    zcgesv_(&c__0, &c_n1, a, &c__1, ip, b, &c__1, x, &c__1, work, swork, &
-	    iter, &info);
+    zcgesv_(&c__0, &c_n1, a, &c__1, ip, b, &c__1, x, &c__1, work, swork, 
+	    rwork, &iter, &info);
     chkxer_("ZCGESV", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 4;
-    zcgesv_(&c__2, &c__1, a, &c__1, ip, b, &c__2, x, &c__2, work, swork, &
-	    iter, &info);
+    zcgesv_(&c__2, &c__1, a, &c__1, ip, b, &c__2, x, &c__2, work, swork, 
+	    rwork, &iter, &info);
     chkxer_("ZCGESV", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 7;
-    zcgesv_(&c__2, &c__1, a, &c__2, ip, b, &c__1, x, &c__2, work, swork, &
-	    iter, &info);
+    zcgesv_(&c__2, &c__1, a, &c__2, ip, b, &c__1, x, &c__2, work, swork, 
+	    rwork, &iter, &info);
     chkxer_("ZCGESV", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 9;
-    zcgesv_(&c__2, &c__1, a, &c__2, ip, b, &c__2, x, &c__1, work, swork, &
-	    iter, &info);
+    zcgesv_(&c__2, &c__1, a, &c__2, ip, b, &c__2, x, &c__1, work, swork, 
+	    rwork, &iter, &info);
     chkxer_("ZCGESV", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
 
 /*     Print a summary line. */
 
     if (infoc_1.ok) {
-	io___18.ciunit = infoc_1.nout;
-	s_wsfe(&io___18);
+	io___19.ciunit = infoc_1.nout;
+	s_wsfe(&io___19);
 	do_fio(&c__1, "ZCGESV", (ftnlen)6);
 	e_wsfe();
     } else {
-	io___19.ciunit = infoc_1.nout;
-	s_wsfe(&io___19);
+	io___20.ciunit = infoc_1.nout;
+	s_wsfe(&io___20);
 	do_fio(&c__1, "ZCGESV", (ftnlen)6);
 	e_wsfe();
     }

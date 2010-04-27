@@ -1,3 +1,15 @@
+/* zlatrz.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -17,12 +29,12 @@
     doublecomplex alpha;
     extern /* Subroutine */ int zlarz_(char *, integer *, integer *, integer *
 , doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
-	    integer *, doublecomplex *), zlarfg_(integer *, 
-	    doublecomplex *, doublecomplex *, integer *, doublecomplex *), 
-	    zlacgv_(integer *, doublecomplex *, integer *);
+	    integer *, doublecomplex *), zlacgv_(integer *, 
+	    doublecomplex *, integer *), zlarfp_(integer *, doublecomplex *, 
+	    doublecomplex *, integer *, doublecomplex *);
 
 
-/*  -- LAPACK routine (version 3.1) -- */
+/*  -- LAPACK routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -142,7 +154,7 @@
 	d_cnjg(&z__1, &a[i__ + i__ * a_dim1]);
 	alpha.r = z__1.r, alpha.i = z__1.i;
 	i__1 = *l + 1;
-	zlarfg_(&i__1, &alpha, &a[i__ + (*n - *l + 1) * a_dim1], lda, &tau[
+	zlarfp_(&i__1, &alpha, &a[i__ + (*n - *l + 1) * a_dim1], lda, &tau[
 		i__]);
 	i__1 = i__;
 	d_cnjg(&z__1, &tau[i__]);

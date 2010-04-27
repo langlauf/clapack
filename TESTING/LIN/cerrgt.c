@@ -1,3 +1,15 @@
+/* cerrgt.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -137,7 +149,7 @@ static integer c__1 = 1;
 
 /*        CGTTRF */
 
-	s_copy(srnamc_1.srnamt, "CGTTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGTTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgttrf_(&c_n1, dl, e, du, du2, ip, &info);
 	chkxer_("CGTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -145,7 +157,7 @@ static integer c__1 = 1;
 
 /*        CGTTRS */
 
-	s_copy(srnamc_1.srnamt, "CGTTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGTTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgttrs_("/", &c__0, &c__0, dl, e, du, du2, ip, x, &c__1, &info);
 	chkxer_("CGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -165,7 +177,7 @@ static integer c__1 = 1;
 
 /*        CGTRFS */
 
-	s_copy(srnamc_1.srnamt, "CGTRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGTRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgtrfs_("/", &c__0, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
@@ -194,7 +206,7 @@ static integer c__1 = 1;
 
 /*        CGTCON */
 
-	s_copy(srnamc_1.srnamt, "CGTCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGTCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgtcon_("/", &c__0, dl, e, du, du2, ip, &anorm, &rcond, w, &info);
 	chkxer_("CGTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -216,7 +228,7 @@ static integer c__1 = 1;
 
 /*        CPTTRF */
 
-	s_copy(srnamc_1.srnamt, "CPTTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpttrf_(&c_n1, d__, e, &info);
 	chkxer_("CPTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -224,7 +236,7 @@ static integer c__1 = 1;
 
 /*        CPTTRS */
 
-	s_copy(srnamc_1.srnamt, "CPTTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpttrs_("/", &c__1, &c__0, d__, e, x, &c__1, &info);
 	chkxer_("CPTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -244,7 +256,7 @@ static integer c__1 = 1;
 
 /*        CPTRFS */
 
-	s_copy(srnamc_1.srnamt, "CPTRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cptrfs_("/", &c__1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
@@ -273,7 +285,7 @@ static integer c__1 = 1;
 
 /*        CPTCON */
 
-	s_copy(srnamc_1.srnamt, "CPTCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cptcon_(&c_n1, d__, e, &anorm, &rcond, rw, &info);
 	chkxer_("CPTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

@@ -1,3 +1,15 @@
+/* zchktr.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -53,7 +65,7 @@ static integer c__9 = 9;
     static char fmt_9997[] = "(\002 NORM='\002,a1,\002', UPLO ='\002,a1,\002"
 	    "', N=\002,i5,\002,\002,11x,\002 type \002,i2,\002, test(\002,i2"
 	    ",\002)=\002,g12.5)";
-    static char fmt_9996[] = "(1x,a6,\002( '\002,a1,\002', '\002,a1,\002', "
+    static char fmt_9996[] = "(1x,a,\002( '\002,a1,\002', '\002,a1,\002', "
 	    "'\002,a1,\002', '\002,a1,\002',\002,i5,\002, ... ), type \002,i2,"
 	    "\002, test(\002,i2,\002)=\002,g12.5)";
 
@@ -299,7 +311,7 @@ static integer c__9 = 9;
 
 /*              Call ZLATTR to generate a triangular test matrix. */
 
-		s_copy(srnamc_1.srnamt, "ZLATTR", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZLATTR", (ftnlen)32, (ftnlen)6);
 		zlattr_(&imat, uplo, "No transpose", diag, iseed, &n, &a[1], &
 			lda, &x[1], &work[1], &rwork[1], &info);
 
@@ -323,7 +335,7 @@ static integer c__9 = 9;
 /*                 Form the inverse of A. */
 
 		    zlacpy_(uplo, &n, &n, &a[1], &lda, &ainv[1], &lda);
-		    s_copy(srnamc_1.srnamt, "ZTRTRI", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZTRTRI", (ftnlen)32, (ftnlen)6);
 		    ztrtri_(uplo, diag, &n, &ainv[1], &lda, &info);
 
 /*                 Check error code from ZTRTRI. */
@@ -404,7 +416,7 @@ static integer c__9 = 9;
 /* +    TEST 2 */
 /*                       Solve and compute residual for op(A)*x = b. */
 
-			    s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)32, (
 				    ftnlen)6);
 			    zlarhs_(path, xtype, uplo, trans, &n, &n, &c__0, &
 				    idiag, &nrhs, &a[1], &lda, &xact[1], &lda, 
@@ -413,7 +425,7 @@ static integer c__9 = 9;
 			    zlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
 				    lda);
 
-			    s_copy(srnamc_1.srnamt, "ZTRTRS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZTRTRS", (ftnlen)32, (
 				    ftnlen)6);
 			    ztrtrs_(uplo, trans, diag, &n, &nrhs, &a[1], &lda, 
 				     &x[1], &lda, &info);
@@ -451,7 +463,7 @@ static integer c__9 = 9;
 /*                       Use iterative refinement to improve the solution */
 /*                       and compute error bounds. */
 
-			    s_copy(srnamc_1.srnamt, "ZTRRFS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZTRRFS", (ftnlen)32, (
 				    ftnlen)6);
 			    ztrrfs_(uplo, trans, diag, &n, &nrhs, &a[1], &lda, 
 				     &b[1], &lda, &x[1], &lda, &rwork[1], &
@@ -522,7 +534,7 @@ static integer c__9 = 9;
 			    *(unsigned char *)norm = 'I';
 			    rcondc = rcondi;
 			}
-			s_copy(srnamc_1.srnamt, "ZTRCON", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "ZTRCON", (ftnlen)32, (ftnlen)
 				6);
 			ztrcon_(norm, uplo, diag, &n, &a[1], &lda, &rcond, &
 				work[1], &rwork[1], &info);
@@ -600,14 +612,14 @@ L80:
 
 /*                 Call ZLATTR to generate a triangular test matrix. */
 
-		    s_copy(srnamc_1.srnamt, "ZLATTR", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZLATTR", (ftnlen)32, (ftnlen)6);
 		    zlattr_(&imat, uplo, trans, diag, iseed, &n, &a[1], &lda, 
 			    &x[1], &work[1], &rwork[1], &info);
 
 /* +    TEST 8 */
 /*                 Solve the system op(A)*x = b. */
 
-		    s_copy(srnamc_1.srnamt, "ZLATRS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZLATRS", (ftnlen)32, (ftnlen)6);
 		    zcopy_(&n, &x[1], &c__1, &b[1], &c__1);
 		    zlatrs_(uplo, trans, diag, "N", &n, &a[1], &lda, &b[1], &
 			    scale, &rwork[1], &info);

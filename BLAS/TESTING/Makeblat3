@@ -1,4 +1,5 @@
-include ../../make.inc
+TOPDIR=../..
+include $(TOPDIR)/make.inc
  
 #######################################################################
 #  This makefile creates the test programs for the BLAS 3 routines.
@@ -44,19 +45,19 @@ complex: ../xblat3c
 complex16: ../xblat3z
 
 ../xblat3s: $(SBLAT3)
-	${CC} $(LOADOPTS)   $(SBLAT3) \
+	$(CC) $(LOADOPTS)   $(SBLAT3) \
         $(BLASLIB) $(F2CLIB) -lm -o ../xblat3s
 
 ../xblat3c: $(CBLAT3) 
-	${CC} $(LOADOPTS)   $(CBLAT3) \
+	$(CC) $(LOADOPTS)   $(CBLAT3) \
         $(BLASLIB) $(F2CLIB) -lm -o ../xblat3c
  
 ../xblat3d: $(DBLAT3) 
-	${CC} $(LOADOPTS)   $(DBLAT3) \
+	$(CC) $(LOADOPTS)   $(DBLAT3) \
         $(BLASLIB) $(F2CLIB) -lm -o ../xblat3d
  
 ../xblat3z: $(ZBLAT3) 
-	${CC} $(LOADOPTS)   $(ZBLAT3) \
+	$(CC) $(LOADOPTS)   $(ZBLAT3) \
         $(BLASLIB) $(F2CLIB) -lm -o ../xblat3z
  
 $(SBLAT3): $(FRC)
@@ -71,4 +72,4 @@ clean:
 	rm -f *.o
  
 .c.o: 
-	${CC} $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $< -o $@

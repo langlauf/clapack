@@ -1,3 +1,15 @@
+/* slaqr3.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -6,8 +18,8 @@
 static integer c__1 = 1;
 static integer c_n1 = -1;
 static logical c_true = TRUE_;
-static real c_b15 = 0.f;
-static real c_b16 = 1.f;
+static real c_b17 = 0.f;
+static real c_b18 = 1.f;
 static integer c__12 = 12;
 
 /* Subroutine */ int slaqr3_(logical *wantt, logical *wantz, integer *n, 
@@ -63,17 +75,17 @@ static integer c__12 = 12;
 	    integer *, real *, integer *, real *, integer *), slaset_(
 	    char *, integer *, integer *, real *, real *, real *, integer *);
     logical sorted;
-    extern /* Subroutine */ int sorghr_(integer *, integer *, integer *, real 
-	    *, integer *, real *, real *, integer *, integer *), strexc_(char 
-	    *, integer *, real *, integer *, real *, integer *, integer *, 
-	    integer *, real *, integer *);
+    extern /* Subroutine */ int strexc_(char *, integer *, real *, integer *, 
+	    real *, integer *, integer *, integer *, real *, integer *), sormhr_(char *, char *, integer *, integer *, integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, real *, 
+	    integer *, integer *);
     real smlnum;
     integer lwkopt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
-/*     November 2006 */
+/*  -- LAPACK auxiliary routine (version 3.2.1)                        -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
+/*  -- April 2009                                                      -- */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -141,7 +153,7 @@ static integer c__12 = 12;
 /*          Specify the rows of Z to which transformations must be */
 /*          applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N. */
 
-/*     Z       (input/output) REAL array, dimension (LDZ,IHI) */
+/*     Z       (input/output) REAL array, dimension (LDZ,N) */
 /*          IF WANTZ is .TRUE., then on output, the orthogonal */
 /*          similarity transformation mentioned above has been */
 /*          accumulated into Z(ILOZ:IHIZ,ILO:IHI) from the right. */
@@ -216,7 +228,7 @@ static integer c__12 = 12;
 /*        Karen Braman and Ralph Byers, Department of Mathematics, */
 /*        University of Kansas, USA */
 
-/*     ================================================================== */
+/*     ================================================================ */
 /*     .. Parameters .. */
 /*     .. */
 /*     .. Local Scalars .. */
@@ -266,11 +278,11 @@ static integer c__12 = 12;
 		c_n1, &info);
 	lwk1 = (integer) work[1];
 
-/*        ==== Workspace query call to SORGHR ==== */
+/*        ==== Workspace query call to SORMHR ==== */
 
 	i__1 = jw - 1;
-	sorghr_(&jw, &c__1, &i__1, &t[t_offset], ldt, &work[1], &work[1], &
-		c_n1, &info);
+	sormhr_("R", "N", &jw, &jw, &c__1, &i__1, &t[t_offset], ldt, &work[1], 
+		 &v[v_offset], ldv, &work[1], &c_n1, &info);
 	lwk2 = (integer) work[1];
 
 /*        ==== Workspace query call to SLAQR4 ==== */
@@ -298,6 +310,7 @@ static integer c__12 = 12;
 /*     ... for an empty active block ... ==== */
     *ns = 0;
     *nd = 0;
+    work[1] = 1.f;
     if (*ktop > *kbot) {
 	return 0;
     }
@@ -344,6 +357,7 @@ static integer c__12 = 12;
 		h__[kwtop + (kwtop - 1) * h_dim1] = 0.f;
 	    }
 	}
+	work[1] = 1.f;
 	return 0;
     }
 
@@ -361,7 +375,7 @@ static integer c__12 = 12;
     scopy_(&i__1, &h__[kwtop + 1 + kwtop * h_dim1], &i__2, &t[t_dim1 + 2], &
 	    i__3);
 
-    slaset_("A", &jw, &jw, &c_b15, &c_b16, &v[v_offset], ldv);
+    slaset_("A", &jw, &jw, &c_b17, &c_b18, &v[v_offset], ldv);
     nmin = ilaenv_(&c__12, "SLAQR3", "SV", &jw, &c__1, &jw, lwork);
     if (jw > nmin) {
 	slaqr4_(&c_true, &c_true, &jw, &c__1, &jw, &t[t_offset], ldt, &sr[
@@ -446,7 +460,7 @@ L20:
 		*ns += -2;
 	    } else {
 
-/*              ==== Undflatable. Move them up out of the way. */
+/*              ==== Undeflatable. Move them up out of the way. */
 /*              .    Fortunately, STREXC does the right thing with */
 /*              .    ILST in case of a rare exchange failure. ==== */
 
@@ -577,7 +591,7 @@ L60:
 
 	    i__1 = jw - 2;
 	    i__2 = jw - 2;
-	    slaset_("L", &i__1, &i__2, &c_b15, &c_b15, &t[t_dim1 + 3], ldt);
+	    slaset_("L", &i__1, &i__2, &c_b17, &c_b17, &t[t_dim1 + 3], ldt);
 
 	    slarf_("L", ns, &jw, &work[1], &c__1, &tau, &t[t_offset], ldt, &
 		    work[jw + 1]);
@@ -605,18 +619,12 @@ L60:
 		 &i__3);
 
 /*        ==== Accumulate orthogonal matrix in order update */
-/*        .    H and Z, if requested.  (A modified version */
-/*        .    of  SORGHR that accumulates block Householder */
-/*        .    transformations into V directly might be */
-/*        .    marginally more efficient than the following.) ==== */
+/*        .    H and Z, if requested.  ==== */
 
 	if (*ns > 1 && s != 0.f) {
 	    i__1 = *lwork - jw;
-	    sorghr_(&jw, &c__1, ns, &t[t_offset], ldt, &work[1], &work[jw + 1]
-, &i__1, &info);
-	    sgemm_("N", "N", &jw, ns, ns, &c_b16, &v[v_offset], ldv, &t[
-		    t_offset], ldt, &c_b15, &wv[wv_offset], ldwv);
-	    slacpy_("A", &jw, ns, &wv[wv_offset], ldwv, &v[v_offset], ldv);
+	    sormhr_("R", "N", &jw, ns, &c__1, ns, &t[t_offset], ldt, &work[1], 
+		     &v[v_offset], ldv, &work[jw + 1], &i__1, &info);
 	}
 
 /*        ==== Update vertical slab in H ==== */
@@ -633,8 +641,8 @@ L60:
 /* Computing MIN */
 	    i__3 = *nv, i__4 = kwtop - krow;
 	    kln = min(i__3,i__4);
-	    sgemm_("N", "N", &kln, &jw, &jw, &c_b16, &h__[krow + kwtop * 
-		    h_dim1], ldh, &v[v_offset], ldv, &c_b15, &wv[wv_offset], 
+	    sgemm_("N", "N", &kln, &jw, &jw, &c_b18, &h__[krow + kwtop * 
+		    h_dim1], ldh, &v[v_offset], ldv, &c_b17, &wv[wv_offset], 
 		    ldwv);
 	    slacpy_("A", &kln, &jw, &wv[wv_offset], ldwv, &h__[krow + kwtop * 
 		    h_dim1], ldh);
@@ -651,8 +659,8 @@ L60:
 /* Computing MIN */
 		i__3 = *nh, i__4 = *n - kcol + 1;
 		kln = min(i__3,i__4);
-		sgemm_("C", "N", &jw, &kln, &jw, &c_b16, &v[v_offset], ldv, &
-			h__[kwtop + kcol * h_dim1], ldh, &c_b15, &t[t_offset], 
+		sgemm_("C", "N", &jw, &kln, &jw, &c_b18, &v[v_offset], ldv, &
+			h__[kwtop + kcol * h_dim1], ldh, &c_b17, &t[t_offset], 
 			 ldt);
 		slacpy_("A", &jw, &kln, &t[t_offset], ldt, &h__[kwtop + kcol *
 			 h_dim1], ldh);
@@ -670,8 +678,8 @@ L60:
 /* Computing MIN */
 		i__3 = *nv, i__4 = *ihiz - krow + 1;
 		kln = min(i__3,i__4);
-		sgemm_("N", "N", &kln, &jw, &jw, &c_b16, &z__[krow + kwtop * 
-			z_dim1], ldz, &v[v_offset], ldv, &c_b15, &wv[
+		sgemm_("N", "N", &kln, &jw, &jw, &c_b18, &z__[krow + kwtop * 
+			z_dim1], ldz, &v[v_offset], ldv, &c_b17, &wv[
 			wv_offset], ldwv);
 		slacpy_("A", &kln, &jw, &wv[wv_offset], ldwv, &z__[krow + 
 			kwtop * z_dim1], ldz);

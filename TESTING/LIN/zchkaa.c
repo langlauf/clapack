@@ -1,3 +1,15 @@
+/* zchkaa.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -30,6 +42,7 @@ static integer c__12 = 12;
 static integer c__0 = 0;
 static integer c__132 = 132;
 static integer c__16 = 16;
+static integer c__100 = 100;
 static integer c__5 = 5;
 static integer c__8 = 8;
 static integer c__2 = 2;
@@ -90,7 +103,7 @@ static integer c__6 = 6;
     integer ic, la, nb, nm, nn, vers_patch__, vers_major__, vers_minor__, lda,
 	     nnb;
     doublereal eps;
-    integer nns, nnb2;
+    integer nns, piv[132], nnb2;
     char path[3];
     integer mval[12], nval[12], nrhs;
     doublecomplex work[20856]	/* was [132][158] */;
@@ -98,7 +111,7 @@ static integer c__6 = 6;
     logical fatal;
     char aline[72];
     extern logical lsame_(char *, char *);
-    integer nbval[12], nmats, nsval[12], nxval[12], iwork[3300];
+    integer nbval[12], nrank, nmats, nsval[12], nxval[12], iwork[3300];
     doublereal rwork[19832];
     integer nbval2[12];
     extern /* Subroutine */ int zchkq3_(logical *, integer *, integer *, 
@@ -164,76 +177,79 @@ static integer c__6 = 6;
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublereal *, integer *, 
-	    integer *), zchkpt_(logical *, integer *, integer *, integer *, 
-	    integer *, doublereal *, logical *, doublecomplex *, doublereal *, 
-	     doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex 
-	    *, doublecomplex *, doublereal *, integer *);
-    logical dotype[30];
-    extern /* Subroutine */ int zchkqp_(logical *, integer *, integer *, 
-	    integer *, integer *, doublereal *, logical *, doublecomplex *, 
-	    doublecomplex *, doublereal *, doublereal *, doublecomplex *, 
-	    doublecomplex *, doublereal *, integer *, integer *), zchkqr_(
-	    logical *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *), zchkps_(logical *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, doublereal *, logical *, integer 
-	    *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublecomplex *, doublecomplex *, doublereal *, 
-	     integer *, integer *), zchkrq_(logical *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    doublereal *, logical *, integer *, doublecomplex *, 
+	    *, doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
+	    doublecomplex *, doublereal *, integer *);
+    logical dotype[30];
+    extern /* Subroutine */ int zchkpt_(logical *, integer *, integer *, 
+	    integer *, integer *, doublereal *, logical *, doublecomplex *, 
+	    doublereal *, doublecomplex *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublereal *, integer *), 
+	    zchkqp_(logical *, integer *, integer *, integer *, integer *, 
+	    doublereal *, logical *, doublecomplex *, doublecomplex *, 
+	    doublereal *, doublereal *, doublecomplex *, doublecomplex *, 
+	    doublereal *, integer *, integer *), zchkqr_(logical *, integer *, 
+	     integer *, integer *, integer *, integer *, integer *, integer *, 
+	     integer *, doublereal *, logical *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublereal *, integer *, 
-	    integer *), zchksp_(logical *, integer *, integer *, integer *, 
-	    integer *, doublereal *, logical *, integer *, doublecomplex *, 
+	    integer *), zchkrq_(logical *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, doublereal 
+	    *, logical *, integer *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublecomplex *, doublereal *, integer *, 
-	    integer *), zchktp_(logical *, integer *, integer *, integer *, 
-	    integer *, doublereal *, logical *, integer *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublereal *, integer *), zchktr_(logical *, 
-	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    doublereal *, logical *, integer *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublereal *, integer *), zchksy_(logical *, 
-	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    doublereal *, logical *, integer *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublecomplex *, doublereal *, integer *, 
-	    integer *), zdrvgb_(logical *, integer *, integer *, integer *, 
-	    doublereal *, logical *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublereal *, 
-	    doublecomplex *, doublereal *, integer *, integer *), zchktz_(
+, doublecomplex *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublereal *, integer *, integer *), zchksp_(
 	    logical *, integer *, integer *, integer *, integer *, doublereal 
-	    *, logical *, doublecomplex *, doublecomplex *, doublereal *, 
-	    doublereal *, doublecomplex *, doublecomplex *, doublereal *, 
-	    integer *), zdrvge_(logical *, integer *, integer *, integer *, 
-	    doublereal *, logical *, integer *, doublecomplex *, 
+	    *, logical *, integer *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+, doublecomplex *, doublereal *, integer *, integer *), zchktp_(
+	    logical *, integer *, integer *, integer *, integer *, doublereal 
+	    *, logical *, integer *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+, doublereal *, integer *), zchksy_(logical *, integer *, integer 
+	    *, integer *, integer *, integer *, integer *, doublereal *, 
+	    logical *, integer *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+, doublecomplex *, doublereal *, integer *, integer *), zchktr_(
+	    logical *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, doublereal *, logical *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+, doublecomplex *, doublereal *, integer *), zchktz_(logical *, 
+	    integer *, integer *, integer *, integer *, doublereal *, logical 
+	    *, doublecomplex *, doublecomplex *, doublereal *, doublereal *, 
+	    doublecomplex *, doublecomplex *, doublereal *, integer *), 
+	    zdrvgb_(logical *, integer *, integer *, integer *, doublereal *, 
+	    logical *, doublecomplex *, integer *, doublecomplex *, integer *, 
+	     doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex 
+	    *, doublecomplex *, doublereal *, doublecomplex *, doublereal *, 
+	    integer *, integer *), zdrvge_(logical *, integer *, integer *, 
+	    integer *, doublereal *, logical *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublecomplex *, doublecomplex *, doublereal *, doublecomplex *, 
-	     doublereal *, integer *, integer *), zdrvhe_(logical *, integer *
-, integer *, integer *, doublereal *, logical *, integer *, 
+	     doublereal *, integer *, integer *), zdrvgt_(logical *, integer *
+, integer *, integer *, doublereal *, logical *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublecomplex *, doublecomplex *, doublereal *, 
-	     integer *, integer *), zdrvgt_(logical *, integer *, integer *, 
-	    integer *, doublereal *, logical *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-, doublecomplex *, doublereal *, integer *, integer *), zdrvhp_(
+, doublecomplex *, doublereal *, integer *, integer *), zdrvhe_(
 	    logical *, integer *, integer *, integer *, doublereal *, logical 
 	    *, integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublereal *, integer *, integer *);
     integer ntypes;
     logical tsterr;
+    extern /* Subroutine */ int zdrvhp_(logical *, integer *, integer *, 
+	    integer *, doublereal *, logical *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+, doublecomplex *, doublecomplex *, doublereal *, integer *, 
+	    integer *);
+    logical tstdrv;
     extern /* Subroutine */ int zdrvls_(logical *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, doublereal *, logical *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublereal *, doublereal *, doublecomplex *, doublereal *, 
-	    integer *, integer *);
-    logical tstdrv;
-    extern /* Subroutine */ int zdrvpb_(logical *, integer *, integer *, 
+	    integer *, integer *), zdrvpb_(logical *, integer *, integer *, 
 	    integer *, doublereal *, logical *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublecomplex *, doublecomplex *, doublereal *, doublecomplex *, 
@@ -257,6 +273,7 @@ static integer c__6 = 6;
 	    *, integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 , doublereal *, integer *, integer *);
+    integer rankval[12];
 
     /* Fortran I/O blocks */
     static cilist io___6 = { 0, 5, 0, 0, 0 };
@@ -292,53 +309,61 @@ static integer c__6 = 6;
     static cilist io___53 = { 0, 6, 0, fmt_9996, 0 };
     static cilist io___54 = { 0, 6, 0, fmt_9993, 0 };
     static cilist io___55 = { 0, 5, 0, 0, 0 };
-    static cilist io___57 = { 0, 6, 0, fmt_9992, 0 };
-    static cilist io___58 = { 0, 5, 0, 0, 0 };
-    static cilist io___60 = { 0, 5, 0, 0, 0 };
-    static cilist io___62 = { 0, 5, 0, 0, 0 };
-    static cilist io___64 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___66 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___67 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___68 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___69 = { 0, 6, 0, 0, 0 };
-    static cilist io___78 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___79 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___87 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___89 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___92 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___93 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___94 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___95 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___57 = { 0, 6, 0, fmt_9996, 0 };
+    static cilist io___58 = { 0, 6, 0, fmt_9995, 0 };
+    static cilist io___59 = { 0, 5, 0, 0, 0 };
+    static cilist io___61 = { 0, 6, 0, fmt_9996, 0 };
+    static cilist io___62 = { 0, 6, 0, fmt_9995, 0 };
+    static cilist io___63 = { 0, 6, 0, fmt_9993, 0 };
+    static cilist io___64 = { 0, 5, 0, 0, 0 };
+    static cilist io___66 = { 0, 6, 0, fmt_9992, 0 };
+    static cilist io___67 = { 0, 5, 0, 0, 0 };
+    static cilist io___69 = { 0, 5, 0, 0, 0 };
+    static cilist io___71 = { 0, 5, 0, 0, 0 };
+    static cilist io___73 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___75 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___76 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___77 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___78 = { 0, 6, 0, 0, 0 };
+    static cilist io___87 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___88 = { 0, 6, 0, fmt_9989, 0 };
     static cilist io___96 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___97 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___98 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___99 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___100 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___101 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___102 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___103 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___104 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___105 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___106 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___107 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___98 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___101 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___102 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___103 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___104 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___105 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___106 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___108 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___109 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___110 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___111 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___112 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___109 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___110 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___111 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___112 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___113 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___114 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___114 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___115 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___116 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___116 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___117 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___118 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___118 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___119 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___120 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___120 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___121 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___122 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___123 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___125 = { 0, 6, 0, fmt_9998, 0 };
-    static cilist io___126 = { 0, 6, 0, fmt_9997, 0 };
+    static cilist io___122 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___123 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___124 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___125 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___126 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___127 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___128 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___129 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___130 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___131 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___132 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___133 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___134 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___136 = { 0, 6, 0, fmt_9998, 0 };
+    static cilist io___137 = { 0, 6, 0, fmt_9997, 0 };
 
 
 
@@ -368,6 +393,8 @@ static integer c__6 = 6;
 /*  5                      Number of values of NB */
 /*  1 3 3 3 20             Values of NB (the blocksize) */
 /*  1 0 5 9 1              Values of NX (crossover point) */
+/*  3                      Number of values of RANK */
+/*  30 50 90               Values of rank (as a % of N) */
 /*  30.0                   Threshold value of test ratio */
 /*  T                      Put T to test the LAPACK routines */
 /*  T                      Put T to test the driver routines */
@@ -376,6 +403,7 @@ static integer c__6 = 6;
 /*  ZGB    8               List types on next line if 0 < NTYPES <  8 */
 /*  ZGT   12               List types on next line if 0 < NTYPES < 12 */
 /*  ZPO    9               List types on next line if 0 < NTYPES <  9 */
+/*  ZPS    9               List types on next line if 0 < NTYPES <  9 */
 /*  ZPP    9               List types on next line if 0 < NTYPES <  9 */
 /*  ZPB    8               List types on next line if 0 < NTYPES <  8 */
 /*  ZPT   12               List types on next line if 0 < NTYPES < 12 */
@@ -727,35 +755,92 @@ L60:
 	e_wsfe();
     }
 
-/*     Read the threshold value for the test ratios. */
+/*     Read the values of RANKVAL */
 
     s_rsle(&io___55);
+    do_lio(&c__3, &c__1, (char *)&nrank, (ftnlen)sizeof(integer));
+    e_rsle();
+    if (nn < 1) {
+	s_wsfe(&io___57);
+	do_fio(&c__1, " NRANK ", (ftnlen)7);
+	do_fio(&c__1, (char *)&nrank, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	e_wsfe();
+	nrank = 0;
+	fatal = TRUE_;
+    } else if (nn > 12) {
+	s_wsfe(&io___58);
+	do_fio(&c__1, " NRANK ", (ftnlen)7);
+	do_fio(&c__1, (char *)&nrank, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+	e_wsfe();
+	nrank = 0;
+	fatal = TRUE_;
+    }
+    s_rsle(&io___59);
+    i__1 = nrank;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&rankval[i__ - 1], (ftnlen)sizeof(
+		integer));
+    }
+    e_rsle();
+    i__1 = nrank;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (rankval[i__ - 1] < 0) {
+	    s_wsfe(&io___61);
+	    do_fio(&c__1, " RANK  ", (ftnlen)7);
+	    do_fio(&c__1, (char *)&rankval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
+	    e_wsfe();
+	    fatal = TRUE_;
+	} else if (rankval[i__ - 1] > 100) {
+	    s_wsfe(&io___62);
+	    do_fio(&c__1, " RANK  ", (ftnlen)7);
+	    do_fio(&c__1, (char *)&rankval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&c__100, (ftnlen)sizeof(integer));
+	    e_wsfe();
+	    fatal = TRUE_;
+	}
+    }
+    if (nrank > 0) {
+	s_wsfe(&io___63);
+	do_fio(&c__1, "RANK % OF N", (ftnlen)11);
+	i__1 = nrank;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&rankval[i__ - 1], (ftnlen)sizeof(integer));
+	}
+	e_wsfe();
+    }
+
+/*     Read the threshold value for the test ratios. */
+
+    s_rsle(&io___64);
     do_lio(&c__5, &c__1, (char *)&thresh, (ftnlen)sizeof(doublereal));
     e_rsle();
-    s_wsfe(&io___57);
+    s_wsfe(&io___66);
     do_fio(&c__1, (char *)&thresh, (ftnlen)sizeof(doublereal));
     e_wsfe();
 
 /*     Read the flag that indicates whether to test the LAPACK routines. */
 
-    s_rsle(&io___58);
+    s_rsle(&io___67);
     do_lio(&c__8, &c__1, (char *)&tstchk, (ftnlen)sizeof(logical));
     e_rsle();
 
 /*     Read the flag that indicates whether to test the driver routines. */
 
-    s_rsle(&io___60);
+    s_rsle(&io___69);
     do_lio(&c__8, &c__1, (char *)&tstdrv, (ftnlen)sizeof(logical));
     e_rsle();
 
 /*     Read the flag that indicates whether to test the error exits. */
 
-    s_rsle(&io___62);
+    s_rsle(&io___71);
     do_lio(&c__8, &c__1, (char *)&tsterr, (ftnlen)sizeof(logical));
     e_rsle();
 
     if (fatal) {
-	s_wsfe(&io___64);
+	s_wsfe(&io___73);
 	e_wsfe();
 	s_stop("", (ftnlen)0);
     }
@@ -763,21 +848,21 @@ L60:
 /*     Calculate and print the machine dependent constants. */
 
     eps = dlamch_("Underflow threshold");
-    s_wsfe(&io___66);
+    s_wsfe(&io___75);
     do_fio(&c__1, "underflow", (ftnlen)9);
     do_fio(&c__1, (char *)&eps, (ftnlen)sizeof(doublereal));
     e_wsfe();
     eps = dlamch_("Overflow threshold");
-    s_wsfe(&io___67);
+    s_wsfe(&io___76);
     do_fio(&c__1, "overflow ", (ftnlen)9);
     do_fio(&c__1, (char *)&eps, (ftnlen)sizeof(doublereal));
     e_wsfe();
     eps = dlamch_("Epsilon");
-    s_wsfe(&io___68);
+    s_wsfe(&io___77);
     do_fio(&c__1, "precision", (ftnlen)9);
     do_fio(&c__1, (char *)&eps, (ftnlen)sizeof(doublereal));
     e_wsfe();
-    s_wsle(&io___69);
+    s_wsle(&io___78);
     e_wsle();
     nrhs = nsval[0];
 
@@ -837,7 +922,7 @@ L130:
 /*     Check first character for correct precision. */
 
     if (! lsame_(c1, "Zomplex precision")) {
-	s_wsfe(&io___78);
+	s_wsfe(&io___87);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 
@@ -845,7 +930,7 @@ L130:
 
 /*        Check for a positive number of tests requested. */
 
-	s_wsfe(&io___79);
+	s_wsfe(&io___88);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 
@@ -861,7 +946,7 @@ L130:
 		    &thresh, &tsterr, &lda, a, &a[21912], &a[43824], b, &b[
 		    2112], &b[4224], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___87);
+	    s_wsfe(&io___96);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -871,7 +956,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], &b[6336], s, 
 		    work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___89);
+	    s_wsfe(&io___98);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -890,7 +975,7 @@ L130:
 		    &thresh, &tsterr, a, &la, &a[43824], &lafac, b, &b[2112], 
 		    &b[4224], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___92);
+	    s_wsfe(&io___101);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -900,7 +985,7 @@ L130:
 		    43824], &lafac, &a[109560], b, &b[2112], &b[4224], &b[
 		    6336], s, work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___93);
+	    s_wsfe(&io___102);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -916,7 +1001,7 @@ L130:
 	    zchkgt_(dotype, &nn, nval, &nns, nsval, &thresh, &tsterr, a, &a[
 		    21912], b, &b[2112], &b[4224], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___94);
+	    s_wsfe(&io___103);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -925,7 +1010,7 @@ L130:
 	    zdrvgt_(dotype, &nn, nval, &nrhs, &thresh, &tsterr, a, &a[21912], 
 		    b, &b[2112], &b[4224], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___95);
+	    s_wsfe(&io___104);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -942,7 +1027,7 @@ L130:
 		    tsterr, &lda, a, &a[21912], &a[43824], b, &b[2112], &b[
 		    4224], work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___96);
+	    s_wsfe(&io___105);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -952,7 +1037,25 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], &b[6336], s, 
 		    work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___97);
+	    s_wsfe(&io___106);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    e_wsfe();
+	}
+
+    } else if (lsamen_(&c__2, c2, "PS")) {
+
+/*        PS:  positive semi-definite matrices */
+
+	ntypes = 9;
+
+	alareq_(path, &nmats, dotype, &ntypes, &c__5, &c__6);
+
+	if (tstchk) {
+	    zchkps_(dotype, &nn, nval, &nnb2, nbval2, &nrank, rankval, &
+		    thresh, &tsterr, &lda, a, &a[21912], &a[43824], piv, work, 
+		     rwork, &c__6);
+	} else {
+	    s_wsfe(&io___108);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -969,7 +1072,7 @@ L130:
 		     &a[21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		     &c__6);
 	} else {
-	    s_wsfe(&io___98);
+	    s_wsfe(&io___109);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -979,7 +1082,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], &b[6336], s, 
 		    work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___99);
+	    s_wsfe(&io___110);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -996,7 +1099,7 @@ L130:
 		    tsterr, &lda, a, &a[21912], &a[43824], b, &b[2112], &b[
 		    4224], work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___100);
+	    s_wsfe(&io___111);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1006,7 +1109,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], &b[6336], s, 
 		    work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___101);
+	    s_wsfe(&io___112);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1022,7 +1125,7 @@ L130:
 	    zchkpt_(dotype, &nn, nval, &nns, nsval, &thresh, &tsterr, a, s, &
 		    a[21912], b, &b[2112], &b[4224], work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___102);
+	    s_wsfe(&io___113);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1031,7 +1134,7 @@ L130:
 	    zdrvpt_(dotype, &nn, nval, &nrhs, &thresh, &tsterr, a, s, &a[
 		    21912], b, &b[2112], &b[4224], work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___103);
+	    s_wsfe(&io___114);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1048,7 +1151,7 @@ L130:
 		    tsterr, &lda, a, &a[21912], &a[43824], b, &b[2112], &b[
 		    4224], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___104);
+	    s_wsfe(&io___115);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1058,7 +1161,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		    iwork, &c__6);
 	} else {
-	    s_wsfe(&io___105);
+	    s_wsfe(&io___116);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1075,7 +1178,7 @@ L130:
 		     &a[21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		     iwork, &c__6);
 	} else {
-	    s_wsfe(&io___106);
+	    s_wsfe(&io___117);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1085,7 +1188,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		    iwork, &c__6);
 	} else {
-	    s_wsfe(&io___107);
+	    s_wsfe(&io___118);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1102,7 +1205,7 @@ L130:
 		    tsterr, &lda, a, &a[21912], &a[43824], b, &b[2112], &b[
 		    4224], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___108);
+	    s_wsfe(&io___119);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1112,7 +1215,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		    iwork, &c__6);
 	} else {
-	    s_wsfe(&io___109);
+	    s_wsfe(&io___120);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1129,7 +1232,7 @@ L130:
 		     &a[21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		     iwork, &c__6);
 	} else {
-	    s_wsfe(&io___110);
+	    s_wsfe(&io___121);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1139,7 +1242,7 @@ L130:
 		    21912], &a[43824], b, &b[2112], &b[4224], work, rwork, 
 		    iwork, &c__6);
 	} else {
-	    s_wsfe(&io___111);
+	    s_wsfe(&io___122);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1156,7 +1259,7 @@ L130:
 		    tsterr, &lda, a, &a[21912], b, &b[2112], &b[4224], work, 
 		    rwork, &c__6);
 	} else {
-	    s_wsfe(&io___112);
+	    s_wsfe(&io___123);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1172,7 +1275,7 @@ L130:
 	    zchktp_(dotype, &nn, nval, &nns, nsval, &thresh, &tsterr, &lda, a, 
 		     &a[21912], b, &b[2112], &b[4224], work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___113);
+	    s_wsfe(&io___124);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1188,7 +1291,7 @@ L130:
 	    zchktb_(dotype, &nn, nval, &nns, nsval, &thresh, &tsterr, &lda, a, 
 		     &a[21912], b, &b[2112], &b[4224], work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___114);
+	    s_wsfe(&io___125);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1206,7 +1309,7 @@ L130:
 		    65736], &a[87648], b, &b[2112], &b[4224], &b[6336], work, 
 		    rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___115);
+	    s_wsfe(&io___126);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1224,7 +1327,7 @@ L130:
 		    65736], &a[87648], b, &b[2112], &b[4224], &b[6336], work, 
 		    rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___116);
+	    s_wsfe(&io___127);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1242,7 +1345,7 @@ L130:
 		    65736], &a[87648], b, &b[2112], &b[4224], &b[6336], work, 
 		    rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___117);
+	    s_wsfe(&io___128);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1260,7 +1363,7 @@ L130:
 		    65736], &a[87648], b, &b[2112], &b[4224], &b[6336], work, 
 		    rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___118);
+	    s_wsfe(&io___129);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1273,7 +1376,7 @@ L130:
 	if (tstchk) {
 	    zchkeq_(&threq, &c__6);
 	} else {
-	    s_wsfe(&io___119);
+	    s_wsfe(&io___130);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1289,7 +1392,7 @@ L130:
 	    zchktz_(dotype, &nm, mval, &nn, nval, &thresh, &tsterr, a, &a[
 		    21912], s, &s[132], b, work, rwork, &c__6);
 	} else {
-	    s_wsfe(&io___120);
+	    s_wsfe(&io___131);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1307,7 +1410,7 @@ L130:
 	    zchkq3_(dotype, &nm, mval, &nn, nval, &nnb, nbval, nxval, &thresh, 
 		     a, &a[21912], s, &s[132], b, work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___121);
+	    s_wsfe(&io___132);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
@@ -1324,14 +1427,14 @@ L130:
 		    nxval, &thresh, &tsterr, a, &a[21912], &a[43824], &a[
 		    65736], &a[87648], s, &s[132], work, rwork, iwork, &c__6);
 	} else {
-	    s_wsfe(&io___122);
+	    s_wsfe(&io___133);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 	}
 
     } else {
 
-	s_wsfe(&io___123);
+	s_wsfe(&io___134);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
@@ -1348,9 +1451,9 @@ L140:
     cl__1.csta = 0;
     f_clos(&cl__1);
     s2 = dsecnd_();
-    s_wsfe(&io___125);
+    s_wsfe(&io___136);
     e_wsfe();
-    s_wsfe(&io___126);
+    s_wsfe(&io___137);
     d__1 = s2 - s1;
     do_fio(&c__1, (char *)&d__1, (ftnlen)sizeof(doublereal));
     e_wsfe();

@@ -1,3 +1,15 @@
+/* cdrvgb.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -47,15 +59,15 @@ static integer c__7 = 7;
     static char fmt_9998[] = "(\002 *** In CDRVGB, LAFB=\002,i5,\002 is too "
 	    "small for N=\002,i5,\002, KU=\002,i5,\002, KL=\002,i5,/\002 ==> "
 	    "Increase LAFB to at least \002,i5)";
-    static char fmt_9997[] = "(1x,a6,\002, N=\002,i5,\002, KL=\002,i5,\002, "
-	    "KU=\002,i5,\002, type \002,i1,\002, test(\002,i1,\002)=\002,g12."
-	    "5)";
-    static char fmt_9995[] = "(1x,a6,\002( '\002,a1,\002','\002,a1,\002',"
-	    "\002,i5,\002,\002,i5,\002,\002,i5,\002,...), EQUED='\002,a1,\002"
-	    "', type \002,i1,\002, test(\002,i1,\002)=\002,g12.5)";
-    static char fmt_9996[] = "(1x,a6,\002( '\002,a1,\002','\002,a1,\002',"
-	    "\002,i5,\002,\002,i5,\002,\002,i5,\002,...), type \002,i1,\002, "
-	    "test(\002,i1,\002)=\002,g12.5)";
+    static char fmt_9997[] = "(1x,a,\002, N=\002,i5,\002, KL=\002,i5,\002, K"
+	    "U=\002,i5,\002, type \002,i1,\002, test(\002,i1,\002)=\002,g12.5)"
+	    ;
+    static char fmt_9995[] = "(1x,a,\002( '\002,a1,\002','\002,a1,\002',\002"
+	    ",i5,\002,\002,i5,\002,\002,i5,\002,...), EQUED='\002,a1,\002', t"
+	    "ype \002,i1,\002, test(\002,i1,\002)=\002,g12.5)";
+    static char fmt_9996[] = "(1x,a,\002( '\002,a1,\002','\002,a1,\002',\002"
+	    ",i5,\002,\002,i5,\002,\002,i5,\002,...), type \002,i1,\002, test("
+	    "\002,i1,\002)=\002,g12.5)";
 
     /* System generated locals */
     address a__1[2];
@@ -434,7 +446,7 @@ static integer c__7 = 7;
 			    mode, &cndnum, dist);
 		    rcondc = 1.f / cndnum;
 
-		    s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)32, (ftnlen)6);
 		    clatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
 			    cndnum, &anorm, &kl, &ku, "Z", &a[1], &lda, &work[
 			    1], &info);
@@ -584,8 +596,8 @@ static integer c__7 = 7;
 
 				claset_("Full", &n, &n, &c_b48, &c_b49, &work[
 					1], &ldb);
-				s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)32, 
+					(ftnlen)6);
 				cgbtrs_("No transpose", &n, &kl, &ku, &n, &
 					afb[1], &ldafb, &iwork[1], &work[1], &
 					ldb, &info);
@@ -633,8 +645,8 @@ static integer c__7 = 7;
 /*                          Form an exact solution and set the right hand */
 /*                          side. */
 
-				s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)32, 
+					(ftnlen)6);
 				clarhs_(path, xtype, "Full", trans, &n, &n, &
 					kl, &ku, nrhs, &a[1], &lda, &xact[1], 
 					&ldb, &b[1], &ldb, iseed, &info);
@@ -656,7 +668,7 @@ static integer c__7 = 7;
 					    1], &ldb);
 
 				    s_copy(srnamc_1.srnamt, "CGBSV ", (ftnlen)
-					    6, (ftnlen)6);
+					    32, (ftnlen)6);
 				    cgbsv_(&n, &kl, &ku, nrhs, &afb[1], &
 					    ldafb, &iwork[1], &x[1], &ldb, &
 					    info);
@@ -752,8 +764,8 @@ static integer c__7 = 7;
 /*                          Solve the system and compute the condition */
 /*                          number and error bounds using CGBSVX. */
 
-				s_copy(srnamc_1.srnamt, "CGBSVX", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CGBSVX", (ftnlen)32, 
+					(ftnlen)6);
 				cgbsvx_(fact, trans, &n, &kl, &ku, nrhs, &a[1]
 , &lda, &afb[1], &ldafb, &iwork[1], 
 					equed, &s[1], &s[ldb + 1], &b[1], &

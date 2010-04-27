@@ -1,10 +1,22 @@
+/* slqt03.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
 /* Common Block Declarations */
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -174,7 +186,7 @@ static real c_b22 = 1.f;
 
 /*     Generate the n-by-n matrix Q */
 
-    s_copy(srnamc_1.srnamt, "SORGLQ", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "SORGLQ", (ftnlen)32, (ftnlen)6);
     sorglq_(n, n, k, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
     for (iside = 1; iside <= 2; ++iside) {
@@ -214,7 +226,7 @@ static real c_b22 = 1.f;
 
 /*           Apply Q or Q' to C */
 
-	    s_copy(srnamc_1.srnamt, "SORMLQ", (ftnlen)6, (ftnlen)6);
+	    s_copy(srnamc_1.srnamt, "SORMLQ", (ftnlen)32, (ftnlen)6);
 	    sormlq_(side, trans, &mc, &nc, k, &af[af_offset], lda, &tau[1], &
 		    cc[cc_offset], lda, &work[1], lwork, &info);
 

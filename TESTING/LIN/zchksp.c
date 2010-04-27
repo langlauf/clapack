@@ -1,3 +1,15 @@
+/* zchksp.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -299,7 +311,7 @@ static integer c__8 = 8;
 		    zlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &
 			    mode, &cndnum, dist);
 
-		    s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)32, (ftnlen)6);
 		    zlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
 			    cndnum, &anorm, &kl, &ku, packit, &a[1], &lda, &
 			    work[1], &info);
@@ -414,7 +426,7 @@ static integer c__8 = 8;
 
 		npp = n * (n + 1) / 2;
 		zcopy_(&npp, &a[1], &c__1, &afac[1], &c__1);
-		s_copy(srnamc_1.srnamt, "ZSPTRF", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZSPTRF", (ftnlen)32, (ftnlen)6);
 		zsptrf_(uplo, &n, &afac[1], &iwork[1], &info);
 
 /*              Adjust the expected value of INFO to account for */
@@ -458,7 +470,7 @@ L100:
 
 		if (! trfcon) {
 		    zcopy_(&npp, &afac[1], &c__1, &ainv[1], &c__1);
-		    s_copy(srnamc_1.srnamt, "ZSPTRI", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZSPTRI", (ftnlen)32, (ftnlen)6);
 		    zsptri_(uplo, &n, &ainv[1], &iwork[1], &work[1], &info);
 
 /*              Check error code from ZSPTRI. */
@@ -512,13 +524,13 @@ L100:
 /* +    TEST 3 */
 /*              Solve and compute residual for  A * X = B. */
 
-		    s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)32, (ftnlen)6);
 		    zlarhs_(path, xtype, uplo, " ", &n, &n, &kl, &ku, &nrhs, &
 			    a[1], &lda, &xact[1], &lda, &b[1], &lda, iseed, &
 			    info);
 		    zlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
 
-		    s_copy(srnamc_1.srnamt, "ZSPTRS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZSPTRS", (ftnlen)32, (ftnlen)6);
 		    zsptrs_(uplo, &n, &nrhs, &afac[1], &iwork[1], &x[1], &lda, 
 			     &info);
 
@@ -543,7 +555,7 @@ L100:
 /* +    TESTS 5, 6, and 7 */
 /*              Use iterative refinement to improve the solution. */
 
-		    s_copy(srnamc_1.srnamt, "ZSPRFS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZSPRFS", (ftnlen)32, (ftnlen)6);
 		    zsprfs_(uplo, &n, &nrhs, &a[1], &afac[1], &iwork[1], &b[1]
 , &lda, &x[1], &lda, &rwork[1], &rwork[nrhs + 1], 
 			    &work[1], &rwork[(nrhs << 1) + 1], &info);
@@ -597,7 +609,7 @@ L100:
 
 L140:
 		anorm = zlansp_("1", uplo, &n, &a[1], &rwork[1]);
-		s_copy(srnamc_1.srnamt, "ZSPCON", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZSPCON", (ftnlen)32, (ftnlen)6);
 		zspcon_(uplo, &n, &afac[1], &iwork[1], &anorm, &rcond, &work[
 			1], &info);
 

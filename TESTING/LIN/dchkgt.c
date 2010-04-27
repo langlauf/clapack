@@ -1,3 +1,15 @@
+/* dchkgt.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -292,7 +304,7 @@ static doublereal c_b64 = 0.;
 /* Computing MAX */
 		i__3 = 2 - ku, i__4 = 3 - max(1,n);
 		koff = max(i__3,i__4);
-		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)32, (ftnlen)6);
 		dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
 			&anorm, &kl, &ku, "Z", &af[koff], &c__3, &work[1], &
 			info);
@@ -386,7 +398,7 @@ static doublereal c_b64 = 0.;
 
 	    i__3 = n + (m << 1);
 	    dcopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
-	    s_copy(srnamc_1.srnamt, "DGTTRF", (ftnlen)6, (ftnlen)6);
+	    s_copy(srnamc_1.srnamt, "DGTTRF", (ftnlen)32, (ftnlen)6);
 	    dgttrf_(&n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + (m << 1) 
 		    + 1], &iwork[1], &info);
 
@@ -473,7 +485,7 @@ static doublereal c_b64 = 0.;
 /*              Estimate the reciprocal of the condition number of the */
 /*              matrix. */
 
-		s_copy(srnamc_1.srnamt, "DGTCON", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DGTCON", (ftnlen)32, (ftnlen)6);
 		dgtcon_(norm, &n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + 
 			(m << 1) + 1], &iwork[1], &anorm, &rcond, &work[1], &
 			iwork[n + 1], &info);
@@ -546,7 +558,7 @@ static doublereal c_b64 = 0.;
 /*                 Solve op(A) * X = B and compute the residual. */
 
 		    dlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
-		    s_copy(srnamc_1.srnamt, "DGTTRS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "DGTTRS", (ftnlen)32, (ftnlen)6);
 		    dgttrs_(trans, &n, &nrhs, &af[1], &af[m + 1], &af[n + m + 
 			    1], &af[n + (m << 1) + 1], &iwork[1], &x[1], &lda, 
 			     &info);
@@ -573,7 +585,7 @@ static doublereal c_b64 = 0.;
 /* +    TESTS 4, 5, and 6 */
 /*                 Use iterative refinement to improve the solution. */
 
-		    s_copy(srnamc_1.srnamt, "DGTRFS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "DGTRFS", (ftnlen)32, (ftnlen)6);
 		    dgtrfs_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1], 
 			     &af[1], &af[m + 1], &af[n + m + 1], &af[n + (m <<
 			     1) + 1], &iwork[1], &b[1], &lda, &x[1], &lda, &

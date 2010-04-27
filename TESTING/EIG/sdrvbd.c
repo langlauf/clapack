@@ -1,3 +1,15 @@
+/* sdrvbd.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -63,7 +75,13 @@ static integer c__0 = 0;
 	    "n(M,N) nonnegative values in\002,\002 decreasing order, else 1/u"
 	    "lp\002,/\00212 = | U - Upartial | / ( M ulp )\002,/\00213 = | VT"
 	    " - VTpartial | / ( N ulp )\002,/\00214 = | S - Spartial | / ( mi"
-	    "n(M,N) ulp |S| )\002,//)";
+	    "n(M,N) ulp |S| )\002,/\00215 = | A - U diag(S) VT | / ( |A| max("
+	    "M,N) ulp ) \002,/\00216 = | I - U**T U | / ( M ulp ) \002,/\0021"
+	    "7 = | I - VT VT**T | / ( N ulp ) \002,/\00218 = 0 if S contains "
+	    "min(M,N) nonnegative values in\002,\002 decreasing order, else 1"
+	    "/ulp\002,/\00219 = | U - Upartial | / ( M ulp )\002,/\00220 = | "
+	    "VT - VTpartial | / ( N ulp )\002,/\00221 = | S - Spartial | / ( "
+	    "min(M,N) ulp |S| )\002,//)";
     static char fmt_9997[] = "(\002 M=\002,i5,\002, N=\002,i5,\002, type "
 	    "\002,i1,\002, IWS=\002,i1,\002, seed=\002,4(i4,\002,\002),\002 t"
 	    "est(\002,i2,\002)=\002,g11.4)";
@@ -116,20 +134,28 @@ static integer c__0 = 0;
 	    *, real *, integer *, real *, real *, integer *, real *, integer *
 , real *, integer *, integer *), slacpy_(char *, 
 	    integer *, integer *, real *, integer *, real *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
-	    real *, integer *), slatms_(integer *, integer *, char *, 
-	    integer *, char *, real *, integer *, real *, real *, integer *, 
-	    integer *, char *, real *, integer *, real *, integer *);
+	    real *, integer *), sgesvj_(char *, char *, char *, 
+	    integer *, integer *, real *, integer *, real *, integer *, real *
+, integer *, real *, integer *, integer *)
+	    , sgejsv_(char *, char *, char *, char *, char *, char *, integer 
+	    *, integer *, real *, integer *, real *, real *, integer *, real *
+, integer *, real *, integer *, integer *, integer *), slatms_(integer *, 
+	    integer *, char *, integer *, char *, real *, integer *, real *, 
+	    real *, integer *, integer *, char *, real *, integer *, real *, 
+	    integer *);
     integer minwrk;
-    real ulpinv, result[14];
+    real ulpinv, result[22];
     integer lswork, mtypes;
 
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, fmt_9996, 0 };
     static cilist io___30 = { 0, 0, 0, fmt_9995, 0 };
     static cilist io___38 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___42 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___43 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___42 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___44 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9997, 0 };
 
 
 
@@ -146,7 +172,8 @@ static integer c__0 = 0;
 /*  ======= */
 
 /*  SDRVBD checks the singular value decomposition (SVD) drivers */
-/*  SGESVD and SGESDD. */
+/*  SGESVD, SGESDD, SGESVJ, and SGEJSV. */
+
 /*  Both SGESVD and SGESDD factor A = U diag(S) VT, where U and VT are */
 /*  orthogonal and diag(S) is diagonal with the entries of the array S */
 /*  on its diagonal. The entries of S are the singular values, */
@@ -202,6 +229,28 @@ static integer c__0 = 0;
 
 /*  (14)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the */
 /*         vector of singular values from the partial SVD */
+
+/*  Test for SGESVJ: */
+
+/*  (15)    | A - U diag(S) VT | / ( |A| max(M,N) ulp ) */
+
+/*  (16)    | I - U'U | / ( M ulp ) */
+
+/*  (17)   | I - VT VT' | / ( N ulp ) */
+
+/*  (18)   S contains MNMIN nonnegative values in decreasing order. */
+/*         (Return 0 if true, 1/ULP if false.) */
+
+/*  Test for SGEJSV: */
+
+/*  (19)    | A - U diag(S) VT | / ( |A| max(M,N) ulp ) */
+
+/*  (20)    | I - U'U | / ( M ulp ) */
+
+/*  (21)   | I - VT VT' | / ( N ulp ) */
+
+/*  (22)   S contains MNMIN nonnegative values in decreasing order. */
+/*         (Return 0 if true, 1/ULP if false.) */
 
 /*  The "sizes" are specified by the arrays MM(1:NSIZES) and */
 /*  NN(1:NSIZES); the value of each element pair (MM(j),NN(j)) */
@@ -564,7 +613,7 @@ L30:
 		    slacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
 , lda);
 		}
-		s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)32, (ftnlen)6);
 		sgesvd_("A", "A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
 			usav_offset], ldu, &vtsav[vtsav_offset], ldvt, &work[
 			1], &lswork, &iinfo);
@@ -627,7 +676,7 @@ L30:
 				ijvt];
 			slacpy_("F", &m, &n, &asav[asav_offset], lda, &a[
 				a_offset], lda);
-			s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)32, (ftnlen)
 				6);
 			sgesvd_(jobu, jobvt, &m, &n, &a[a_offset], lda, &s[1], 
 				 &u[u_offset], ldu, &vt[vt_offset], ldvt, &
@@ -712,7 +761,7 @@ L70:
 
 		slacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset], 
 			lda);
-		s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)32, (ftnlen)6);
 		sgesdd_("A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
 			usav_offset], ldu, &vtsav[vtsav_offset], ldvt, &work[
 			1], &lswork, &iwork[1], &iinfo);
@@ -769,7 +818,7 @@ L70:
 		    *(unsigned char *)jobq = *(unsigned char *)&cjob[ijq];
 		    slacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
 , lda);
-		    s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)32, (ftnlen)6);
 		    sgesdd_(jobq, &m, &n, &a[a_offset], lda, &s[1], &u[
 			    u_offset], ldu, &vt[vt_offset], ldvt, &work[1], &
 			    lswork, &iwork[1], &iinfo);
@@ -842,20 +891,186 @@ L70:
 /* L110: */
 		}
 
+/*              Test SGESVJ: Factorize A */
+/*              Note: SGESVJ does not work for M < N */
+
+		result[14] = 0.f;
+		result[15] = 0.f;
+		result[16] = 0.f;
+		result[17] = 0.f;
+
+		if (m >= n) {
+		    iwtmp = mnmin * 5 * mnmin + mnmin * 9 + max(m,n);
+		    lswork = iwtmp + (iws - 1) * (*lwork - iwtmp) / 3;
+		    lswork = min(lswork,*lwork);
+		    lswork = max(lswork,1);
+		    if (iws == 4) {
+			lswork = *lwork;
+		    }
+
+		    slacpy_("F", &m, &n, &asav[asav_offset], lda, &usav[
+			    usav_offset], lda);
+		    s_copy(srnamc_1.srnamt, "SGESVJ", (ftnlen)32, (ftnlen)6);
+		    sgesvj_("G", "U", "V", &m, &n, &usav[usav_offset], lda, &
+			    ssav[1], &c__0, &a[a_offset], ldvt, &work[1], 
+			    lwork, info);
+
+/*                 SGESVJ retuns V not VT, so we transpose to use the same */
+/*                 test suite. */
+
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = n;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    vtsav[j + i__ * vtsav_dim1] = a[i__ + j * a_dim1];
+			}
+		    }
+
+		    if (iinfo != 0) {
+			io___41.ciunit = *nout;
+			s_wsfe(&io___41);
+			do_fio(&c__1, "GESVJ", (ftnlen)5);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&lswork, (ftnlen)sizeof(integer)
+				);
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			return 0;
+		    }
+
+/*                 Do tests 15--18 */
+
+		    sbdt01_(&m, &n, &c__0, &asav[asav_offset], lda, &usav[
+			    usav_offset], ldu, &ssav[1], &e[1], &vtsav[
+			    vtsav_offset], ldvt, &work[1], &result[14]);
+		    if (m != 0 && n != 0) {
+			sort01_("Columns", &m, &m, &usav[usav_offset], ldu, &
+				work[1], lwork, &result[15]);
+			sort01_("Rows", &n, &n, &vtsav[vtsav_offset], ldvt, &
+				work[1], lwork, &result[16]);
+		    }
+		    result[17] = 0.f;
+		    i__3 = mnmin - 1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (ssav[i__] < ssav[i__ + 1]) {
+			    result[17] = ulpinv;
+			}
+			if (ssav[i__] < 0.f) {
+			    result[17] = ulpinv;
+			}
+/* L200: */
+		    }
+		    if (mnmin >= 1) {
+			if (ssav[mnmin] < 0.f) {
+			    result[17] = ulpinv;
+			}
+		    }
+		}
+
+/*              Test SGEJSV: Factorize A */
+/*              Note: SGEJSV does not work for M < N */
+
+		result[18] = 0.f;
+		result[19] = 0.f;
+		result[20] = 0.f;
+		result[21] = 0.f;
+		if (m >= n) {
+		    iwtmp = mnmin * 5 * mnmin + mnmin * 9 + max(m,n);
+		    lswork = iwtmp + (iws - 1) * (*lwork - iwtmp) / 3;
+		    lswork = min(lswork,*lwork);
+		    lswork = max(lswork,1);
+		    if (iws == 4) {
+			lswork = *lwork;
+		    }
+
+		    slacpy_("F", &m, &n, &asav[asav_offset], lda, &vtsav[
+			    vtsav_offset], lda);
+		    s_copy(srnamc_1.srnamt, "SGEJSV", (ftnlen)32, (ftnlen)6);
+		    sgejsv_("G", "U", "V", "R", "N", "N", &m, &n, &vtsav[
+			    vtsav_offset], lda, &ssav[1], &usav[usav_offset], 
+			    ldu, &a[a_offset], ldvt, &work[1], lwork, &iwork[
+			    1], info);
+
+/*                 SGEJSV retuns V not VT, so we transpose to use the same */
+/*                 test suite. */
+
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = n;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    vtsav[j + i__ * vtsav_dim1] = a[i__ + j * a_dim1];
+			}
+		    }
+
+		    if (iinfo != 0) {
+			io___42.ciunit = *nout;
+			s_wsfe(&io___42);
+			do_fio(&c__1, "GESVJ", (ftnlen)5);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&lswork, (ftnlen)sizeof(integer)
+				);
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			return 0;
+		    }
+
+/*                 Do tests 19--22 */
+
+		    sbdt01_(&m, &n, &c__0, &asav[asav_offset], lda, &usav[
+			    usav_offset], ldu, &ssav[1], &e[1], &vtsav[
+			    vtsav_offset], ldvt, &work[1], &result[18]);
+		    if (m != 0 && n != 0) {
+			sort01_("Columns", &m, &m, &usav[usav_offset], ldu, &
+				work[1], lwork, &result[19]);
+			sort01_("Rows", &n, &n, &vtsav[vtsav_offset], ldvt, &
+				work[1], lwork, &result[20]);
+		    }
+		    result[21] = 0.f;
+		    i__3 = mnmin - 1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (ssav[i__] < ssav[i__ + 1]) {
+			    result[21] = ulpinv;
+			}
+			if (ssav[i__] < 0.f) {
+			    result[21] = ulpinv;
+			}
+/* L300: */
+		    }
+		    if (mnmin >= 1) {
+			if (ssav[mnmin] < 0.f) {
+			    result[21] = ulpinv;
+			}
+		    }
+		}
+
 /*              End of Loop -- Check for RESULT(j) > THRESH */
 
-		for (j = 1; j <= 14; ++j) {
+		for (j = 1; j <= 22; ++j) {
 		    if (result[j - 1] >= *thresh) {
 			if (nfail == 0) {
-			    io___41.ciunit = *nout;
-			    s_wsfe(&io___41);
+			    io___43.ciunit = *nout;
+			    s_wsfe(&io___43);
 			    e_wsfe();
-			    io___42.ciunit = *nout;
-			    s_wsfe(&io___42);
+			    io___44.ciunit = *nout;
+			    s_wsfe(&io___44);
 			    e_wsfe();
 			}
-			io___43.ciunit = *nout;
-			s_wsfe(&io___43);
+			io___45.ciunit = *nout;
+			s_wsfe(&io___45);
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
@@ -871,7 +1086,7 @@ L70:
 		    }
 /* L120: */
 		}
-		ntest += 14;
+		ntest += 22;
 
 /* L130: */
 	    }

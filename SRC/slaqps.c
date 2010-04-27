@@ -1,3 +1,15 @@
+/* slaqps.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -34,14 +46,14 @@ static real c_b16 = 0.f;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *), sswap_(integer *, real *, integer *, real *, integer *);
     extern doublereal slamch_(char *);
-    extern /* Subroutine */ int slarfg_(integer *, real *, real *, integer *, 
-	    real *);
     integer lsticc;
     extern integer isamax_(integer *, real *, integer *);
+    extern /* Subroutine */ int slarfp_(integer *, real *, real *, integer *, 
+	    real *);
     integer lastrk;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -199,10 +211,10 @@ L10:
 
 	if (rk < *m) {
 	    i__1 = *m - rk + 1;
-	    slarfg_(&i__1, &a[rk + k * a_dim1], &a[rk + 1 + k * a_dim1], &
+	    slarfp_(&i__1, &a[rk + k * a_dim1], &a[rk + 1 + k * a_dim1], &
 		    c__1, &tau[k]);
 	} else {
-	    slarfg_(&c__1, &a[rk + k * a_dim1], &a[rk + k * a_dim1], &c__1, &
+	    slarfp_(&c__1, &a[rk + k * a_dim1], &a[rk + k * a_dim1], &c__1, &
 		    tau[k]);
 	}
 

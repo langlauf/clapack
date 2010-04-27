@@ -1,3 +1,15 @@
+/* derrsy.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -145,7 +157,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTRF */
 
-	s_copy(srnamc_1.srnamt, "DSYTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("DSYTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -161,7 +173,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTF2 */
 
-	s_copy(srnamc_1.srnamt, "DSYTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("DSYTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -177,7 +189,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTRI */
 
-	s_copy(srnamc_1.srnamt, "DSYTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("DSYTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -193,7 +205,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTRS */
 
-	s_copy(srnamc_1.srnamt, "DSYTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("DSYTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -217,7 +229,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYRFS */
 
-	s_copy(srnamc_1.srnamt, "DSYRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsyrfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, iw, &info);
@@ -256,7 +268,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYCON */
 
-	s_copy(srnamc_1.srnamt, "DSYCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsycon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, iw, &info);
 	chkxer_("DSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -281,7 +293,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPTRF */
 
-	s_copy(srnamc_1.srnamt, "DSPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptrf_("/", &c__0, a, ip, &info);
 	chkxer_("DSPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -293,7 +305,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPTRI */
 
-	s_copy(srnamc_1.srnamt, "DSPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("DSPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -305,7 +317,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPTRS */
 
-	s_copy(srnamc_1.srnamt, "DSPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("DSPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -325,7 +337,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPRFS */
 
-	s_copy(srnamc_1.srnamt, "DSPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		iw, &info);
@@ -354,7 +366,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPCON */
 
-	s_copy(srnamc_1.srnamt, "DSPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspcon_("/", &c__0, a, ip, &anrm, &rcond, w, iw, &info);
 	chkxer_("DSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

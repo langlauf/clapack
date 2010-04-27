@@ -1,3 +1,15 @@
+/* zlaqr5.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -21,13 +33,12 @@ static integer c__2 = 2;
     integer h_dim1, h_offset, u_dim1, u_offset, v_dim1, v_offset, wh_dim1, 
 	    wh_offset, wv_dim1, wv_offset, z_dim1, z_offset, i__1, i__2, i__3,
 	     i__4, i__5, i__6, i__7, i__8, i__9, i__10, i__11;
-    doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8, d__9, d__10, 
-	    d__11, d__12, d__13, d__14;
+    doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8, d__9, d__10;
     doublecomplex z__1, z__2, z__3, z__4, z__5, z__6, z__7, z__8;
 
     /* Builtin functions */
-    double d_imag(doublecomplex *);
     void d_cnjg(doublecomplex *, doublecomplex *);
+    double d_imag(doublecomplex *);
 
     /* Local variables */
     integer j, k, m, i2, j2, i4, j4, k1;
@@ -67,8 +78,8 @@ static integer c__2 = 2;
     doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
 /*     November 2006 */
 
 /*     .. Scalar Arguments .. */
@@ -117,9 +128,9 @@ static integer c__2 = 2;
 /*             NSHFTS gives the number of simultaneous shifts.  NSHFTS */
 /*             must be positive and even. */
 
-/*      S      (input) COMPLEX*16 array of size (NSHFTS) */
+/*      S      (input/output) COMPLEX*16 array of size (NSHFTS) */
 /*             S contains the shifts of origin that define the multi- */
-/*             shift QR sweep. */
+/*             shift QR sweep.  On output S may be reordered. */
 
 /*      H      (input/output) COMPLEX*16 array of size (LDH,N) */
 /*             On input H contains a Hessenberg matrix.  On output a */
@@ -185,15 +196,15 @@ static integer c__2 = 2;
 /*        Karen Braman and Ralph Byers, Department of Mathematics, */
 /*        University of Kansas, USA */
 
-/*      ============================================================ */
-/*      Reference: */
+/*     ================================================================ */
+/*     Reference: */
 
-/*      K. Braman, R. Byers and R. Mathias, The Multi-Shift QR */
-/*      Algorithm Part I: Maintaining Well Focused Shifts, and */
-/*      Level 3 Performance, SIAM Journal of Matrix Analysis, */
-/*      volume 23, pages 929--947, 2002. */
+/*     K. Braman, R. Byers and R. Mathias, The Multi-Shift QR */
+/*     Algorithm Part I: Maintaining Well Focused Shifts, and */
+/*     Level 3 Performance, SIAM Journal of Matrix Analysis, */
+/*     volume 23, pages 929--947, 2002. */
 
-/*      ============================================================ */
+/*     ================================================================ */
 /*     .. Parameters .. */
 /*     .. */
 /*     .. Local Scalars .. */
@@ -248,7 +259,7 @@ static integer c__2 = 2;
 	return 0;
     }
 
-/*     ==== NSHFTS is supposed to be even, but if is odd, */
+/*     ==== NSHFTS is supposed to be even, but if it is odd, */
 /*     .    then simply reduce it by one.  ==== */
 
     ns = *nshfts - *nshfts % 2;
@@ -355,23 +366,16 @@ static integer c__2 = 2;
 			    v_dim1 + 1]);
 
 /*                 ==== A Bulge may collapse because of vigilant */
-/*                 .    deflation or destructive underflow.  (The */
-/*                 .    initial bulge is always collapsed.) Use */
-/*                 .    the two-small-subdiagonals trick to try */
-/*                 .    to get it started again. If V(2,M).NE.0 and */
-/*                 .    V(3,M) = H(K+3,K+1) = H(K+3,K+2) = 0, then */
-/*                 .    this bulge is collapsing into a zero */
-/*                 .    subdiagonal.  It will be restarted next */
-/*                 .    trip through the loop.) */
+/*                 .    deflation or destructive underflow.  In the */
+/*                 .    underflow case, try the two-small-subdiagonals */
+/*                 .    trick to try to reinflate the bulge.  ==== */
 
-		    i__5 = m * v_dim1 + 1;
-		    i__6 = m * v_dim1 + 3;
-		    i__7 = k + 3 + (k + 1) * h_dim1;
-		    i__8 = k + 3 + (k + 2) * h_dim1;
-		    if ((v[i__5].r != 0. || v[i__5].i != 0.) && (v[i__6].r != 
-			    0. || v[i__6].i != 0. || h__[i__7].r == 0. && h__[
-			    i__7].i == 0. && (h__[i__8].r == 0. && h__[i__8]
-			    .i == 0.))) {
+		    i__5 = k + 3 + k * h_dim1;
+		    i__6 = k + 3 + (k + 1) * h_dim1;
+		    i__7 = k + 3 + (k + 2) * h_dim1;
+		    if (h__[i__5].r != 0. || h__[i__5].i != 0. || (h__[i__6]
+			    .r != 0. || h__[i__6].i != 0.) || h__[i__7].r == 
+			    0. && h__[i__7].i == 0.) {
 
 /*                    ==== Typical case: not collapsed (yet). ==== */
 
@@ -384,71 +388,63 @@ static integer c__2 = 2;
 		    } else {
 
 /*                    ==== Atypical case: collapsed.  Attempt to */
-/*                    .    reintroduce ignoring H(K+1,K).  If the */
-/*                    .    fill resulting from the new reflector */
-/*                    .    is too large, then abandon it. */
+/*                    .    reintroduce ignoring H(K+1,K) and H(K+2,K). */
+/*                    .    If the fill resulting from the new */
+/*                    .    reflector is too large, then abandon it. */
 /*                    .    Otherwise, use the new one. ==== */
 
 			zlaqr1_(&c__3, &h__[k + 1 + (k + 1) * h_dim1], ldh, &
 				s[(m << 1) - 1], &s[m * 2], vt);
-			scl = (d__1 = vt[0].r, abs(d__1)) + (d__2 = d_imag(vt)
-				, abs(d__2)) + ((d__3 = vt[1].r, abs(d__3)) + 
-				(d__4 = d_imag(&vt[1]), abs(d__4))) + ((d__5 =
-				 vt[2].r, abs(d__5)) + (d__6 = d_imag(&vt[2]),
-				 abs(d__6)));
-			if (scl != 0.) {
-			    z__1.r = vt[0].r / scl, z__1.i = vt[0].i / scl;
-			    vt[0].r = z__1.r, vt[0].i = z__1.i;
-			    z__1.r = vt[1].r / scl, z__1.i = vt[1].i / scl;
-			    vt[1].r = z__1.r, vt[1].i = z__1.i;
-			    z__1.r = vt[2].r / scl, z__1.i = vt[2].i / scl;
-			    vt[2].r = z__1.r, vt[2].i = z__1.i;
-			}
-
-/*                    ==== The following is the traditional and */
-/*                    .    conservative two-small-subdiagonals */
-/*                    .    test.  ==== */
-/*                    . */
+			alpha.r = vt[0].r, alpha.i = vt[0].i;
+			zlarfg_(&c__3, &alpha, &vt[1], &c__1, vt);
+			d_cnjg(&z__2, vt);
 			i__5 = k + 1 + k * h_dim1;
+			d_cnjg(&z__5, &vt[1]);
+			i__6 = k + 2 + k * h_dim1;
+			z__4.r = z__5.r * h__[i__6].r - z__5.i * h__[i__6].i, 
+				z__4.i = z__5.r * h__[i__6].i + z__5.i * h__[
+				i__6].r;
+			z__3.r = h__[i__5].r + z__4.r, z__3.i = h__[i__5].i + 
+				z__4.i;
+			z__1.r = z__2.r * z__3.r - z__2.i * z__3.i, z__1.i = 
+				z__2.r * z__3.i + z__2.i * z__3.r;
+			refsum.r = z__1.r, refsum.i = z__1.i;
+
+			i__5 = k + 2 + k * h_dim1;
+			z__3.r = refsum.r * vt[1].r - refsum.i * vt[1].i, 
+				z__3.i = refsum.r * vt[1].i + refsum.i * vt[1]
+				.r;
+			z__2.r = h__[i__5].r - z__3.r, z__2.i = h__[i__5].i - 
+				z__3.i;
+			z__1.r = z__2.r, z__1.i = z__2.i;
+			z__5.r = refsum.r * vt[2].r - refsum.i * vt[2].i, 
+				z__5.i = refsum.r * vt[2].i + refsum.i * vt[2]
+				.r;
+			z__4.r = z__5.r, z__4.i = z__5.i;
 			i__6 = k + k * h_dim1;
 			i__7 = k + 1 + (k + 1) * h_dim1;
 			i__8 = k + 2 + (k + 2) * h_dim1;
-			if (((d__1 = h__[i__5].r, abs(d__1)) + (d__2 = d_imag(
-				&h__[k + 1 + k * h_dim1]), abs(d__2))) * ((
-				d__3 = vt[1].r, abs(d__3)) + (d__4 = d_imag(&
-				vt[1]), abs(d__4)) + ((d__5 = vt[2].r, abs(
-				d__5)) + (d__6 = d_imag(&vt[2]), abs(d__6)))) 
-				> ulp * ((d__7 = vt[0].r, abs(d__7)) + (d__8 =
-				 d_imag(vt), abs(d__8))) * ((d__9 = h__[i__6]
-				.r, abs(d__9)) + (d__10 = d_imag(&h__[k + k * 
-				h_dim1]), abs(d__10)) + ((d__11 = h__[i__7].r,
-				 abs(d__11)) + (d__12 = d_imag(&h__[k + 1 + (
-				k + 1) * h_dim1]), abs(d__12))) + ((d__13 = 
-				h__[i__8].r, abs(d__13)) + (d__14 = d_imag(&
-				h__[k + 2 + (k + 2) * h_dim1]), abs(d__14)))))
-				 {
+			if ((d__1 = z__1.r, abs(d__1)) + (d__2 = d_imag(&z__1)
+				, abs(d__2)) + ((d__3 = z__4.r, abs(d__3)) + (
+				d__4 = d_imag(&z__4), abs(d__4))) > ulp * ((
+				d__5 = h__[i__6].r, abs(d__5)) + (d__6 = 
+				d_imag(&h__[k + k * h_dim1]), abs(d__6)) + ((
+				d__7 = h__[i__7].r, abs(d__7)) + (d__8 = 
+				d_imag(&h__[k + 1 + (k + 1) * h_dim1]), abs(
+				d__8))) + ((d__9 = h__[i__8].r, abs(d__9)) + (
+				d__10 = d_imag(&h__[k + 2 + (k + 2) * h_dim1])
+				, abs(d__10))))) {
 
 /*                       ==== Starting a new bulge here would */
-/*                       .    create non-negligible fill.   If */
-/*                       .    the old reflector is diagonal (only */
-/*                       .    possible with underflows), then */
-/*                       .    change it to I.  Otherwise, use */
-/*                       .    it with trepidation. ==== */
+/*                       .    create non-negligible fill.  Use */
+/*                       .    the old one with trepidation. ==== */
 
-			    i__5 = m * v_dim1 + 2;
-			    i__6 = m * v_dim1 + 3;
-			    if (v[i__5].r == 0. && v[i__5].i == 0. && (v[i__6]
-				    .r == 0. && v[i__6].i == 0.)) {
-				i__5 = m * v_dim1 + 1;
-				v[i__5].r = 0., v[i__5].i = 0.;
-			    } else {
-				i__5 = k + 1 + k * h_dim1;
-				h__[i__5].r = beta.r, h__[i__5].i = beta.i;
-				i__5 = k + 2 + k * h_dim1;
-				h__[i__5].r = 0., h__[i__5].i = 0.;
-				i__5 = k + 3 + k * h_dim1;
-				h__[i__5].r = 0., h__[i__5].i = 0.;
-			    }
+			    i__5 = k + 1 + k * h_dim1;
+			    h__[i__5].r = beta.r, h__[i__5].i = beta.i;
+			    i__5 = k + 2 + k * h_dim1;
+			    h__[i__5].r = 0., h__[i__5].i = 0.;
+			    i__5 = k + 3 + k * h_dim1;
+			    h__[i__5].r = 0., h__[i__5].i = 0.;
 			} else {
 
 /*                       ==== Stating a new bulge here would */
@@ -456,32 +452,10 @@ static integer c__2 = 2;
 /*                       .    Replace the old reflector with */
 /*                       .    the new one. ==== */
 
-			    alpha.r = vt[0].r, alpha.i = vt[0].i;
-			    zlarfg_(&c__3, &alpha, &vt[1], &c__1, vt);
-			    i__5 = k + 1 + k * h_dim1;
-			    i__6 = k + 2 + k * h_dim1;
-			    d_cnjg(&z__4, &vt[1]);
-			    z__3.r = h__[i__6].r * z__4.r - h__[i__6].i * 
-				    z__4.i, z__3.i = h__[i__6].r * z__4.i + 
-				    h__[i__6].i * z__4.r;
-			    z__2.r = h__[i__5].r + z__3.r, z__2.i = h__[i__5]
-				    .i + z__3.i;
-			    i__7 = k + 3 + k * h_dim1;
-			    d_cnjg(&z__6, &vt[2]);
-			    z__5.r = h__[i__7].r * z__6.r - h__[i__7].i * 
-				    z__6.i, z__5.i = h__[i__7].r * z__6.i + 
-				    h__[i__7].i * z__6.r;
-			    z__1.r = z__2.r + z__5.r, z__1.i = z__2.i + 
-				    z__5.i;
-			    refsum.r = z__1.r, refsum.i = z__1.i;
 			    i__5 = k + 1 + k * h_dim1;
 			    i__6 = k + 1 + k * h_dim1;
-			    d_cnjg(&z__3, vt);
-			    z__2.r = z__3.r * refsum.r - z__3.i * refsum.i, 
-				    z__2.i = z__3.r * refsum.i + z__3.i * 
-				    refsum.r;
-			    z__1.r = h__[i__6].r - z__2.r, z__1.i = h__[i__6]
-				    .i - z__2.i;
+			    z__1.r = h__[i__6].r - refsum.r, z__1.i = h__[
+				    i__6].i - refsum.i;
 			    h__[i__5].r = z__1.r, h__[i__5].i = z__1.i;
 			    i__5 = k + 2 + k * h_dim1;
 			    h__[i__5].r = 0., h__[i__5].i = 0.;
@@ -524,13 +498,6 @@ static integer c__2 = 2;
 		    i__4 = k + 2 + k * h_dim1;
 		    h__[i__4].r = 0., h__[i__4].i = 0.;
 		}
-	    } else {
-
-/*              ==== Initialize V(1,M22) here to avoid possible undefined */
-/*              .    variable problems later. ==== */
-
-		i__4 = m22 * v_dim1 + 1;
-		v[i__4].r = 0., v[i__4].i = 0.;
 	    }
 
 /*           ==== Multiply H by reflections from the left ==== */
@@ -1226,7 +1193,7 @@ static integer c__2 = 2;
 			    ldu, &h__[incol + 1 + jcol * h_dim1], ldh, &c_b2, 
 			    &wh[wh_offset], ldwh);
 
-/*                 ==== Copy top of H bottom of WH ==== */
+/*                 ==== Copy top of H to bottom of WH ==== */
 
 		    zlacpy_("ALL", &j2, &jlen, &h__[incol + 1 + jcol * h_dim1]
 , ldh, &wh[i2 + 1 + wh_dim1], ldwh);

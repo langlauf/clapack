@@ -1,3 +1,15 @@
+/* slafts.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -42,9 +54,9 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*  -- LAPACK auxiliary test routine (version 3.1.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
-/*     November 2006 */
+/*     April 2009 */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -135,11 +147,6 @@ static integer c__4 = 4;
 		    slahd2_(iounit, type__);
 		}
 		++(*ie);
-/* **            WRITE( IOUNIT, 15 )' Matrix of order', N, */
-/* **     $               ',  type ', IMAT, */
-/* **     $               ',  test ', K, */
-/* **     $               ',  ratio = ', RESULT( K ) */
-/* **   15       FORMAT( A16, I5, 2( A8, I2 ), A11, G13.6 ) */
 		if (result[k] < 1e4f) {
 		    io___2.ciunit = *iounit;
 		    s_wsfe(&io___2);
@@ -177,10 +184,6 @@ static integer c__4 = 4;
 		    slahd2_(iounit, type__);
 		}
 		++(*ie);
-/* **              WRITE( IOUNIT, FMT = 9997 )' Matrix of size', M, ' x', */
-/* **     $             N, ', type ', IMAT, ',  test ', K, ',  ratio = ', */
-/* **     $             RESULT( K ) */
-/* ** 9997           FORMAT( A10, I5, A2, I5, A7, I2, A8, I2, A11, G13.6 ) */
 		if (result[k] < 1e4f) {
 		    io___4.ciunit = *iounit;
 		    s_wsfe(&io___4);

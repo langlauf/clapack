@@ -1,3 +1,15 @@
+/* ddrvpt.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -35,9 +47,9 @@ static doublereal c_b24 = 0.;
     static integer iseedy[4] = { 0,0,0,1 };
 
     /* Format strings */
-    static char fmt_9999[] = "(1x,a6,\002, N =\002,i5,\002, type \002,i2,"
-	    "\002, test \002,i2,\002, ratio = \002,g12.5)";
-    static char fmt_9998[] = "(1x,a6,\002, FACT='\002,a1,\002', N =\002,i5"
+    static char fmt_9999[] = "(1x,a,\002, N =\002,i5,\002, type \002,i2,\002"
+	    ", test \002,i2,\002, ratio = \002,g12.5)";
+    static char fmt_9998[] = "(1x,a,\002, FACT='\002,a1,\002', N =\002,i5"
 	    ",\002, type \002,i2,\002, test \002,i2,\002, ratio = \002,g12.5)";
 
     /* System generated locals */
@@ -262,7 +274,7 @@ static doublereal c_b24 = 0.;
 /*              Type 1-6:  generate a symmetric tridiagonal matrix of */
 /*              known condition number in lower triangular band storage. */
 
-		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)32, (ftnlen)6);
 		dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
 			&anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
 
@@ -472,7 +484,7 @@ static doublereal c_b24 = 0.;
 
 /*                 Factor A as L*D*L' and solve the system A*X = B. */
 
-		    s_copy(srnamc_1.srnamt, "DPTSV ", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "DPTSV ", (ftnlen)32, (ftnlen)6);
 		    dptsv_(&n, nrhs, &d__[n + 1], &e[n + 1], &x[1], &lda, &
 			    info);
 
@@ -555,7 +567,7 @@ static doublereal c_b24 = 0.;
 /*              Solve the system and compute the condition number and */
 /*              error bounds using DPTSVX. */
 
-		s_copy(srnamc_1.srnamt, "DPTSVX", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DPTSVX", (ftnlen)32, (ftnlen)6);
 		dptsvx_(fact, &n, nrhs, &d__[1], &e[1], &d__[n + 1], &e[n + 1]
 , &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
 			*nrhs + 1], &work[1], &info);

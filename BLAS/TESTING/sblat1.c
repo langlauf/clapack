@@ -1,3 +1,15 @@
+/* sblat1.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -145,7 +157,7 @@ static integer c__5 = 5;
 	    stest1_(real *, real *, real *, real *);
 
     /* Fortran I/O blocks */
-    static cilist io___19 = { 0, 6, 0, 0, 0 };
+    static cilist io___18 = { 0, 6, 0, 0, 0 };
 
 
 /*     .. Parameters .. */
@@ -181,7 +193,7 @@ static integer c__5 = 5;
 	    stest1_(&sc, &dc1[k - 1], &dc1[k - 1], sfac);
 	    stest1_(&ss, &ds1[k - 1], &ds1[k - 1], sfac);
 	} else {
-	    s_wsle(&io___19);
+	    s_wsle(&io___18);
 	    do_lio(&c__9, &c__1, " Shouldn't be here in CHECK0", (ftnlen)28);
 	    e_wsle();
 	    s_stop("", (ftnlen)0);
@@ -238,7 +250,7 @@ L40:
     extern integer isamax_(integer *, real *, integer *);
 
     /* Fortran I/O blocks */
-    static cilist io___32 = { 0, 6, 0, 0, 0 };
+    static cilist io___31 = { 0, 6, 0, 0, 0 };
 
 
 /*     .. Parameters .. */
@@ -289,7 +301,7 @@ L40:
 		i__1 = isamax_(&combla_1.n, sx, &combla_1.incx);
 		itest1_(&i__1, &itrue2[np1 - 1]);
 	    } else {
-		s_wsle(&io___32);
+		s_wsle(&io___31);
 		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK1", (ftnlen)
 			28);
 		e_wsle();
@@ -367,7 +379,7 @@ L40:
 	    real *, real *, real *, real *);
 
     /* Fortran I/O blocks */
-    static cilist io___63 = { 0, 6, 0, 0, 0 };
+    static cilist io___58 = { 0, 6, 0, 0, 0 };
 
 
 /*     .. Parameters .. */
@@ -435,7 +447,7 @@ L40:
 		stest_(&lenx, sx, stx, ssize2, &c_b34);
 		stest_(&leny, sy, sty, ssize2, &c_b34);
 	    } else {
-		s_wsle(&io___63);
+		s_wsle(&io___58);
 		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK2", (ftnlen)
 			28);
 		e_wsle();
@@ -506,7 +518,7 @@ L40:
     real mwpstx[5], mwpsty[5];
 
     /* Fortran I/O blocks */
-    static cilist io___88 = { 0, 6, 0, 0, 0 };
+    static cilist io___82 = { 0, 6, 0, 0, 0 };
 
 
 /*     .. Parameters .. */
@@ -546,7 +558,7 @@ L40:
 		stest_(&lenx, sx, stx, &ssize2[ksize * 14 - 14], sfac);
 		stest_(&leny, sy, sty, &ssize2[ksize * 14 - 14], sfac);
 	    } else {
-		s_wsle(&io___88);
+		s_wsle(&io___82);
 		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK3", (ftnlen)
 			28);
 		e_wsle();
@@ -685,9 +697,9 @@ L40:
     extern doublereal sdiff_(real *, real *);
 
     /* Fortran I/O blocks */
-    static cilist io___105 = { 0, 6, 0, fmt_99999, 0 };
-    static cilist io___106 = { 0, 6, 0, fmt_99998, 0 };
-    static cilist io___107 = { 0, 6, 0, fmt_99997, 0 };
+    static cilist io___99 = { 0, 6, 0, fmt_99999, 0 };
+    static cilist io___100 = { 0, 6, 0, fmt_99998, 0 };
+    static cilist io___101 = { 0, 6, 0, fmt_99997, 0 };
 
 
 /*     ********************************* STEST ************************** */
@@ -731,12 +743,12 @@ L40:
 	}
 /*                             PRINT FAIL MESSAGE AND HEADER. */
 	combla_1.pass = FALSE_;
-	s_wsfe(&io___105);
+	s_wsfe(&io___99);
 	e_wsfe();
-	s_wsfe(&io___106);
+	s_wsfe(&io___100);
 	e_wsfe();
 L20:
-	s_wsfe(&io___107);
+	s_wsfe(&io___101);
 	do_fio(&c__1, (char *)&combla_1.icase, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&combla_1.n, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&combla_1.incx, (ftnlen)sizeof(integer));
@@ -818,9 +830,9 @@ doublereal sdiff_(real *sa, real *sb)
     integer id;
 
     /* Fortran I/O blocks */
-    static cilist io___110 = { 0, 6, 0, fmt_99999, 0 };
-    static cilist io___111 = { 0, 6, 0, fmt_99998, 0 };
-    static cilist io___113 = { 0, 6, 0, fmt_99997, 0 };
+    static cilist io___104 = { 0, 6, 0, fmt_99999, 0 };
+    static cilist io___105 = { 0, 6, 0, fmt_99998, 0 };
+    static cilist io___107 = { 0, 6, 0, fmt_99997, 0 };
 
 
 /*     ********************************* ITEST1 ************************* */
@@ -847,13 +859,13 @@ doublereal sdiff_(real *sa, real *sb)
     }
 /*                             PRINT FAIL MESSAGE AND HEADER. */
     combla_1.pass = FALSE_;
-    s_wsfe(&io___110);
+    s_wsfe(&io___104);
     e_wsfe();
-    s_wsfe(&io___111);
+    s_wsfe(&io___105);
     e_wsfe();
 L20:
     id = *icomp - *itrue;
-    s_wsfe(&io___113);
+    s_wsfe(&io___107);
     do_fio(&c__1, (char *)&combla_1.icase, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&combla_1.n, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&combla_1.incx, (ftnlen)sizeof(integer));

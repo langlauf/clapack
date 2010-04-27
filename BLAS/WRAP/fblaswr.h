@@ -154,6 +154,9 @@ srot_(integer* N,
       real* c, real* s);
 
 int
+crotg_(complex* a, complex* b, complex* c, complex* s);
+
+int
 drotg_(doublereal* a, doublereal* b, doublereal* c, doublereal* s);
 
 int
@@ -161,6 +164,9 @@ drot_(integer* N,
       doublereal* X, integer* incX,
       doublereal* Y, integer* incY,
       doublereal* c, doublereal* s);
+
+int
+zrotg_(doublecomplex* a, doublecomplex* b, doublecomplex* c, doublecomplex* s);
 
 int
 sscal_(integer* N,

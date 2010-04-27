@@ -1,3 +1,15 @@
+/* zchkqr.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -42,7 +54,7 @@ static integer c__3 = 3;
 	    "t(\002,i2,\002)=\002,g12.5)";
 
     /* System generated locals */
-    integer i__1, i__2, i__3, i__4, i__5;
+    integer i__1, i__2, i__3, i__4;
 
     /* Builtin functions */
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
@@ -79,6 +91,7 @@ static integer c__3 = 3;
 	    integer *, integer *), alasum_(char *, 
 	    integer *, integer *, integer *, integer *);
     doublereal cndnum;
+    extern logical zgennd_(integer *, integer *, doublecomplex *, integer *);
     extern /* Subroutine */ int xlaenv_(integer *, integer *), zlacpy_(char *, 
 	     integer *, integer *, doublecomplex *, integer *, doublecomplex *
 , integer *), zlarhs_(char *, char *, char *, char *, 
@@ -91,7 +104,7 @@ static integer c__3 = 3;
 	    integer *, integer *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, integer *);
-    doublereal result[7];
+    doublereal result[8];
     extern /* Subroutine */ int zerrqr_(char *, integer *);
 
     /* Fortran I/O blocks */
@@ -195,6 +208,8 @@ static integer c__3 = 3;
 /*     .. */
 /*     .. Local Arrays .. */
 /*     .. */
+/*     .. External Functions .. */
+/*     .. */
 /*     .. External Subroutines .. */
 /*     .. */
 /*     .. Intrinsic Functions .. */
@@ -276,7 +291,7 @@ static integer c__3 = 3;
 		zlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)32, (ftnlen)6);
 		zlatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
 			work[1], &info);
@@ -321,6 +336,9 @@ static integer c__3 = 3;
 			xlaenv_(&c__1, &nb);
 			nx = nxval[inb];
 			xlaenv_(&c__3, &nx);
+			for (i__ = 1; i__ <= 8; ++i__) {
+			    result[i__ - 1] = 0.;
+			}
 			nt = 2;
 			if (ik == 1) {
 
@@ -329,6 +347,10 @@ static integer c__3 = 3;
 			    zqrt01_(&m, &n, &a[1], &af[1], &aq[1], &ar[1], &
 				    lda, &tau[1], &work[1], &lwork, &rwork[1], 
 				     result);
+			    if (! zgennd_(&m, &n, &af[1], &lda)) {
+				result[7] = *thresh * 2;
+			    }
+			    ++nt;
 			} else if (m >= n) {
 
 /*                       Test ZUNGQR, using factorization */
@@ -337,9 +359,6 @@ static integer c__3 = 3;
 			    zqrt02_(&m, &n, &k, &a[1], &af[1], &aq[1], &ar[1], 
 				     &lda, &tau[1], &work[1], &lwork, &rwork[
 				    1], result);
-			} else {
-			    result[0] = 0.;
-			    result[1] = 0.;
 			}
 			if (m >= k) {
 
@@ -360,8 +379,8 @@ static integer c__3 = 3;
 /*                          Generate a solution and set the right */
 /*                          hand side. */
 
-				s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)32, 
+					(ftnlen)6);
 				zlarhs_(path, "New", "Full", "No transpose", &
 					m, &n, &c__0, &c__0, nrhs, &a[1], &
 					lda, &xact[1], &lda, &b[1], &lda, 
@@ -369,8 +388,8 @@ static integer c__3 = 3;
 
 				zlacpy_("Full", &m, nrhs, &b[1], &lda, &x[1], 
 					&lda);
-				s_copy(srnamc_1.srnamt, "ZGEQRS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "ZGEQRS", (ftnlen)32, 
+					(ftnlen)6);
 				zgeqrs_(&m, &n, nrhs, &af[1], &lda, &tau[1], &
 					x[1], &lda, &work[1], &lwork, &info);
 
@@ -386,21 +405,13 @@ static integer c__3 = 3;
 					lda, &x[1], &lda, &b[1], &lda, &rwork[
 					1], &result[6]);
 				++nt;
-			    } else {
-				result[6] = 0.;
 			    }
-			} else {
-			    result[2] = 0.;
-			    result[3] = 0.;
-			    result[4] = 0.;
-			    result[5] = 0.;
 			}
 
 /*                    Print information about the tests that did not */
 /*                    pass the threshold. */
 
-			i__5 = nt;
-			for (i__ = 1; i__ <= i__5; ++i__) {
+			for (i__ = 1; i__ <= 8; ++i__) {
 			    if (result[i__ - 1] >= *thresh) {
 				if (nfail == 0 && nerrs == 0) {
 				    alahd_(nout, path);

@@ -1,3 +1,15 @@
+/* cchkgb.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -440,7 +452,7 @@ static integer c__7 = 7;
 				a[i__7].r = 0.f, a[i__7].i = 0.f;
 /* L20: */
 			    }
-			    s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)32, (
 				    ftnlen)6);
 			    clatms_(&m, &n, dist, iseed, type__, &rwork[1], &
 				    mode, &cndnum, &anorm, &kl, &ku, "Z", &a[
@@ -539,7 +551,7 @@ static integer c__7 = 7;
 				clacpy_("Full", &i__9, &n, &a[1], &lda, &afac[
 					kl + 1], &ldafac);
 			    }
-			    s_copy(srnamc_1.srnamt, "CGBTRF", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "CGBTRF", (ftnlen)32, (
 				    ftnlen)6);
 			    cgbtrf_(&m, &n, &kl, &ku, &afac[1], &ldafac, &
 				    iwork[1], &info);
@@ -610,8 +622,8 @@ static integer c__7 = 7;
 				ldb = max(1,n);
 				claset_("Full", &n, &n, &c_b61, &c_b62, &work[
 					1], &ldb);
-				s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)32, 
+					(ftnlen)6);
 				cgbtrs_("No transpose", &n, &kl, &ku, &n, &
 					afac[1], &ldafac, &iwork[1], &work[1], 
 					 &ldb, &info);
@@ -671,7 +683,7 @@ static integer c__7 = 7;
 /*                             Solve and compute residual for A * X = B. */
 
 				    s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)
-					    6, (ftnlen)6);
+					    32, (ftnlen)6);
 				    clarhs_(path, xtype, " ", trans, &n, &n, &
 					    kl, &ku, &nrhs, &a[1], &lda, &
 					    xact[1], &ldb, &b[1], &ldb, iseed, 
@@ -681,7 +693,7 @@ static integer c__7 = 7;
 					    x[1], &ldb);
 
 				    s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)
-					    6, (ftnlen)6);
+					    32, (ftnlen)6);
 				    cgbtrs_(trans, &n, &kl, &ku, &nrhs, &afac[
 					    1], &ldafac, &iwork[1], &x[1], &
 					    ldb, &info);
@@ -713,7 +725,7 @@ static integer c__7 = 7;
 /*                             solution. */
 
 				    s_copy(srnamc_1.srnamt, "CGBRFS", (ftnlen)
-					    6, (ftnlen)6);
+					    32, (ftnlen)6);
 				    cgbrfs_(trans, &n, &kl, &ku, &nrhs, &a[1], 
 					     &lda, &afac[1], &ldafac, &iwork[
 					    1], &b[1], &ldb, &x[1], &ldb, &
@@ -787,8 +799,8 @@ L90:
 				    rcondc = rcondi;
 				    *(unsigned char *)norm = 'I';
 				}
-				s_copy(srnamc_1.srnamt, "CGBCON", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CGBCON", (ftnlen)32, 
+					(ftnlen)6);
 				cgbcon_(norm, &n, &kl, &ku, &afac[1], &ldafac, 
 					 &iwork[1], &anorm, &rcond, &work[1], 
 					&rwork[1], &info);

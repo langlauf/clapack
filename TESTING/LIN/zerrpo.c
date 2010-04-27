@@ -1,3 +1,15 @@
+/* zerrpo.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -173,7 +185,7 @@ static integer c_n1 = -1;
 
 /*        ZPOTRF */
 
-	s_copy(srnamc_1.srnamt, "ZPOTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpotrf_("/", &c__0, a, &c__1, &info);
 	chkxer_("ZPOTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -189,7 +201,7 @@ static integer c_n1 = -1;
 
 /*        ZPOTF2 */
 
-	s_copy(srnamc_1.srnamt, "ZPOTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpotf2_("/", &c__0, a, &c__1, &info);
 	chkxer_("ZPOTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +217,7 @@ static integer c_n1 = -1;
 
 /*        ZPOTRI */
 
-	s_copy(srnamc_1.srnamt, "ZPOTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpotri_("/", &c__0, a, &c__1, &info);
 	chkxer_("ZPOTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -221,7 +233,7 @@ static integer c_n1 = -1;
 
 /*        ZPOTRS */
 
-	s_copy(srnamc_1.srnamt, "ZPOTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpotrs_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("ZPOTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -245,7 +257,7 @@ static integer c_n1 = -1;
 
 /*        ZPORFS */
 
-	s_copy(srnamc_1.srnamt, "ZPORFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPORFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zporfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &c__1, 
 		r1, r2, w, r__, &info);
@@ -284,7 +296,7 @@ static integer c_n1 = -1;
 
 /*        ZPOCON */
 
-	s_copy(srnamc_1.srnamt, "ZPOCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpocon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r__, &info)
 		;
@@ -309,7 +321,7 @@ static integer c_n1 = -1;
 
 /*        ZPOEQU */
 
-	s_copy(srnamc_1.srnamt, "ZPOEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpoequ_(&c_n1, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("ZPOEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -326,7 +338,7 @@ static integer c_n1 = -1;
 
 /*        ZPPTRF */
 
-	s_copy(srnamc_1.srnamt, "ZPPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpptrf_("/", &c__0, a, &info);
 	chkxer_("ZPPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -338,7 +350,7 @@ static integer c_n1 = -1;
 
 /*        ZPPTRI */
 
-	s_copy(srnamc_1.srnamt, "ZPPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpptri_("/", &c__0, a, &info);
 	chkxer_("ZPPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -350,7 +362,7 @@ static integer c_n1 = -1;
 
 /*        ZPPTRS */
 
-	s_copy(srnamc_1.srnamt, "ZPPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpptrs_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("ZPPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -370,7 +382,7 @@ static integer c_n1 = -1;
 
 /*        ZPPRFS */
 
-	s_copy(srnamc_1.srnamt, "ZPPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpprfs_("/", &c__0, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, r__, 
 		&info);
@@ -399,7 +411,7 @@ static integer c_n1 = -1;
 
 /*        ZPPCON */
 
-	s_copy(srnamc_1.srnamt, "ZPPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zppcon_("/", &c__0, a, &anrm, &rcond, w, r__, &info);
 	chkxer_("ZPPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -416,7 +428,7 @@ static integer c_n1 = -1;
 
 /*        ZPPEQU */
 
-	s_copy(srnamc_1.srnamt, "ZPPEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zppequ_("/", &c__0, a, r1, &rcond, &anrm, &info);
 	chkxer_("ZPPEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -433,7 +445,7 @@ static integer c_n1 = -1;
 
 /*        ZPBTRF */
 
-	s_copy(srnamc_1.srnamt, "ZPBTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbtrf_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("ZPBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -453,7 +465,7 @@ static integer c_n1 = -1;
 
 /*        ZPBTF2 */
 
-	s_copy(srnamc_1.srnamt, "ZPBTF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBTF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbtf2_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("ZPBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -473,7 +485,7 @@ static integer c_n1 = -1;
 
 /*        ZPBTRS */
 
-	s_copy(srnamc_1.srnamt, "ZPBTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbtrs_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("ZPBTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -501,7 +513,7 @@ static integer c_n1 = -1;
 
 /*        ZPBRFS */
 
-	s_copy(srnamc_1.srnamt, "ZPBRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbrfs_("/", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -545,7 +557,7 @@ static integer c_n1 = -1;
 
 /*        ZPBCON */
 
-	s_copy(srnamc_1.srnamt, "ZPBCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbcon_("/", &c__0, &c__0, a, &c__1, &anrm, &rcond, w, r__, &info);
 	chkxer_("ZPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -570,7 +582,7 @@ static integer c_n1 = -1;
 
 /*        ZPBEQU */
 
-	s_copy(srnamc_1.srnamt, "ZPBEQU", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBEQU", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbequ_("/", &c__0, &c__0, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("ZPBEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

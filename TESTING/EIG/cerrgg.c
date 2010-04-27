@@ -1,3 +1,15 @@
+/* cerrgg.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -220,7 +232,7 @@ static integer c__5 = 5;
 
 /*        CGGHRD */
 
-	s_copy(srnamc_1.srnamt, "CGGHRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGHRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgghrd_("/", "N", &c__0, &c__1, &c__0, a, &c__1, b, &c__1, q, &c__1, 
 		z__, &c__1, &info);
@@ -270,7 +282,7 @@ static integer c__5 = 5;
 
 /*        CHGEQZ */
 
-	s_copy(srnamc_1.srnamt, "CHGEQZ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHGEQZ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chgeqz_("/", "N", "N", &c__0, &c__1, &c__0, a, &c__1, b, &c__1, alpha, 
 		 beta, q, &c__1, z__, &c__1, w, &c__1, rw, &info);
@@ -325,7 +337,7 @@ static integer c__5 = 5;
 
 /*        CTGEVC */
 
-	s_copy(srnamc_1.srnamt, "CTGEVC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTGEVC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctgevc_("/", "A", sel, &c__0, a, &c__1, b, &c__1, q, &c__1, z__, &
 		c__1, &c__0, &m, w, rw, &info);
@@ -374,7 +386,7 @@ static integer c__5 = 5;
 
 /*        CGGSVD */
 
-	s_copy(srnamc_1.srnamt, "CGGSVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGSVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggsvd_("/", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
 		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, rw, 
@@ -445,7 +457,7 @@ static integer c__5 = 5;
 
 /*        CGGSVP */
 
-	s_copy(srnamc_1.srnamt, "CGGSVP", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGSVP", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggsvp_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
@@ -516,7 +528,7 @@ static integer c__5 = 5;
 
 /*        CTGSJA */
 
-	s_copy(srnamc_1.srnamt, "CTGSJA", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTGSJA", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctgsja_("/", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
 		c__1, b, &c__1, &tola, &tolb, r1, r2, u, &c__1, v, &c__1, q, &
@@ -591,7 +603,7 @@ static integer c__5 = 5;
 
 /*        CGGGLM */
 
-	s_copy(srnamc_1.srnamt, "CGGGLM", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGGLM", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggglm_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, tau, alpha, beta, w, 
 		&c__18, &info);
@@ -640,7 +652,7 @@ static integer c__5 = 5;
 
 /*        CGGLSE */
 
-	s_copy(srnamc_1.srnamt, "CGGLSE", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGLSE", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgglse_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, tau, alpha, beta, w, 
 		&c__18, &info);
@@ -689,7 +701,7 @@ static integer c__5 = 5;
 
 /*        CGGQRF */
 
-	s_copy(srnamc_1.srnamt, "CGGQRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGQRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggqrf_(&c_n1, &c__0, &c__0, a, &c__1, alpha, b, &c__1, beta, w, &
 		c__18, &info);
@@ -724,7 +736,7 @@ static integer c__5 = 5;
 
 /*        CGGRQF */
 
-	s_copy(srnamc_1.srnamt, "CGGRQF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGRQF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggrqf_(&c_n1, &c__0, &c__0, a, &c__1, alpha, b, &c__1, beta, w, &
 		c__18, &info);
@@ -765,7 +777,7 @@ static integer c__5 = 5;
 
 /*        CGGES */
 
-	s_copy(srnamc_1.srnamt, "CGGES ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGES ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgges_("/", "N", "S", (L_fp)clctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 alpha, beta, q, &c__1, u, &c__1, w, &c__1, rw, bw, &info);
@@ -825,7 +837,7 @@ static integer c__5 = 5;
 
 /*        CGGESX */
 
-	s_copy(srnamc_1.srnamt, "CGGESX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGESX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggesx_("/", "N", "S", (L_fp)clctsx_, "N", &c__1, a, &c__1, b, &c__1, 
 		&sdim, alpha, beta, q, &c__1, u, &c__1, rce, rcv, w, &c__1, 
@@ -908,7 +920,7 @@ static integer c__5 = 5;
 
 /*        CGGEV */
 
-	s_copy(srnamc_1.srnamt, "CGGEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggev_("/", "N", &c__1, a, &c__1, b, &c__1, alpha, beta, q, &c__1, u, 
 		&c__1, w, &c__1, rw, &info);
@@ -963,7 +975,7 @@ static integer c__5 = 5;
 
 /*        CGGEVX */
 
-	s_copy(srnamc_1.srnamt, "CGGEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGGEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cggevx_("/", "N", "N", "N", &c__1, a, &c__1, b, &c__1, alpha, beta, q, 
 		 &c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, 
@@ -1040,7 +1052,7 @@ static integer c__5 = 5;
 
 /*        CTGEXC */
 
-	s_copy(srnamc_1.srnamt, "CTGEXC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTGEXC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 3;
 	ctgexc_(&c_true, &c_true, &c_n1, a, &c__1, b, &c__1, q, &c__1, z__, &
 		c__1, &ifst, &ilst, &info);
@@ -1080,7 +1092,7 @@ static integer c__5 = 5;
 
 /*        CTGSEN */
 
-	s_copy(srnamc_1.srnamt, "CTGSEN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTGSEN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctgsen_(&c_n1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, 
 		alpha, beta, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &
@@ -1145,7 +1157,7 @@ static integer c__5 = 5;
 
 /*        CTGSNA */
 
-	s_copy(srnamc_1.srnamt, "CTGSNA", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTGSNA", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctgsna_("/", "A", sel, &c__1, a, &c__1, b, &c__1, q, &c__1, u, &c__1, 
 		r1, r2, &c__1, &m, w, &c__1, iw, &info);
@@ -1195,7 +1207,7 @@ static integer c__5 = 5;
 
 /*        CTGSYL */
 
-	s_copy(srnamc_1.srnamt, "CTGSYL", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTGSYL", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctgsyl_("/", &c__0, &c__1, &c__1, a, &c__1, b, &c__1, q, &c__1, u, &
 		c__1, v, &c__1, z__, &c__1, &scale, &dif, w, &c__1, iw, &info);

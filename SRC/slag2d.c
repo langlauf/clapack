@@ -1,3 +1,15 @@
+/* slag2d.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,16 +23,11 @@
     integer i__, j;
 
 
-/*  -- LAPACK PROTOTYPE auxiliary routine (version 3.1.1) -- */
+/*  -- LAPACK PROTOTYPE auxiliary routine (version 3.1.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
-/*     January 2007 */
+/*     August 2007 */
 
 /*     .. */
-/*     .. WARNING: PROTOTYPE .. */
-/*     This is an LAPACK PROTOTYPE routine which means that the */
-/*     interface of this routine is likely to be changed in the future */
-/*     based on community feedback. */
-
 /*     .. Scalar Arguments .. */
 /*     .. */
 /*     .. Array Arguments .. */
@@ -36,7 +43,7 @@
 /*  from double to single, it is not possible to overflow when */
 /*  converting from single to double. */
 
-/*  This is a helper routine so there is no argument checking. */
+/*  This is an auxiliary routine so there is no argument checking. */
 
 /*  Arguments */
 /*  ========= */
@@ -47,14 +54,14 @@
 /*  N       (input) INTEGER */
 /*          The number of columns of the matrix A.  N >= 0. */
 
-/*  SA      (output) REAL array, dimension (LDSA,N) */
-/*          On exit, the M-by-N coefficient matrix SA. */
+/*  SA      (input) REAL array, dimension (LDSA,N) */
+/*          On entry, the M-by-N coefficient matrix SA. */
 
 /*  LDSA    (input) INTEGER */
 /*          The leading dimension of the array SA.  LDSA >= max(1,M). */
 
-/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
-/*          On entry, the M-by-N coefficient matrix A. */
+/*  A       (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          On exit, the M-by-N coefficient matrix A. */
 
 /*  LDA     (input) INTEGER */
 /*          The leading dimension of the array A.  LDA >= max(1,M). */
@@ -82,7 +89,7 @@
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    a[i__ + j * a_dim1] = sa[i__ + j * sa_dim1];
-/* L30: */
+/* L10: */
 	}
 /* L20: */
     }

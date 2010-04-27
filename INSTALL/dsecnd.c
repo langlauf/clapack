@@ -16,4 +16,3 @@ doublereal dsecnd_()
   return (doublereal)(rusage.tms_utime) / CLK_TCK;
 
 } /* dsecnd_ */
-

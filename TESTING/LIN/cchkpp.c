@@ -1,3 +1,15 @@
+/* cchkpp.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -277,7 +289,7 @@ static integer c__8 = 8;
 		clatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)32, (ftnlen)6);
 		clatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, packit, &a[1], &lda, &work[
 			1], &info);
@@ -353,7 +365,7 @@ static integer c__8 = 8;
 
 		npp = n * (n + 1) / 2;
 		ccopy_(&npp, &a[1], &c__1, &afac[1], &c__1);
-		s_copy(srnamc_1.srnamt, "CPPTRF", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "CPPTRF", (ftnlen)32, (ftnlen)6);
 		cpptrf_(uplo, &n, &afac[1], &info);
 
 /*              Check error code from CPPTRF. */
@@ -380,7 +392,7 @@ static integer c__8 = 8;
 /*              Form the inverse and compute the residual. */
 
 		ccopy_(&npp, &afac[1], &c__1, &ainv[1], &c__1);
-		s_copy(srnamc_1.srnamt, "CPPTRI", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "CPPTRI", (ftnlen)32, (ftnlen)6);
 		cpptri_(uplo, &n, &ainv[1], &info);
 
 /*              Check error code from CPPTRI. */
@@ -423,13 +435,13 @@ static integer c__8 = 8;
 /* +    TEST 3 */
 /*              Solve and compute residual for  A * X = B. */
 
-		    s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)32, (ftnlen)6);
 		    clarhs_(path, xtype, uplo, " ", &n, &n, &kl, &ku, &nrhs, &
 			    a[1], &lda, &xact[1], &lda, &b[1], &lda, iseed, &
 			    info);
 		    clacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
 
-		    s_copy(srnamc_1.srnamt, "CPPTRS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "CPPTRS", (ftnlen)32, (ftnlen)6);
 		    cpptrs_(uplo, &n, &nrhs, &afac[1], &x[1], &lda, &info);
 
 /*              Check error code from CPPTRS. */
@@ -453,7 +465,7 @@ static integer c__8 = 8;
 /* +    TESTS 5, 6, and 7 */
 /*              Use iterative refinement to improve the solution. */
 
-		    s_copy(srnamc_1.srnamt, "CPPRFS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "CPPRFS", (ftnlen)32, (ftnlen)6);
 		    cpprfs_(uplo, &n, &nrhs, &a[1], &afac[1], &b[1], &lda, &x[
 			    1], &lda, &rwork[1], &rwork[nrhs + 1], &work[1], &
 			    rwork[(nrhs << 1) + 1], &info);
@@ -506,7 +518,7 @@ static integer c__8 = 8;
 /*              Get an estimate of RCOND = 1/CNDNUM. */
 
 		anorm = clanhp_("1", uplo, &n, &a[1], &rwork[1]);
-		s_copy(srnamc_1.srnamt, "CPPCON", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "CPPCON", (ftnlen)32, (ftnlen)6);
 		cppcon_(uplo, &n, &afac[1], &anorm, &rcond, &work[1], &rwork[
 			1], &info);
 

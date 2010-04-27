@@ -1,3 +1,15 @@
+/* cerrec.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -133,7 +145,7 @@ static integer c__3 = 3;
 
 /*     Test CTRSYL */
 
-    s_copy(srnamc_1.srnamt, "CTRSYL", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CTRSYL", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     ctrsyl_("X", "N", &c__1, &c__0, &c__0, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
@@ -178,7 +190,7 @@ static integer c__3 = 3;
 
 /*     Test CTREXC */
 
-    s_copy(srnamc_1.srnamt, "CTREXC", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CTREXC", (ftnlen)32, (ftnlen)6);
     ifst = 1;
     ilst = 1;
     infoc_1.infot = 1;
@@ -224,7 +236,7 @@ static integer c__3 = 3;
 
 /*     Test CTRSNA */
 
-    s_copy(srnamc_1.srnamt, "CTRSNA", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CTRSNA", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     ctrsna_("X", "A", sel, &c__0, a, &c__1, b, &c__1, c__, &c__1, s, sep, &
 	    c__1, &m, work, &c__1, rw, &info);
@@ -275,7 +287,7 @@ static integer c__3 = 3;
 /*     Test CTRSEN */
 
     sel[0] = FALSE_;
-    s_copy(srnamc_1.srnamt, "CTRSEN", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CTRSEN", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     ctrsen_("X", "N", sel, &c__0, a, &c__1, b, &c__1, x, &m, s, sep, work, &
 	    c__1, &info);

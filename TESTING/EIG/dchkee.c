@@ -1,3 +1,15 @@
+/* dchkee.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -17,7 +29,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -115,11 +127,11 @@ static integer c__264 = 264;
 	    "\002.\002,i1)";
     static char fmt_9984[] = "(/\002 The following parameter values will be "
 	    "used:\002)";
-    static char fmt_9989[] = "(\002 Invalid input value: \002,a6,\002=\002,i"
-	    "6,\002; must be >=\002,i6)";
-    static char fmt_9988[] = "(\002 Invalid input value: \002,a6,\002=\002,i"
-	    "6,\002; must be <=\002,i6)";
-    static char fmt_9983[] = "(4x,a6,10i6,/10x,10i6)";
+    static char fmt_9989[] = "(\002 Invalid input value: \002,a,\002=\002,"
+	    "i6,\002; must be >=\002,i6)";
+    static char fmt_9988[] = "(\002 Invalid input value: \002,a,\002=\002,"
+	    "i6,\002; must be <=\002,i6)";
+    static char fmt_9983[] = "(4x,a,10i6,/10x,10i6)";
     static char fmt_9981[] = "(\002 Relative machine \002,a,\002 is taken to"
 	    " be\002,d16.6)";
     static char fmt_9982[] = "(/\002 Routines pass computational tests if te"
@@ -133,8 +145,8 @@ static integer c__264 = 264;
 	    "i4,\002, NX =\002,i4,\002, INMIN=\002,i4,\002, INWIN =\002,i4"
 	    ",\002, INIBL =\002,i4,\002, ISHFTS =\002,i4,\002, IACC22 =\002,i"
 	    "4)";
-    static char fmt_9980[] = "(\002 *** Error code from \002,a6,\002 = \002,"
-	    "i4)";
+    static char fmt_9980[] = "(\002 *** Error code from \002,a,\002 = \002,i"
+	    "4)";
     static char fmt_9997[] = "(//1x,a3,\002:  NB =\002,i4,\002, NBMIN =\002,"
 	    "i4,\002, NX =\002,i4)";
     static char fmt_9995[] = "(//1x,a3,\002:  NB =\002,i4,\002, NBMIN =\002,"
@@ -186,7 +198,7 @@ static integer c__264 = 264;
     integer iacc22[20];
     logical fatal;
     integer iseed[4], nbcol[20], inibl[20], nbval[20], nbmin[20];
-    char vname[6];
+    char vname[32];
     integer inmin[20], newsd, nsval[20], inwin[20], nxval[20], iwork[89760];
     extern /* Subroutine */ int dchkbb_(integer *, integer *, integer *, 
 	    integer *, integer *, integer *, logical *, integer *, integer *, 
@@ -1706,15 +1718,15 @@ L10:
 	}
 	e_rsle();
 	if (svd) {
-	    s_copy(vname, "    M ", (ftnlen)6, (ftnlen)6);
+	    s_copy(vname, "    M ", (ftnlen)32, (ftnlen)6);
 	} else {
-	    s_copy(vname, "    N ", (ftnlen)6, (ftnlen)6);
+	    s_copy(vname, "    N ", (ftnlen)32, (ftnlen)6);
 	}
 	i__1 = nn;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    if (mval[i__ - 1] < 0) {
 		s_wsfe(&io___64);
-		do_fio(&c__1, vname, (ftnlen)6);
+		do_fio(&c__1, vname, (ftnlen)32);
 		do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer))
 			;
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
@@ -1722,7 +1734,7 @@ L10:
 		fatal = TRUE_;
 	    } else if (mval[i__ - 1] > 132) {
 		s_wsfe(&io___65);
-		do_fio(&c__1, vname, (ftnlen)6);
+		do_fio(&c__1, vname, (ftnlen)32);
 		do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer))
 			;
 		do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));

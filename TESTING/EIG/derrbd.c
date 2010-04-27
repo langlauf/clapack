@@ -1,3 +1,15 @@
+/* derrbd.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -138,7 +150,7 @@ static integer c__1 = 1;
 
 /*        DGEBRD */
 
-	s_copy(srnamc_1.srnamt, "DGEBRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DGEBRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgebrd_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("DGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -159,7 +171,7 @@ static integer c__1 = 1;
 
 /*        DGEBD2 */
 
-	s_copy(srnamc_1.srnamt, "DGEBD2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DGEBD2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgebd2_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &info);
 	chkxer_("DGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -176,7 +188,7 @@ static integer c__1 = 1;
 
 /*        DORGBR */
 
-	s_copy(srnamc_1.srnamt, "DORGBR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DORGBR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dorgbr_("/", &c__0, &c__0, &c__0, a, &c__1, tq, w, &c__1, &info);
 	chkxer_("DORGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -221,7 +233,7 @@ static integer c__1 = 1;
 
 /*        DORMBR */
 
-	s_copy(srnamc_1.srnamt, "DORMBR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DORMBR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dormbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
@@ -291,7 +303,7 @@ static integer c__1 = 1;
 
 /*        DBDSQR */
 
-	s_copy(srnamc_1.srnamt, "DBDSQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DBDSQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
 		a, &c__1, w, &info);
@@ -336,7 +348,7 @@ static integer c__1 = 1;
 
 /*        DBDSDC */
 
-	s_copy(srnamc_1.srnamt, "DBDSDC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DBDSDC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dbdsdc_("/", "N", &c__0, d__, e, u, &c__1, v, &c__1, q, iq, w, iw, &
 		info);

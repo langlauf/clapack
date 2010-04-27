@@ -1,3 +1,15 @@
+/* clarfg.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -31,7 +43,7 @@ static complex c_b5 = {1.f,0.f};
     real safmin, rsafmn;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*  -- LAPACK auxiliary routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -126,11 +138,11 @@ static complex c_b5 = {1.f,0.f};
 	safmin = slamch_("S") / slamch_("E");
 	rsafmn = 1.f / safmin;
 
+	knt = 0;
 	if (dabs(beta) < safmin) {
 
 /*           XNORM, BETA may be inaccurate; scale X and recompute them */
 
-	    knt = 0;
 L10:
 	    ++knt;
 	    i__1 = *n - 1;
@@ -150,37 +162,25 @@ L10:
 	    alpha->r = q__1.r, alpha->i = q__1.i;
 	    r__1 = slapy3_(&alphr, &alphi, &xnorm);
 	    beta = -r_sign(&r__1, &alphr);
-	    r__1 = (beta - alphr) / beta;
-	    r__2 = -alphi / beta;
-	    q__1.r = r__1, q__1.i = r__2;
-	    tau->r = q__1.r, tau->i = q__1.i;
-	    q__2.r = alpha->r - beta, q__2.i = alpha->i;
-	    cladiv_(&q__1, &c_b5, &q__2);
-	    alpha->r = q__1.r, alpha->i = q__1.i;
-	    i__1 = *n - 1;
-	    cscal_(&i__1, alpha, &x[1], incx);
-
-/*           If ALPHA is subnormal, it may lose relative accuracy */
-
-	    alpha->r = beta, alpha->i = 0.f;
-	    i__1 = knt;
-	    for (j = 1; j <= i__1; ++j) {
-		q__1.r = safmin * alpha->r, q__1.i = safmin * alpha->i;
-		alpha->r = q__1.r, alpha->i = q__1.i;
-/* L20: */
-	    }
-	} else {
-	    r__1 = (beta - alphr) / beta;
-	    r__2 = -alphi / beta;
-	    q__1.r = r__1, q__1.i = r__2;
-	    tau->r = q__1.r, tau->i = q__1.i;
-	    q__2.r = alpha->r - beta, q__2.i = alpha->i;
-	    cladiv_(&q__1, &c_b5, &q__2);
-	    alpha->r = q__1.r, alpha->i = q__1.i;
-	    i__1 = *n - 1;
-	    cscal_(&i__1, alpha, &x[1], incx);
-	    alpha->r = beta, alpha->i = 0.f;
 	}
+	r__1 = (beta - alphr) / beta;
+	r__2 = -alphi / beta;
+	q__1.r = r__1, q__1.i = r__2;
+	tau->r = q__1.r, tau->i = q__1.i;
+	q__2.r = alpha->r - beta, q__2.i = alpha->i;
+	cladiv_(&q__1, &c_b5, &q__2);
+	alpha->r = q__1.r, alpha->i = q__1.i;
+	i__1 = *n - 1;
+	cscal_(&i__1, alpha, &x[1], incx);
+
+/*        If ALPHA is subnormal, it may lose relative accuracy */
+
+	i__1 = knt;
+	for (j = 1; j <= i__1; ++j) {
+	    beta *= safmin;
+/* L20: */
+	}
+	alpha->r = beta, alpha->i = 0.f;
     }
 
     return 0;

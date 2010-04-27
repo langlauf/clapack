@@ -1,3 +1,15 @@
+/* zlaqr2.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -63,17 +75,19 @@ static logical c_true = TRUE_;
 	    zlaset_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *);
     doublereal smlnum;
-    extern /* Subroutine */ int zunghr_(integer *, integer *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
-	    integer *, integer *), ztrexc_(char *, integer *, doublecomplex *, 
-	     integer *, doublecomplex *, integer *, integer *, integer *, 
+    extern /* Subroutine */ int ztrexc_(char *, integer *, doublecomplex *, 
+	    integer *, doublecomplex *, integer *, integer *, integer *, 
 	    integer *);
     integer lwkopt;
+    extern /* Subroutine */ int zunmhr_(char *, char *, integer *, integer *, 
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
+	     doublecomplex *, integer *, doublecomplex *, integer *, integer *
+);
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
-/*     November 2006 */
+/*  -- LAPACK auxiliary routine (version 3.2.1)                        -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.. */
+/*  -- April 2009                                                      -- */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -145,7 +159,7 @@ static logical c_true = TRUE_;
 /*          Specify the rows of Z to which transformations must be */
 /*          applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N. */
 
-/*     Z       (input/output) COMPLEX*16 array, dimension (LDZ,IHI) */
+/*     Z       (input/output) COMPLEX*16 array, dimension (LDZ,N) */
 /*          IF WANTZ is .TRUE., then on output, the unitary */
 /*          similarity transformation mentioned above has been */
 /*          accumulated into Z(ILOZ:IHIZ,ILO:IHI) from the right. */
@@ -216,7 +230,7 @@ static logical c_true = TRUE_;
 /*        Karen Braman and Ralph Byers, Department of Mathematics, */
 /*        University of Kansas, USA */
 
-/*     ================================================================== */
+/*     ================================================================ */
 /*     .. Parameters .. */
 /*     .. */
 /*     .. Local Scalars .. */
@@ -269,11 +283,11 @@ static logical c_true = TRUE_;
 		c_n1, &info);
 	lwk1 = (integer) work[1].r;
 
-/*        ==== Workspace query call to ZUNGHR ==== */
+/*        ==== Workspace query call to ZUNMHR ==== */
 
 	i__1 = jw - 1;
-	zunghr_(&jw, &c__1, &i__1, &t[t_offset], ldt, &work[1], &work[1], &
-		c_n1, &info);
+	zunmhr_("R", "N", &jw, &jw, &c__1, &i__1, &t[t_offset], ldt, &work[1], 
+		 &v[v_offset], ldv, &work[1], &c_n1, &info);
 	lwk2 = (integer) work[1].r;
 
 /*        ==== Optimal workspace ==== */
@@ -294,6 +308,7 @@ static logical c_true = TRUE_;
 /*     ... for an empty active block ... ==== */
     *ns = 0;
     *nd = 0;
+    work[1].r = 1., work[1].i = 0.;
     if (*ktop > *kbot) {
 	return 0;
     }
@@ -345,6 +360,7 @@ static logical c_true = TRUE_;
 		h__[i__1].r = 0., h__[i__1].i = 0.;
 	    }
 	}
+	work[1].r = 1., work[1].i = 0.;
 	return 0;
     }
 
@@ -393,7 +409,7 @@ static logical c_true = TRUE_;
 	    --(*ns);
 	} else {
 
-/*           ==== One undflatable eigenvalue.  Move it up out of the */
+/*           ==== One undeflatable eigenvalue.  Move it up out of the */
 /*           .    way.   (ZTREXC can not fail in this case.) ==== */
 
 	    ifst = *ns;
@@ -502,18 +518,12 @@ static logical c_true = TRUE_;
 		 &i__3);
 
 /*        ==== Accumulate orthogonal matrix in order update */
-/*        .    H and Z, if requested.  (A modified version */
-/*        .    of  ZUNGHR that accumulates block Householder */
-/*        .    transformations into V directly might be */
-/*        .    marginally more efficient than the following.) ==== */
+/*        .    H and Z, if requested.  ==== */
 
 	if (*ns > 1 && (s.r != 0. || s.i != 0.)) {
 	    i__1 = *lwork - jw;
-	    zunghr_(&jw, &c__1, ns, &t[t_offset], ldt, &work[1], &work[jw + 1]
-, &i__1, &info);
-	    zgemm_("N", "N", &jw, ns, ns, &c_b2, &v[v_offset], ldv, &t[
-		    t_offset], ldt, &c_b1, &wv[wv_offset], ldwv);
-	    zlacpy_("A", &jw, ns, &wv[wv_offset], ldwv, &v[v_offset], ldv);
+	    zunmhr_("R", "N", &jw, ns, &c__1, ns, &t[t_offset], ldt, &work[1], 
+		     &v[v_offset], ldv, &work[jw + 1], &i__1, &info);
 	}
 
 /*        ==== Update vertical slab in H ==== */

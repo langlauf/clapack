@@ -1,3 +1,15 @@
+/* cerrvx.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -208,7 +220,7 @@ static integer c__4 = 4;
 
 /*        CGESV */
 
-	s_copy(srnamc_1.srnamt, "CGESV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGESV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgesv_(&c_n1, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CGESV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -228,7 +240,7 @@ static integer c__4 = 4;
 
 /*        CGESVX */
 
-	s_copy(srnamc_1.srnamt, "CGESVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGESVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -292,7 +304,7 @@ static integer c__4 = 4;
 
 /*        CGBSV */
 
-	s_copy(srnamc_1.srnamt, "CGBSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbsv_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CGBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -320,7 +332,7 @@ static integer c__4 = 4;
 
 /*        CGBSVX */
 
-	s_copy(srnamc_1.srnamt, "CGBSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGBSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbsvx_("/", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
@@ -407,7 +419,7 @@ static integer c__4 = 4;
 
 /*        CGTSV */
 
-	s_copy(srnamc_1.srnamt, "CGTSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGTSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgtsv_(&c_n1, &c__0, a, &a[4], &a[8], b, &c__1, &info);
 	chkxer_("CGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -423,7 +435,7 @@ static integer c__4 = 4;
 
 /*        CGTSVX */
 
-	s_copy(srnamc_1.srnamt, "CGTSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGTSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgtsvx_("/", "N", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
 		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -459,7 +471,7 @@ static integer c__4 = 4;
 
 /*        CPOSV */
 
-	s_copy(srnamc_1.srnamt, "CPOSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPOSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cposv_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("CPOSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -483,7 +495,7 @@ static integer c__4 = 4;
 
 /*        CPOSVX */
 
-	s_copy(srnamc_1.srnamt, "CPOSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPOSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cposvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
 		c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -541,7 +553,7 @@ static integer c__4 = 4;
 
 /*        CPPSV */
 
-	s_copy(srnamc_1.srnamt, "CPPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cppsv_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("CPPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -561,7 +573,7 @@ static integer c__4 = 4;
 
 /*        CPPSVX */
 
-	s_copy(srnamc_1.srnamt, "CPPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cppsvx_("/", "U", &c__0, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, rw, &info);
@@ -609,7 +621,7 @@ static integer c__4 = 4;
 
 /*        CPBSV */
 
-	s_copy(srnamc_1.srnamt, "CPBSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPBSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbsv_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info)
 		;
@@ -643,7 +655,7 @@ static integer c__4 = 4;
 
 /*        CPBSVX */
 
-	s_copy(srnamc_1.srnamt, "CPBSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPBSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbsvx_("/", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
 		b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -706,7 +718,7 @@ static integer c__4 = 4;
 
 /*        CPTSV */
 
-	s_copy(srnamc_1.srnamt, "CPTSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cptsv_(&c_n1, &c__0, r__, a, b, &c__1, &info);
 	chkxer_("CPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -722,7 +734,7 @@ static integer c__4 = 4;
 
 /*        CPTSVX */
 
-	s_copy(srnamc_1.srnamt, "CPTSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CPTSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cptsvx_("/", &c__0, &c__0, r__, a, rf, af, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
@@ -753,7 +765,7 @@ static integer c__4 = 4;
 
 /*        CHESV */
 
-	s_copy(srnamc_1.srnamt, "CHESV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHESV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chesv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("CHESV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -777,7 +789,7 @@ static integer c__4 = 4;
 
 /*        CHESVX */
 
-	s_copy(srnamc_1.srnamt, "CHESVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHESVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chesvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, 
 		&c__1, &rcond, r1, r2, w, &c__1, rw, &info);
@@ -828,7 +840,7 @@ static integer c__4 = 4;
 
 /*        CHPSV */
 
-	s_copy(srnamc_1.srnamt, "CHPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chpsv_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("CHPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -848,7 +860,7 @@ static integer c__4 = 4;
 
 /*        CHPSVX */
 
-	s_copy(srnamc_1.srnamt, "CHPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chpsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
@@ -884,7 +896,7 @@ static integer c__4 = 4;
 
 /*        CSYSV */
 
-	s_copy(srnamc_1.srnamt, "CSYSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csysv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("CSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -904,7 +916,7 @@ static integer c__4 = 4;
 
 /*        CSYSVX */
 
-	s_copy(srnamc_1.srnamt, "CSYSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSYSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	csysvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, 
 		&c__1, &rcond, r1, r2, w, &c__1, rw, &info);
@@ -955,7 +967,7 @@ static integer c__4 = 4;
 
 /*        CSPSV */
 
-	s_copy(srnamc_1.srnamt, "CSPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cspsv_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("CSPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -975,7 +987,7 @@ static integer c__4 = 4;
 
 /*        CSPSVX */
 
-	s_copy(srnamc_1.srnamt, "CSPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CSPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cspsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);

@@ -1,3 +1,15 @@
+/* cerrqr.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -135,7 +147,7 @@ static integer c__2 = 2;
 
 /*     CGEQRF */
 
-    s_copy(srnamc_1.srnamt, "CGEQRF", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CGEQRF", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cgeqrf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("CGEQRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -155,7 +167,7 @@ static integer c__2 = 2;
 
 /*     CGEQR2 */
 
-    s_copy(srnamc_1.srnamt, "CGEQR2", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CGEQR2", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cgeqr2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("CGEQR2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -171,7 +183,7 @@ static integer c__2 = 2;
 
 /*     CGEQRS */
 
-    s_copy(srnamc_1.srnamt, "CGEQRS", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CGEQRS", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cgeqrs_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("CGEQRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -203,7 +215,7 @@ static integer c__2 = 2;
 
 /*     CUNGQR */
 
-    s_copy(srnamc_1.srnamt, "CUNGQR", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CUNGQR", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cungqr_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("CUNGQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -235,7 +247,7 @@ static integer c__2 = 2;
 
 /*     CUNG2R */
 
-    s_copy(srnamc_1.srnamt, "CUNG2R", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CUNG2R", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cung2r_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("CUNG2R", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -263,7 +275,7 @@ static integer c__2 = 2;
 
 /*     CUNMQR */
 
-    s_copy(srnamc_1.srnamt, "CUNMQR", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CUNMQR", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cunmqr_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -327,7 +339,7 @@ static integer c__2 = 2;
 
 /*     CUNM2R */
 
-    s_copy(srnamc_1.srnamt, "CUNM2R", (ftnlen)6, (ftnlen)6);
+    s_copy(srnamc_1.srnamt, "CUNM2R", (ftnlen)32, (ftnlen)6);
     infoc_1.infot = 1;
     cunm2r_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("CUNM2R", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

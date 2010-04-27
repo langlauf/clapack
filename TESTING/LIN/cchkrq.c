@@ -1,3 +1,15 @@
+/* cchkrq.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -72,9 +84,11 @@ static integer c__3 = 3;
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
 ), alaerh_(char *, char *, integer *, 
 	    integer *, char *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *), clacpy_(char *, integer *, integer *, complex *, 
-	    integer *, complex *, integer *), clarhs_(char *, char *, 
-	    char *, char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *);
+    extern logical cgennd_(integer *, integer *, complex *, integer *);
+    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
+	    *, integer *, complex *, integer *), clarhs_(char *, char 
+	    *, char *, char *, integer *, integer *, integer *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, complex *, 
 	    integer *, integer *, integer *), 
 	    alasum_(char *, integer *, integer *, integer *, integer *);
@@ -85,7 +99,7 @@ static integer c__3 = 3;
 	    integer *, char *, real *, integer *, real *, real *, integer *, 
 	    integer *, char *, complex *, integer *, complex *, integer *), cerrrq_(char *, integer *), 
 	    xlaenv_(integer *, integer *);
-    real result[7];
+    real result[8];
 
     /* Fortran I/O blocks */
     static cilist io___33 = { 0, 0, 0, fmt_9999, 0 };
@@ -188,6 +202,8 @@ static integer c__3 = 3;
 /*     .. */
 /*     .. Local Arrays .. */
 /*     .. */
+/*     .. External Functions .. */
+/*     .. */
 /*     .. External Subroutines .. */
 /*     .. */
 /*     .. Intrinsic Functions .. */
@@ -269,7 +285,7 @@ static integer c__3 = 3;
 		clatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)32, (ftnlen)6);
 		clatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
 			work[1], &info);
@@ -314,6 +330,9 @@ static integer c__3 = 3;
 			xlaenv_(&c__1, &nb);
 			nx = nxval[inb];
 			xlaenv_(&c__3, &nx);
+			for (i__ = 1; i__ <= 8; ++i__) {
+			    result[i__ - 1] = 0.f;
+			}
 			nt = 2;
 			if (ik == 1) {
 
@@ -322,6 +341,19 @@ static integer c__3 = 3;
 			    crqt01_(&m, &n, &a[1], &af[1], &aq[1], &ar[1], &
 				    lda, &tau[1], &work[1], &lwork, &rwork[1], 
 				     result);
+			    if (m <= n) {
+/*                          Check the upper-right m-by-m corner */
+				if (! cgennd_(&m, &m, &af[lda * (n - m) + 1], 
+					&lda)) {
+				    result[7] = *thresh * 2;
+				}
+			    } else {
+/*                          Check the (m-n)th subdiagonal */
+				i__ = m - n;
+				if (! cgennd_(&n, &n, &af[i__ + 1], &lda)) {
+				    result[7] = *thresh * 2;
+				}
+			    }
 			} else if (m <= n) {
 
 /*                       Test CUNGRQ, using factorization */
@@ -353,8 +385,8 @@ static integer c__3 = 3;
 /*                          Generate a solution and set the right */
 /*                          hand side. */
 
-				s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)32, 
+					(ftnlen)6);
 				clarhs_(path, "New", "Full", "No transpose", &
 					m, &n, &c__0, &c__0, nrhs, &a[1], &
 					lda, &xact[1], &lda, &b[1], &lda, 
@@ -362,8 +394,8 @@ static integer c__3 = 3;
 
 				clacpy_("Full", &m, nrhs, &b[1], &lda, &x[n - 
 					m + 1], &lda);
-				s_copy(srnamc_1.srnamt, "CGERQS", (ftnlen)6, (
-					ftnlen)6);
+				s_copy(srnamc_1.srnamt, "CGERQS", (ftnlen)32, 
+					(ftnlen)6);
 				cgerqs_(&m, &n, nrhs, &af[1], &lda, &tau[1], &
 					x[1], &lda, &work[1], &lwork, &info);
 

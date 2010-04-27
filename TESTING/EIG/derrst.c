@@ -1,3 +1,15 @@
+/* derrst.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -222,7 +234,7 @@ static integer c__18 = 18;
 
 /*        DSYTRD */
 
-	s_copy(srnamc_1.srnamt, "DSYTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytrd_("/", &c__0, a, &c__1, d__, e, tau, w, &c__1, &info)
 		;
@@ -247,7 +259,7 @@ static integer c__18 = 18;
 
 /*        DORGTR */
 
-	s_copy(srnamc_1.srnamt, "DORGTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DORGTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dorgtr_("/", &c__0, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("DORGTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -268,7 +280,7 @@ static integer c__18 = 18;
 
 /*        DORMTR */
 
-	s_copy(srnamc_1.srnamt, "DORMTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DORMTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dormtr_("/", "U", "N", &c__0, &c__0, a, &c__1, tau, c__, &c__1, w, &
 		c__1, &info);
@@ -323,7 +335,7 @@ static integer c__18 = 18;
 
 /*        DSPTRD */
 
-	s_copy(srnamc_1.srnamt, "DSPTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptrd_("/", &c__0, a, d__, e, tau, &info);
 	chkxer_("DSPTRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -336,7 +348,7 @@ static integer c__18 = 18;
 
 /*        DOPGTR */
 
-	s_copy(srnamc_1.srnamt, "DOPGTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DOPGTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dopgtr_("/", &c__0, a, tau, z__, &c__1, w, &info);
 	chkxer_("DOPGTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -353,7 +365,7 @@ static integer c__18 = 18;
 
 /*        DOPMTR */
 
-	s_copy(srnamc_1.srnamt, "DOPMTR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DOPMTR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dopmtr_("/", "U", "N", &c__0, &c__0, a, tau, c__, &c__1, w, &info);
 	chkxer_("DOPMTR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -382,7 +394,7 @@ static integer c__18 = 18;
 
 /*        DPTEQR */
 
-	s_copy(srnamc_1.srnamt, "DPTEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DPTEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpteqr_("/", &c__0, d__, e, z__, &c__1, w, &info);
 	chkxer_("DPTEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -399,7 +411,7 @@ static integer c__18 = 18;
 
 /*        DSTEBZ */
 
-	s_copy(srnamc_1.srnamt, "DSTEBZ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEBZ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dstebz_("/", "E", &c__0, &c_b220, &c_b221, &c__1, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
@@ -444,7 +456,7 @@ static integer c__18 = 18;
 
 /*        DSTEIN */
 
-	s_copy(srnamc_1.srnamt, "DSTEIN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEIN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dstein_(&c_n1, d__, e, &c__0, x, i1, i2, z__, &c__1, w, iw, i3, &info)
 		;
@@ -469,7 +481,7 @@ static integer c__18 = 18;
 
 /*        DSTEQR */
 
-	s_copy(srnamc_1.srnamt, "DSTEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsteqr_("/", &c__0, d__, e, z__, &c__1, w, &info);
 	chkxer_("DSTEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -486,7 +498,7 @@ static integer c__18 = 18;
 
 /*        DSTERF */
 
-	s_copy(srnamc_1.srnamt, "DSTERF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTERF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsterf_(&c_n1, d__, e, &info);
 	chkxer_("DSTERF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -495,7 +507,7 @@ static integer c__18 = 18;
 
 /*        DSTEDC */
 
-	s_copy(srnamc_1.srnamt, "DSTEDC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEDC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dstedc_("/", &c__0, d__, e, z__, &c__1, w, &c__1, iw, &c__1, &info);
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -536,7 +548,7 @@ static integer c__18 = 18;
 
 /*        DSTEVD */
 
-	s_copy(srnamc_1.srnamt, "DSTEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dstevd_("/", &c__0, d__, e, z__, &c__1, w, &c__1, iw, &c__1, &info);
 	chkxer_("DSTEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -569,7 +581,7 @@ static integer c__18 = 18;
 
 /*        DSTEV */
 
-	s_copy(srnamc_1.srnamt, "DSTEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dstev_("/", &c__0, d__, e, z__, &c__1, w, &info);
 	chkxer_("DSTEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -586,7 +598,7 @@ static integer c__18 = 18;
 
 /*        DSTEVX */
 
-	s_copy(srnamc_1.srnamt, "DSTEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dstevx_("/", "A", &c__0, d__, e, &c_b220, &c_b220, &c__0, &c__0, &
 		c_b220, &m, x, z__, &c__1, w, iw, i3, &info);
@@ -637,7 +649,7 @@ static integer c__18 = 18;
 /*        DSTEVR */
 
 	n = 1;
-	s_copy(srnamc_1.srnamt, "DSTEVR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSTEVR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	i__1 = n * 20;
 	i__2 = n * 10;
@@ -716,7 +728,7 @@ static integer c__18 = 18;
 
 /*        DSYEVD */
 
-	s_copy(srnamc_1.srnamt, "DSYEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsyevd_("/", "U", &c__0, a, &c__1, x, w, &c__1, iw, &c__1, &info);
 	chkxer_("DSYEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -761,7 +773,7 @@ static integer c__18 = 18;
 
 /*        DSYEVR */
 
-	s_copy(srnamc_1.srnamt, "DSYEVR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYEVR", (ftnlen)32, (ftnlen)6);
 	n = 1;
 	infoc_1.infot = 1;
 	i__1 = n * 26;
@@ -856,7 +868,7 @@ static integer c__18 = 18;
 
 /*        DSYEV */
 
-	s_copy(srnamc_1.srnamt, "DSYEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsyev_("/", "U", &c__0, a, &c__1, x, w, &c__1, &info);
 	chkxer_("DSYEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -881,7 +893,7 @@ static integer c__18 = 18;
 
 /*        DSYEVX */
 
-	s_copy(srnamc_1.srnamt, "DSYEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSYEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsyevx_("/", "A", "U", &c__0, a, &c__1, &c_b220, &c_b220, &c__0, &
 		c__0, &c_b220, &m, x, z__, &c__1, w, &c__1, iw, i3, &info);
@@ -944,7 +956,7 @@ static integer c__18 = 18;
 
 /*        DSPEVD */
 
-	s_copy(srnamc_1.srnamt, "DSPEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspevd_("/", "U", &c__0, a, x, z__, &c__1, w, &c__1, iw, &c__1, &info);
 	chkxer_("DSPEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -992,7 +1004,7 @@ static integer c__18 = 18;
 
 /*        DSPEV */
 
-	s_copy(srnamc_1.srnamt, "DSPEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspev_("/", "U", &c__0, a, w, z__, &c__1, x, &info);
 	chkxer_("DSPEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -1013,7 +1025,7 @@ static integer c__18 = 18;
 
 /*        DSPEVX */
 
-	s_copy(srnamc_1.srnamt, "DSPEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSPEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspevx_("/", "A", "U", &c__0, a, &c_b220, &c_b220, &c__0, &c__0, &
 		c_b220, &m, x, z__, &c__1, w, iw, i3, &info);
@@ -1070,7 +1082,7 @@ static integer c__18 = 18;
 
 /*        DSBTRD */
 
-	s_copy(srnamc_1.srnamt, "DSBTRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSBTRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsbtrd_("/", "U", &c__0, &c__0, a, &c__1, d__, e, z__, &c__1, w, &
 		info);
@@ -1105,7 +1117,7 @@ static integer c__18 = 18;
 
 /*        DSBEVD */
 
-	s_copy(srnamc_1.srnamt, "DSBEVD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSBEVD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
@@ -1165,7 +1177,7 @@ static integer c__18 = 18;
 
 /*        DSBEV */
 
-	s_copy(srnamc_1.srnamt, "DSBEV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSBEV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsbev_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &info);
 	chkxer_("DSBEV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -1194,7 +1206,7 @@ static integer c__18 = 18;
 
 /*        DSBEVX */
 
-	s_copy(srnamc_1.srnamt, "DSBEVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "DSBEVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsbevx_("/", "A", "U", &c__0, &c__0, a, &c__1, q, &c__1, &c_b220, &
 		c_b220, &c__0, &c__0, &c_b220, &m, x, z__, &c__1, w, iw, i3, &

@@ -1,3 +1,15 @@
+/* ddrvls.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -393,7 +405,7 @@ static doublereal c_b96 = -1.;
 						1], &ldb, &b[1], &ldb);
 				    }
 				    s_copy(srnamc_1.srnamt, "DGELS ", (ftnlen)
-					    6, (ftnlen)6);
+					    32, (ftnlen)6);
 				    dgels_(trans, &m, &n, &nrhs, &a[1], &lda, 
 					    &b[1], &ldb, &work[1], &lwork, &
 					    info);
@@ -499,7 +511,7 @@ static doublereal c_b96 = -1.;
 			dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], &
 				ldb);
 
-			s_copy(srnamc_1.srnamt, "DGELSX", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DGELSX", (ftnlen)32, (ftnlen)
 				6);
 			dgelsx_(&m, &n, &nrhs, &a[1], &lda, &b[1], &ldb, &
 				iwork[1], &rcond, &crank, &work[1], &info);
@@ -614,7 +626,7 @@ static doublereal c_b96 = -1.;
 			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], 
 				     &ldb);
 
-			    s_copy(srnamc_1.srnamt, "DGELSY", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DGELSY", (ftnlen)32, (
 				    ftnlen)6);
 			    dgelsy_(&m, &n, &nrhs, &a[1], &lda, &b[1], &ldb, &
 				    iwork[1], &rcond, &crank, &work[1], &
@@ -672,7 +684,7 @@ static doublereal c_b96 = -1.;
 				    lda);
 			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], 
 				     &ldb);
-			    s_copy(srnamc_1.srnamt, "DGELSS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DGELSS", (ftnlen)32, (
 				    ftnlen)6);
 			    dgelss_(&m, &n, &nrhs, &a[1], &lda, &b[1], &ldb, &
 				    s[1], &rcond, &crank, &work[1], &lwork, &
@@ -744,7 +756,7 @@ static doublereal c_b96 = -1.;
 			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], 
 				     &ldb);
 
-			    s_copy(srnamc_1.srnamt, "DGELSD", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "DGELSD", (ftnlen)32, (
 				    ftnlen)6);
 			    dgelsd_(&m, &n, &nrhs, &a[1], &lda, &b[1], &ldb, &
 				    s[1], &rcond, &crank, &work[1], &lwork, &

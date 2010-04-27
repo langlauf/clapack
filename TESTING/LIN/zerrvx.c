@@ -1,3 +1,15 @@
+/* zerrvx.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -222,7 +234,7 @@ static integer c__4 = 4;
 
 /*        ZGESV */
 
-	s_copy(srnamc_1.srnamt, "ZGESV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGESV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgesv_(&c_n1, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("ZGESV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -242,7 +254,7 @@ static integer c__4 = 4;
 
 /*        ZGESVX */
 
-	s_copy(srnamc_1.srnamt, "ZGESVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGESVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -306,7 +318,7 @@ static integer c__4 = 4;
 
 /*        ZGBSV */
 
-	s_copy(srnamc_1.srnamt, "ZGBSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbsv_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("ZGBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -334,7 +346,7 @@ static integer c__4 = 4;
 
 /*        ZGBSVX */
 
-	s_copy(srnamc_1.srnamt, "ZGBSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGBSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgbsvx_("/", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
@@ -421,7 +433,7 @@ static integer c__4 = 4;
 
 /*        ZGTSV */
 
-	s_copy(srnamc_1.srnamt, "ZGTSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGTSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgtsv_(&c_n1, &c__0, a, &a[4], &a[8], b, &c__1, &info);
 	chkxer_("ZGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -437,7 +449,7 @@ static integer c__4 = 4;
 
 /*        ZGTSVX */
 
-	s_copy(srnamc_1.srnamt, "ZGTSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGTSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgtsvx_("/", "N", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
 		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -473,7 +485,7 @@ static integer c__4 = 4;
 
 /*        ZPOSV */
 
-	s_copy(srnamc_1.srnamt, "ZPOSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zposv_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("ZPOSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -497,7 +509,7 @@ static integer c__4 = 4;
 
 /*        ZPOSVX */
 
-	s_copy(srnamc_1.srnamt, "ZPOSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPOSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zposvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
 		c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -555,7 +567,7 @@ static integer c__4 = 4;
 
 /*        ZPPSV */
 
-	s_copy(srnamc_1.srnamt, "ZPPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zppsv_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("ZPPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -575,7 +587,7 @@ static integer c__4 = 4;
 
 /*        ZPPSVX */
 
-	s_copy(srnamc_1.srnamt, "ZPPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zppsvx_("/", "U", &c__0, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, rw, &info);
@@ -623,7 +635,7 @@ static integer c__4 = 4;
 
 /*        ZPBSV */
 
-	s_copy(srnamc_1.srnamt, "ZPBSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbsv_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info)
 		;
@@ -657,7 +669,7 @@ static integer c__4 = 4;
 
 /*        ZPBSVX */
 
-	s_copy(srnamc_1.srnamt, "ZPBSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPBSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zpbsvx_("/", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
 		b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
@@ -720,7 +732,7 @@ static integer c__4 = 4;
 
 /*        ZPTSV */
 
-	s_copy(srnamc_1.srnamt, "ZPTSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zptsv_(&c_n1, &c__0, r__, a, b, &c__1, &info);
 	chkxer_("ZPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -736,7 +748,7 @@ static integer c__4 = 4;
 
 /*        ZPTSVX */
 
-	s_copy(srnamc_1.srnamt, "ZPTSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZPTSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zptsvx_("/", &c__0, &c__0, r__, a, rf, af, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
@@ -767,7 +779,7 @@ static integer c__4 = 4;
 
 /*        ZHESV */
 
-	s_copy(srnamc_1.srnamt, "ZHESV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHESV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhesv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("ZHESV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -791,7 +803,7 @@ static integer c__4 = 4;
 
 /*        ZHESVX */
 
-	s_copy(srnamc_1.srnamt, "ZHESVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHESVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhesvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, 
 		&c__1, &rcond, r1, r2, w, &c__1, rw, &info);
@@ -842,7 +854,7 @@ static integer c__4 = 4;
 
 /*        ZHPSV */
 
-	s_copy(srnamc_1.srnamt, "ZHPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpsv_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("ZHPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -862,7 +874,7 @@ static integer c__4 = 4;
 
 /*        ZHPSVX */
 
-	s_copy(srnamc_1.srnamt, "ZHPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
@@ -898,7 +910,7 @@ static integer c__4 = 4;
 
 /*        ZSYSV */
 
-	s_copy(srnamc_1.srnamt, "ZSYSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsysv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("ZSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -918,7 +930,7 @@ static integer c__4 = 4;
 
 /*        ZSYSVX */
 
-	s_copy(srnamc_1.srnamt, "ZSYSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSYSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zsysvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, 
 		&c__1, &rcond, r1, r2, w, &c__1, rw, &info);
@@ -969,7 +981,7 @@ static integer c__4 = 4;
 
 /*        ZSPSV */
 
-	s_copy(srnamc_1.srnamt, "ZSPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zspsv_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("ZSPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -989,7 +1001,7 @@ static integer c__4 = 4;
 
 /*        ZSPSVX */
 
-	s_copy(srnamc_1.srnamt, "ZSPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZSPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zspsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);

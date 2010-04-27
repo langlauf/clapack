@@ -1,3 +1,15 @@
+/* zchkge.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -23,6 +35,7 @@ static integer c__2 = 2;
 static integer c__0 = 0;
 static integer c_n1 = -1;
 static doublecomplex c_b23 = {0.,0.};
+static logical c_true = TRUE_;
 static integer c__8 = 8;
 
 /* Subroutine */ int zchkge_(logical *dotype, integer *nm, integer *mval, 
@@ -81,7 +94,7 @@ static integer c__8 = 8;
 	     doublereal *, doublereal *), zget07_(char *, integer *, integer *
 , doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, doublereal *, doublereal *);
+	    doublereal *, logical *, doublereal *, doublereal *);
     char trans[1];
     integer izero, nerrs;
     doublereal dummy;
@@ -321,7 +334,7 @@ static integer c__8 = 8;
 		zlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)32, (ftnlen)6);
 		zlatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
 			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
 			work[1], &info);
@@ -378,7 +391,7 @@ static integer c__8 = 8;
 /*                 Compute the LU factorization of the matrix. */
 
 		    zlacpy_("Full", &m, &n, &a[1], &lda, &afac[1], &lda);
-		    s_copy(srnamc_1.srnamt, "ZGETRF", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "ZGETRF", (ftnlen)32, (ftnlen)6);
 		    zgetrf_(&m, &n, &afac[1], &lda, &iwork[1], &info);
 
 /*                 Check error code from ZGETRF. */
@@ -404,7 +417,7 @@ static integer c__8 = 8;
 		    if (m == n && info == 0) {
 			zlacpy_("Full", &n, &n, &afac[1], &lda, &ainv[1], &
 				lda);
-			s_copy(srnamc_1.srnamt, "ZGETRI", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "ZGETRI", (ftnlen)32, (ftnlen)
 				6);
 			nrhs = nsval[1];
 			lwork = *nmax * max(3,nrhs);
@@ -507,7 +520,7 @@ static integer c__8 = 8;
 /* +    TEST 3 */
 /*                       Solve and compute residual for A * X = B. */
 
-			    s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)32, (
 				    ftnlen)6);
 			    zlarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku, 
 				     &nrhs, &a[1], &lda, &xact[1], &lda, &b[1]
@@ -516,7 +529,7 @@ static integer c__8 = 8;
 
 			    zlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
 				    lda);
-			    s_copy(srnamc_1.srnamt, "ZGETRS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZGETRS", (ftnlen)32, (
 				    ftnlen)6);
 			    zgetrs_(trans, &n, &nrhs, &afac[1], &lda, &iwork[
 				    1], &x[1], &lda, &info);
@@ -545,7 +558,7 @@ static integer c__8 = 8;
 /*                       Use iterative refinement to improve the */
 /*                       solution. */
 
-			    s_copy(srnamc_1.srnamt, "ZGERFS", (ftnlen)6, (
+			    s_copy(srnamc_1.srnamt, "ZGERFS", (ftnlen)32, (
 				    ftnlen)6);
 			    zgerfs_(trans, &n, &nrhs, &a[1], &lda, &afac[1], &
 				    lda, &iwork[1], &b[1], &lda, &x[1], &lda, 
@@ -564,7 +577,7 @@ static integer c__8 = 8;
 				    rcondc, &result[4]);
 			    zget07_(trans, &n, &nrhs, &a[1], &lda, &b[1], &
 				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
-				    1], &rwork[nrhs + 1], &result[5]);
+				    1], &c_true, &rwork[nrhs + 1], &result[5]);
 
 /*                       Print information about the tests that did not */
 /*                       pass the threshold. */
@@ -612,7 +625,7 @@ L70:
 			    rcondc = rcondi;
 			    *(unsigned char *)norm = 'I';
 			}
-			s_copy(srnamc_1.srnamt, "ZGECON", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "ZGECON", (ftnlen)32, (ftnlen)
 				6);
 			zgecon_(norm, &n, &afac[1], &lda, &anorm, &rcond, &
 				work[1], &rwork[1], &info);

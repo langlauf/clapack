@@ -1,3 +1,15 @@
+/* dchktp.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -48,10 +60,10 @@ static integer c__9 = 9;
     static char fmt_9998[] = "(\002 UPLO='\002,a1,\002', TRANS='\002,a1,\002"
 	    "', DIAG='\002,a1,\002', N=\002,i5,\002', NRHS=\002,i5,\002, type "
 	    "\002,i2,\002, test(\002,i2,\002)= \002,g12.5)";
-    static char fmt_9997[] = "(1x,a6,\002( '\002,a1,\002', '\002,a1,\002', "
+    static char fmt_9997[] = "(1x,a,\002( '\002,a1,\002', '\002,a1,\002', "
 	    "'\002,a1,\002',\002,i5,\002, ... ), type \002,i2,\002, test(\002"
 	    ",i2,\002)=\002,g12.5)";
-    static char fmt_9996[] = "(1x,a6,\002( '\002,a1,\002', '\002,a1,\002', "
+    static char fmt_9996[] = "(1x,a,\002( '\002,a1,\002', '\002,a1,\002', "
 	    "'\002,a1,\002', '\002,a1,\002',\002,i5,\002, ... ), type \002,i2,"
 	    "\002, test(\002,i2,\002)=\002,g12.5)";
 
@@ -290,7 +302,7 @@ static integer c__9 = 9;
 
 /*              Call DLATTP to generate a triangular test matrix. */
 
-		s_copy(srnamc_1.srnamt, "DLATTP", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DLATTP", (ftnlen)32, (ftnlen)6);
 		dlattp_(&imat, uplo, "No transpose", diag, iseed, &n, &ap[1], 
 			&x[1], &work[1], &info);
 
@@ -308,7 +320,7 @@ static integer c__9 = 9;
 		if (n > 0) {
 		    dcopy_(&lap, &ap[1], &c__1, &ainvp[1], &c__1);
 		}
-		s_copy(srnamc_1.srnamt, "DTPTRI", (ftnlen)6, (ftnlen)6);
+		s_copy(srnamc_1.srnamt, "DTPTRI", (ftnlen)32, (ftnlen)6);
 		dtptri_(uplo, diag, &n, &ainvp[1], &info);
 
 /*              Check error code from DTPTRI. */
@@ -380,7 +392,7 @@ static integer c__9 = 9;
 /* +    TEST 2 */
 /*                 Solve and compute residual for op(A)*x = b. */
 
-			s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)32, (ftnlen)
 				6);
 			dlarhs_(path, xtype, uplo, trans, &n, &n, &c__0, &
 				idiag, &nrhs, &ap[1], &lap, &xact[1], &lda, &
@@ -388,7 +400,7 @@ static integer c__9 = 9;
 			*(unsigned char *)xtype = 'C';
 			dlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
 
-			s_copy(srnamc_1.srnamt, "DTPTRS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DTPTRS", (ftnlen)32, (ftnlen)
 				6);
 			dtptrs_(uplo, trans, diag, &n, &nrhs, &ap[1], &x[1], &
 				lda, &info);
@@ -419,7 +431,7 @@ static integer c__9 = 9;
 /*                 Use iterative refinement to improve the solution and */
 /*                 compute error bounds. */
 
-			s_copy(srnamc_1.srnamt, "DTPRFS", (ftnlen)6, (ftnlen)
+			s_copy(srnamc_1.srnamt, "DTPRFS", (ftnlen)32, (ftnlen)
 				6);
 			dtprfs_(uplo, trans, diag, &n, &nrhs, &ap[1], &b[1], &
 				lda, &x[1], &lda, &rwork[1], &rwork[nrhs + 1], 
@@ -490,7 +502,7 @@ static integer c__9 = 9;
 			rcondc = rcondi;
 		    }
 
-		    s_copy(srnamc_1.srnamt, "DTPCON", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "DTPCON", (ftnlen)32, (ftnlen)6);
 		    dtpcon_(norm, uplo, diag, &n, &ap[1], &rcond, &work[1], &
 			    iwork[1], &info);
 
@@ -563,14 +575,14 @@ L70:
 
 /*                 Call DLATTP to generate a triangular test matrix. */
 
-		    s_copy(srnamc_1.srnamt, "DLATTP", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "DLATTP", (ftnlen)32, (ftnlen)6);
 		    dlattp_(&imat, uplo, trans, diag, iseed, &n, &ap[1], &x[1]
 , &work[1], &info);
 
 /* +    TEST 8 */
 /*                 Solve the system op(A)*x = b. */
 
-		    s_copy(srnamc_1.srnamt, "DLATPS", (ftnlen)6, (ftnlen)6);
+		    s_copy(srnamc_1.srnamt, "DLATPS", (ftnlen)32, (ftnlen)6);
 		    dcopy_(&n, &x[1], &c__1, &b[1], &c__1);
 		    dlatps_(uplo, trans, diag, "N", &n, &ap[1], &b[1], &scale, 
 			     &rwork[1], &info);

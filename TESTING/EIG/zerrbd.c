@@ -1,3 +1,15 @@
+/* zerrbd.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -139,7 +151,7 @@ static integer c__1 = 1;
 
 /*        ZGEBRD */
 
-	s_copy(srnamc_1.srnamt, "ZGEBRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZGEBRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgebrd_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("ZGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -160,7 +172,7 @@ static integer c__1 = 1;
 
 /*        ZUNGBR */
 
-	s_copy(srnamc_1.srnamt, "ZUNGBR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUNGBR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zungbr_("/", &c__0, &c__0, &c__0, a, &c__1, tq, w, &c__1, &info);
 	chkxer_("ZUNGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +217,7 @@ static integer c__1 = 1;
 
 /*        ZUNMBR */
 
-	s_copy(srnamc_1.srnamt, "ZUNMBR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZUNMBR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zunmbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
@@ -275,7 +287,7 @@ static integer c__1 = 1;
 
 /*        ZBDSQR */
 
-	s_copy(srnamc_1.srnamt, "ZBDSQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZBDSQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
 		a, &c__1, rw, &info);

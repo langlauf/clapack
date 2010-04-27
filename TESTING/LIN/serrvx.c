@@ -1,3 +1,15 @@
+/* serrvx.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -171,7 +183,7 @@ static integer c__4 = 4;
 
 /*        SGESV */
 
-	s_copy(srnamc_1.srnamt, "SGESV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGESV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgesv_(&c_n1, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("SGESV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -191,7 +203,7 @@ static integer c__4 = 4;
 
 /*        SGESVX */
 
-	s_copy(srnamc_1.srnamt, "SGESVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGESVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
@@ -255,7 +267,7 @@ static integer c__4 = 4;
 
 /*        SGBSV */
 
-	s_copy(srnamc_1.srnamt, "SGBSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGBSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbsv_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("SGBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -283,7 +295,7 @@ static integer c__4 = 4;
 
 /*        SGBSVX */
 
-	s_copy(srnamc_1.srnamt, "SGBSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGBSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbsvx_("/", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
@@ -370,7 +382,7 @@ static integer c__4 = 4;
 
 /*        SGTSV */
 
-	s_copy(srnamc_1.srnamt, "SGTSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGTSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgtsv_(&c_n1, &c__0, a, &a[4], &a[8], b, &c__1, &info);
 	chkxer_("SGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -386,7 +398,7 @@ static integer c__4 = 4;
 
 /*        SGTSVX */
 
-	s_copy(srnamc_1.srnamt, "SGTSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SGTSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgtsvx_("/", "N", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
 		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
@@ -422,7 +434,7 @@ static integer c__4 = 4;
 
 /*        SPOSV */
 
-	s_copy(srnamc_1.srnamt, "SPOSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPOSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sposv_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("SPOSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -446,7 +458,7 @@ static integer c__4 = 4;
 
 /*        SPOSVX */
 
-	s_copy(srnamc_1.srnamt, "SPOSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPOSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sposvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
 		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
@@ -504,7 +516,7 @@ static integer c__4 = 4;
 
 /*        SPPSV */
 
-	s_copy(srnamc_1.srnamt, "SPPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sppsv_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("SPPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -524,7 +536,7 @@ static integer c__4 = 4;
 
 /*        SPPSVX */
 
-	s_copy(srnamc_1.srnamt, "SPPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sppsvx_("/", "U", &c__0, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
@@ -572,7 +584,7 @@ static integer c__4 = 4;
 
 /*        SPBSV */
 
-	s_copy(srnamc_1.srnamt, "SPBSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPBSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	spbsv_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info)
 		;
@@ -606,7 +618,7 @@ static integer c__4 = 4;
 
 /*        SPBSVX */
 
-	s_copy(srnamc_1.srnamt, "SPBSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPBSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	spbsvx_("/", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
 		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
@@ -669,7 +681,7 @@ static integer c__4 = 4;
 
 /*        SPTSV */
 
-	s_copy(srnamc_1.srnamt, "SPTSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPTSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sptsv_(&c_n1, &c__0, a, &a[4], b, &c__1, &info);
 	chkxer_("SPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -685,7 +697,7 @@ static integer c__4 = 4;
 
 /*        SPTSVX */
 
-	s_copy(srnamc_1.srnamt, "SPTSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SPTSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sptsvx_("/", &c__0, &c__0, a, &a[4], af, &af[4], b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, &info);
@@ -716,7 +728,7 @@ static integer c__4 = 4;
 
 /*        SSYSV */
 
-	s_copy(srnamc_1.srnamt, "SSYSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SSYSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssysv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("SSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -736,7 +748,7 @@ static integer c__4 = 4;
 
 /*        SSYSVX */
 
-	s_copy(srnamc_1.srnamt, "SSYSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SSYSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssysvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, 
 		&c__1, &rcond, r1, r2, w, &c__1, iw, &info);
@@ -787,7 +799,7 @@ static integer c__4 = 4;
 
 /*        SSPSV */
 
-	s_copy(srnamc_1.srnamt, "SSPSV ", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SSPSV ", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sspsv_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("SSPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -807,7 +819,7 @@ static integer c__4 = 4;
 
 /*        SSPSVX */
 
-	s_copy(srnamc_1.srnamt, "SSPSVX", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "SSPSVX", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	sspsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, iw, &info);

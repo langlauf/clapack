@@ -1,7 +1,8 @@
-include ../../make.inc
+TOPDIR=../..
+include $(TOPDIR)/make.inc
 
 ########################################################################
-#  This is the makefile for the eigenvalue test program from CLAPACK.
+#  This is the makefile for the eigenvalue test program from LAPACK.
 #  The test files are organized as follows:
 #
 #     AEIGTST -- Auxiliary test routines used in all precisions
@@ -127,24 +128,28 @@ double: ../xeigtstd
 complex16: ../xeigtstz
 
 ../xeigtsts: $(SEIGTST) $(SCIGTST) $(AEIGTST) ; \
-          $(CC) $(LOADOPTS)   -o $@ \
+          $(CC) $(LOADOPTS)   -o xeigtsts \
           $(SEIGTST) $(SCIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
+		  ../../INSTALL/second.o \
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm && mv xeigtsts $@
 
 ../xeigtstc: $(CEIGTST) $(SCIGTST) $(AEIGTST) ; \
-          $(CC) $(LOADOPTS)   -o $@ \
+          $(CC) $(LOADOPTS)   -o xeigtstc \
           $(CEIGTST) $(SCIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
+		  ../../INSTALL/second.o \
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm && mv xeigtstc $@
 
 ../xeigtstd: $(DEIGTST) $(DZIGTST) $(AEIGTST) ; \
-          $(CC) $(LOADOPTS)   -o $@ \
+          $(CC) $(LOADOPTS)   -o xeigtstd \
           $(DEIGTST) $(DZIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
+		  ../../INSTALL/dsecnd.o \
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm && mv xeigtstd $@
 
 ../xeigtstz: $(ZEIGTST) $(DZIGTST) $(AEIGTST) ; \
-          $(CC) $(LOADOPTS)   -o $@ \
+          $(CC) $(LOADOPTS)   -o xeigtstz \
           $(ZEIGTST) $(DZIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
+		  ../../INSTALL/dsecnd.o \
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm && mv xeigtstz $@
 
 $(AEIGTST): $(FRC)
 $(SCIGTST): $(FRC)
@@ -161,13 +166,12 @@ clean:
 	rm -f *.o
 
 schkee.o: schkee.c
-	$(CC) $(DRVCFLAGS)  -c $< -o $@
+	$(CC) $(DRVCFLAGS) -c $< -o $@
 dchkee.o: dchkee.c
-	$(CC) $(DRVCFLAGS)  -c $< -o $@
+	$(CC) $(DRVCFLAGS) -c $< -o $@
 cchkee.o: cchkee.c
-	$(CC) $(DRVCFLAGS)  -c $< -o $@
+	$(CC) $(DRVCFLAGS) -c $< -o $@
 zchkee.o: zchkee.c
-	$(CC) $(DRVCFLAGS)  -c $< -o $@
+	$(CC) $(DRVCFLAGS) -c $< -o $@
 
-.c.o : ; $(CC) $(CFLAGS)  -c $< -o $@
-
+.c.o : ; $(CC) $(CFLAGS) -c $<

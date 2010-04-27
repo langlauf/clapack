@@ -1,4 +1,5 @@
-include ../../make.inc
+TOPDIR=../..
+include $(TOPDIR)/make.inc
 
 # Unix makefile: see README.
 # For C++, first "make hadd".
@@ -27,7 +28,7 @@ include ../../make.inc
 ## or remove both the ld and mv lines above.
 
 MISC =	f77vers.o i77vers.o main.o s_rnge.o abort_.o exit_.o getarg_.o iargc_.o\
-	getenv_.o signal_.o s_stop.o s_paus.o system_.o cabs.o\
+	getenv_.o signal_.o s_stop.o s_paus.o system_.o cabs.o ctype.o\
 	derf_.o derfc_.o erf_.o erfc_.o sig_die.o uninit.o
 POW =	pow_ci.o pow_dd.o pow_di.o pow_hh.o pow_ii.o pow_ri.o pow_zi.o pow_zz.o
 CX =	c_abs.o c_cos.o c_div.o c_exp.o c_log.o c_sin.o c_sqrt.o
@@ -41,8 +42,8 @@ DBL =	d_abs.o d_acos.o d_asin.o d_atan.o d_atn2.o\
 	d_imag.o d_int.o d_lg10.o d_log.o d_mod.o\
 	d_nint.o d_prod.o d_sign.o d_sin.o d_sinh.o\
 	d_sqrt.o d_tan.o d_tanh.o
-INT =	i_abs.o i_dim.o i_dnnt.o i_indx.o i_len.o i_mod.o i_nint.o i_sign.o\
-	lbitbits.o lbitshft.o
+INT =	i_abs.o i_dim.o i_dnnt.o i_indx.o i_len.o i_len_trim.o i_mod.o i_nint.o i_sign.o\
+	lbitbits.o lbitshft.o i_ceiling.o
 HALF =	h_abs.o h_dim.o h_dnnt.o h_indx.o h_len.o h_mod.o h_nint.o h_sign.o
 CMP =	l_ge.o l_gt.o l_le.o l_lt.o hl_ge.o hl_gt.o hl_le.o hl_lt.o
 EFL =	ef1asc_.o ef1cmc_.o
@@ -189,16 +190,17 @@ arith.h: arithchk.c
 check:
 	xsum Notice README abort_.c arithchk.c backspac.c c_abs.c c_cos.c \
 	c_div.c c_exp.c c_log.c c_sin.c c_sqrt.c cabs.c close.c comptry.bat \
+	ctype.c ctype.h \
 	d_abs.c d_acos.c d_asin.c d_atan.c d_atn2.c d_cnjg.c d_cos.c d_cosh.c \
 	d_dim.c d_exp.c d_imag.c d_int.c d_lg10.c d_log.c d_mod.c \
 	d_nint.c d_prod.c d_sign.c d_sin.c d_sinh.c d_sqrt.c d_tan.c \
 	d_tanh.c derf_.c derfc_.c dfe.c dolio.c dtime_.c due.c ef1asc_.c \
 	ef1cmc_.c endfile.c erf_.c erfc_.c err.c etime_.c exit_.c f2c.h0 \
 	f2ch.add f77_aloc.c f77vers.c fio.h fmt.c fmt.h fmtlib.c \
-	fp.h ftell_.c ftell64_.c \
+	fp.h ftell_.c ftell64_.c i_ceiling.c \
 	getarg_.c getenv_.c h_abs.c h_dim.c h_dnnt.c h_indx.c h_len.c \
 	h_mod.c h_nint.c h_sign.c hl_ge.c hl_gt.c hl_le.c hl_lt.c \
-	i77vers.c i_abs.c i_dim.c i_dnnt.c i_indx.c i_len.c i_mod.c \
+	i77vers.c i_abs.c i_dim.c i_dnnt.c i_indx.c i_len.c i_len_trim.c i_mod.c \
 	i_nint.c i_sign.c iargc_.c iio.c ilnw.c inquire.c l_ge.c l_gt.c \
 	l_le.c l_lt.c lbitbits.c lbitshft.c libf2c.lbc libf2c.sy lio.h \
 	lread.c lwrite.c main.c makefile.sy makefile.u makefile.vc \

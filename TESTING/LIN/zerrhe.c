@@ -1,3 +1,15 @@
+/* zerrhe.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -163,7 +175,7 @@ static integer c__4 = 4;
 
 /*        ZHETRF */
 
-	s_copy(srnamc_1.srnamt, "ZHETRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHETRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("ZHETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -179,7 +191,7 @@ static integer c__4 = 4;
 
 /*        ZHETF2 */
 
-	s_copy(srnamc_1.srnamt, "ZHETF2", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHETF2", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("ZHETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -195,7 +207,7 @@ static integer c__4 = 4;
 
 /*        ZHETRI */
 
-	s_copy(srnamc_1.srnamt, "ZHETRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHETRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("ZHETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -211,7 +223,7 @@ static integer c__4 = 4;
 
 /*        ZHETRS */
 
-	s_copy(srnamc_1.srnamt, "ZHETRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHETRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("ZHETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -235,7 +247,7 @@ static integer c__4 = 4;
 
 /*        ZHERFS */
 
-	s_copy(srnamc_1.srnamt, "ZHERFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHERFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zherfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, r__, &info);
@@ -274,7 +286,7 @@ static integer c__4 = 4;
 
 /*        ZHECON */
 
-	s_copy(srnamc_1.srnamt, "ZHECON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHECON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhecon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, &info);
 	chkxer_("ZHECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -300,7 +312,7 @@ static integer c__4 = 4;
 
 /*        ZHPTRF */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRF", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPTRF", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptrf_("/", &c__0, a, ip, &info);
 	chkxer_("ZHPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -312,7 +324,7 @@ static integer c__4 = 4;
 
 /*        ZHPTRI */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRI", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPTRI", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("ZHPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -324,7 +336,7 @@ static integer c__4 = 4;
 
 /*        ZHPTRS */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPTRS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("ZHPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -344,7 +356,7 @@ static integer c__4 = 4;
 
 /*        ZHPRFS */
 
-	s_copy(srnamc_1.srnamt, "ZHPRFS", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPRFS", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		r__, &info);
@@ -373,7 +385,7 @@ static integer c__4 = 4;
 
 /*        ZHPCON */
 
-	s_copy(srnamc_1.srnamt, "ZHPCON", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "ZHPCON", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpcon_("/", &c__0, a, ip, &anrm, &rcond, w, &info);
 	chkxer_("ZHPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &

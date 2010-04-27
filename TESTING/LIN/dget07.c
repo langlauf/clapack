@@ -1,3 +1,15 @@
+/* dget07.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -8,7 +20,7 @@ static integer c__1 = 1;
 /* Subroutine */ int dget07_(char *trans, integer *n, integer *nrhs, 
 	doublereal *a, integer *lda, doublereal *b, integer *ldb, doublereal *
 	x, integer *ldx, doublereal *xact, integer *ldxact, doublereal *ferr, 
-	doublereal *berr, doublereal *reslts)
+	logical *chkferr, doublereal *berr, doublereal *reslts)
 {
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset, xact_dim1, 
@@ -101,6 +113,11 @@ static integer c__1 = 1;
 /*          of the largest entry in (X - XTRUE) divided by the magnitude */
 /*          of the largest entry in X. */
 
+/*  CHKFERR (input) LOGICAL */
+/*          Set to .TRUE. to check FERR, .FALSE. not to check FERR. */
+/*          When the test system is ill-conditioned, the "true" */
+/*          solution in XACT may be incorrect. */
+
 /*  BERR    (input) DOUBLE PRECISION array, dimension (NRHS) */
 /*          The componentwise relative backward error of each solution */
 /*          vector (i.e., the smallest relative change in any entry of A */
@@ -159,41 +176,43 @@ static integer c__1 = 1;
 /*     over all the vectors X and XACT using the infinity-norm. */
 
     errbnd = 0.;
-    i__1 = *nrhs;
-    for (j = 1; j <= i__1; ++j) {
-	imax = idamax_(n, &x[j * x_dim1 + 1], &c__1);
+    if (*chkferr) {
+	i__1 = *nrhs;
+	for (j = 1; j <= i__1; ++j) {
+	    imax = idamax_(n, &x[j * x_dim1 + 1], &c__1);
 /* Computing MAX */
-	d__2 = (d__1 = x[imax + j * x_dim1], abs(d__1));
-	xnorm = max(d__2,unfl);
-	diff = 0.;
-	i__2 = *n;
-	for (i__ = 1; i__ <= i__2; ++i__) {
+	    d__2 = (d__1 = x[imax + j * x_dim1], abs(d__1));
+	    xnorm = max(d__2,unfl);
+	    diff = 0.;
+	    i__2 = *n;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = diff, d__3 = (d__1 = x[i__ + j * x_dim1] - xact[i__ + j * 
-		    xact_dim1], abs(d__1));
-	    diff = max(d__2,d__3);
+		d__2 = diff, d__3 = (d__1 = x[i__ + j * x_dim1] - xact[i__ + 
+			j * xact_dim1], abs(d__1));
+		diff = max(d__2,d__3);
 /* L10: */
-	}
+	    }
 
-	if (xnorm > 1.) {
-	    goto L20;
-	} else if (diff <= ovfl * xnorm) {
-	    goto L20;
-	} else {
-	    errbnd = 1. / eps;
-	    goto L30;
-	}
+	    if (xnorm > 1.) {
+		goto L20;
+	    } else if (diff <= ovfl * xnorm) {
+		goto L20;
+	    } else {
+		errbnd = 1. / eps;
+		goto L30;
+	    }
 
 L20:
-	if (diff / xnorm <= ferr[j]) {
+	    if (diff / xnorm <= ferr[j]) {
 /* Computing MAX */
-	    d__1 = errbnd, d__2 = diff / xnorm / ferr[j];
-	    errbnd = max(d__1,d__2);
-	} else {
-	    errbnd = 1. / eps;
-	}
+		d__1 = errbnd, d__2 = diff / xnorm / ferr[j];
+		errbnd = max(d__1,d__2);
+	    } else {
+		errbnd = 1. / eps;
+	    }
 L30:
-	;
+	    ;
+	}
     }
     reslts[1] = errbnd;
 

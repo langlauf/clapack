@@ -1,3 +1,15 @@
+/* cerrhs.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -11,7 +23,7 @@ struct {
 #define infoc_1 infoc_
 
 struct {
-    char srnamt[6];
+    char srnamt[32];
 } srnamc_;
 
 #define srnamc_1 srnamc_
@@ -153,7 +165,7 @@ static integer c__4 = 4;
 
 /*        CGEBAL */
 
-	s_copy(srnamc_1.srnamt, "CGEBAL", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEBAL", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgebal_("/", &c__0, a, &c__1, &ilo, &ihi, s, &info);
 	chkxer_("CGEBAL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -170,7 +182,7 @@ static integer c__4 = 4;
 
 /*        CGEBAK */
 
-	s_copy(srnamc_1.srnamt, "CGEBAK", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEBAK", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgebak_("/", "R", &c__0, &c__1, &c__0, s, &c__0, a, &c__1, &info);
 	chkxer_("CGEBAK", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -211,7 +223,7 @@ static integer c__4 = 4;
 
 /*        CGEHRD */
 
-	s_copy(srnamc_1.srnamt, "CGEHRD", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CGEHRD", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgehrd_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("CGEHRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -244,7 +256,7 @@ static integer c__4 = 4;
 
 /*        CUNGHR */
 
-	s_copy(srnamc_1.srnamt, "CUNGHR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUNGHR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cunghr_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("CUNGHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -277,7 +289,7 @@ static integer c__4 = 4;
 
 /*        CUNMHR */
 
-	s_copy(srnamc_1.srnamt, "CUNMHR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CUNMHR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	cunmhr_("/", "N", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
 		c__1, w, &c__1, &info);
@@ -362,7 +374,7 @@ static integer c__4 = 4;
 
 /*        CHSEQR */
 
-	s_copy(srnamc_1.srnamt, "CHSEQR", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHSEQR", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chseqr_("/", "N", &c__0, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
@@ -412,7 +424,7 @@ static integer c__4 = 4;
 
 /*        CHSEIN */
 
-	s_copy(srnamc_1.srnamt, "CHSEIN", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CHSEIN", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	chsein_("/", "N", "N", sel, &c__0, a, &c__1, x, vl, &c__1, vr, &c__1, 
 		&c__0, &m, w, rw, ifaill, ifailr, &info);
@@ -457,7 +469,7 @@ static integer c__4 = 4;
 
 /*        CTREVC */
 
-	s_copy(srnamc_1.srnamt, "CTREVC", (ftnlen)6, (ftnlen)6);
+	s_copy(srnamc_1.srnamt, "CTREVC", (ftnlen)32, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrevc_("/", "A", sel, &c__0, a, &c__1, vl, &c__1, vr, &c__1, &c__0, &
 		m, w, rw, &info);

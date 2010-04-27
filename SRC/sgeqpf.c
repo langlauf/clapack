@@ -1,3 +1,15 @@
+/* sgeqpf.f -- translated by f2c (version 20061008).
+   You must link the resulting object file with libf2c:
+	on Microsoft Windows system, link with libf2c.lib;
+	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+	or, if you install libf2c.a in a standard place, with -lf2c -lm
+	-- in that order, at the end of the command line, as in
+		cc *.o -lf2c -lm
+	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+
+		http://www.netlib.org/f2c/libf2c.zip
+*/
+
 #include "f2c.h"
 #include "blaswrap.h"
 
@@ -31,12 +43,13 @@ static integer c__1 = 1;
 	    *, integer *, real *, integer *, real *, real *, integer *, real *
 , integer *);
     extern doublereal slamch_(char *);
-    extern /* Subroutine */ int xerbla_(char *, integer *), slarfg_(
-	    integer *, real *, real *, integer *, real *);
+    extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
+    extern /* Subroutine */ int slarfp_(integer *, real *, real *, integer *, 
+	    real *);
 
 
-/*  -- LAPACK deprecated driver routine (version 3.1) -- */
+/*  -- LAPACK deprecated driver routine (version 3.2) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
 /*     November 2006 */
 
@@ -226,10 +239,10 @@ static integer c__1 = 1;
 
 	    if (i__ < *m) {
 		i__2 = *m - i__ + 1;
-		slarfg_(&i__2, &a[i__ + i__ * a_dim1], &a[i__ + 1 + i__ * 
+		slarfp_(&i__2, &a[i__ + i__ * a_dim1], &a[i__ + 1 + i__ * 
 			a_dim1], &c__1, &tau[i__]);
 	    } else {
-		slarfg_(&c__1, &a[*m + *m * a_dim1], &a[*m + *m * a_dim1], &
+		slarfp_(&c__1, &a[*m + *m * a_dim1], &a[*m + *m * a_dim1], &
 			c__1, &tau[*m]);
 	    }
 
